@@ -20,6 +20,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/health', HealthController::class)->name('health');
 
+/*
+|--------------------------------------------------------------------------
+| Territories & Logistics Zones
+|--------------------------------------------------------------------------
+*/
+Route::prefix('territories')->name('territories.')->group(function () {
+    Route::get('/countries', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'countries'])->name('countries');
+    Route::get('/countries/{country}/governorates', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'governorates'])->name('governorates');
+    Route::get('/governorates/{governorate}/cities', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'cities'])->name('cities');
+    Route::get('/cities/{city}/districts', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'districts'])->name('districts');
+    Route::get('/zones', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'zones'])->name('zones');
+    Route::post('/zones/resolve', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'resolveZone'])->name('zones.resolve');
+});
+
 Route::middleware('throttle:auth')->group(function () {
     Route::post('/auth/register', [AuthController::class, 'register'])->name('auth.register');
     Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
@@ -28,6 +42,7 @@ Route::middleware('throttle:auth')->group(function () {
 // Gateway callbacks — authenticated by signature, not by session/token.
 Route::post('/webhooks/payments/{gateway}', PaymentWebhookController::class)
     ->whereIn('gateway', ['stripe', 'paymob', 'fawry', 'paytabs'])
+    ->middleware('throttle:webhooks')
     ->name('webhooks.payments');
 
 /*

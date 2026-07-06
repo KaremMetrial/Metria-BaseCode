@@ -20,6 +20,8 @@ class RolesAndPermissionsSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = [
+            // Super Admin override
+            'admin.super',
             // Users
             'users.view', 'users.create', 'users.update', 'users.delete',
             // Roles
@@ -28,6 +30,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'payments.view', 'payments.create', 'payments.refund',
             // Wallets
             'wallets.view', 'wallets.adjust',
+            // Territories & Logistics
+            'territories.view', 'territories.manage',
+            'zones.view', 'zones.manage',
+            'couriers.track',
             // Governance
             'governance.settings.view', 'governance.settings.manage',
             'governance.flags.manage',
@@ -43,13 +49,21 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $roles = [
             'super-admin' => $permissions,
-            'admin' => array_diff($permissions, ['roles.manage']),
+            'admin' => array_diff($permissions, ['roles.manage', 'admin.super']),
             'finance' => [
                 'payments.view', 'payments.refund',
                 'wallets.view', 'wallets.adjust',
                 'governance.approvals.view', 'governance.approvals.decide',
             ],
-            'support' => ['users.view', 'payments.view', 'wallets.view'],
+            'logistics-dispatcher' => [
+                'territories.view', 'territories.manage',
+                'zones.view', 'zones.manage',
+                'couriers.track',
+            ],
+            'courier' => [
+                'territories.view', 'zones.view', 'couriers.track',
+            ],
+            'support' => ['users.view', 'payments.view', 'wallets.view', 'territories.view', 'zones.view'],
             'customer' => [],
         ];
 

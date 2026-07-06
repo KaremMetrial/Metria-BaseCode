@@ -38,6 +38,9 @@ trait ApiResponses
 
         if ($data instanceof JsonResource && ! $data instanceof ResourceCollection) {
             $payload['data'] = $data->resolve(request());
+            if (! empty($data->additional)) {
+                $payload = array_merge($payload, $data->additional);
+            }
         }
 
         return response()->json($payload, $status);

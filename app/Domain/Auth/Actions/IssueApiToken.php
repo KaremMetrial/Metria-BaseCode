@@ -26,7 +26,15 @@ class IssueApiToken
             throw new ApiException(__('auth.failed'), status: 401, errorCode: 'invalid_credentials');
         }
 
-        $token = $user->createToken($deviceName)->plainTextToken;
+        $abilities = $user->hasPermissionTo('admin.super')
+            ? ['*']
+            : $user->getPermissionsViaRoles()->pluck('name')->toArray();
+
+        if (empty($abilities)) {
+            $abilities = ['*'];
+        }
+
+        $token = $user->createToken($deviceName, $abilities)->plainTextToken;
 
         $this->audit->log('auth.login', $user);
 

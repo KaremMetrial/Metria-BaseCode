@@ -15,6 +15,7 @@ use App\Http\Resources\ApprovalRequestResource;
 use App\Http\Resources\PaymentResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PaymentController extends ApiController
 {
@@ -65,10 +66,7 @@ class PaymentController extends ApiController
 
     public function show(Request $request, Payment $payment): JsonResponse
     {
-        abort_unless(
-            $payment->user_id === $request->user()->id || $request->user()->can('payments.view'),
-            403,
-        );
+        Gate::authorize('view', $payment);
 
         return $this->respond(new PaymentResource($payment));
     }
@@ -76,6 +74,7 @@ class PaymentController extends ApiController
     /** Maker-checker: creates an approval request (or refunds directly when approvals are off). */
     public function refund(RefundPaymentRequest $request, Payment $payment): JsonResponse
     {
+        Gate::authorize('refund', $payment);
         $amount = $request->validated('amount') !== null
             ? Money::fromDecimal($request->validated('amount'), $payment->currency)
             : null;

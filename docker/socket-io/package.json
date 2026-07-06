@@ -1,0 +1,22 @@
+{
+  "name": "metrial-socket-io-server",
+  "version": "1.0.0",
+  "description": "Enterprise Real-Time Socket.IO Server for Metrial Base Code (Redis Pub/Sub Bridge)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "ioredis": "^5.4.2",
+    "socket.io": "^4.8.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Metrial Enterprise Team",
+  "license": "MIT"
+}

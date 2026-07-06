@@ -27,6 +27,10 @@ class ResolveTenant
 
         $this->manager->set($tenantId);
 
+        if ($tenantId !== null && function_exists('setPermissionsTeamId')) {
+            setPermissionsTeamId($tenantId);
+        }
+
         return $next($request);
     }
 }

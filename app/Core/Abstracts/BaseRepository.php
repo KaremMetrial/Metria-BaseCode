@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core\Abstracts;
 
 use App\Core\Contracts\RepositoryInterface;
+use App\Core\Support\Filters\QueryFilter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -46,6 +47,21 @@ abstract class BaseRepository implements RepositoryInterface
         );
 
         return $this->query()->latest()->paginate($perPage);
+    }
+
+    public function filter(QueryFilter $filter): Builder
+    {
+        return $filter->apply($this->query());
+    }
+
+    public function getFiltered(QueryFilter $filter, ?int $perPage = null): LengthAwarePaginator
+    {
+        $perPage = min(
+            $perPage ?? (int) config('core.api.per_page', 20),
+            (int) config('core.api.max_per_page', 100),
+        );
+
+        return $this->filter($filter)->paginate($perPage);
     }
 
     public function create(array $attributes): Model

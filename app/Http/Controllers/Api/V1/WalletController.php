@@ -10,12 +10,14 @@ use App\Http\Resources\WalletResource;
 use App\Http\Resources\WalletTransactionResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class WalletController extends ApiController
 {
     public function show(Request $request, WalletService $wallets): JsonResponse
     {
         $wallet = $wallets->firstOrCreateFor($request->user());
+        Gate::authorize('view', $wallet);
 
         return $this->respond(new WalletResource($wallet));
     }
@@ -23,6 +25,7 @@ class WalletController extends ApiController
     public function transactions(Request $request, WalletService $wallets): JsonResponse
     {
         $wallet = $wallets->firstOrCreateFor($request->user());
+        Gate::authorize('viewTransactions', $wallet);
 
         $transactions = $wallet->transactions()
             ->with('wallet:id,currency')

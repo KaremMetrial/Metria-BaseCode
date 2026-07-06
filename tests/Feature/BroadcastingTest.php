@@ -68,6 +68,10 @@ class BroadcastingTest extends TestCase
 
     public function test_private_channel_authorization_allows_owner_and_rejects_unauthorized_users(): void
     {
+        // Use a driver that enforces channel authorization rules (log driver ignores auth callbacks)
+        config(['broadcasting.default' => 'redis']);
+        require base_path('routes/channels.php');
+
         $owner = User::factory()->create();
         $otherUser = User::factory()->create();
         $wallet = $this->walletService()->firstOrCreateFor($owner, 'EGP');
@@ -99,6 +103,27 @@ class BroadcastingTest extends TestCase
             'socket_id' => '1234.5678',
         ]);
         $response->assertStatus(403);
+    }
+
+    public function test_presence_channel_authorization_returns_user_data(): void
+    {
+        config(['broadcasting.default' => 'redis']);
+        require base_path('routes/channels.php');
+
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/v1/broadcasting/auth', [
+            'channel_name' => 'presence-territories.zone.downtown',
+            'socket_id' => '1234.5678',
+        ]);
+
+        $response->assertSuccessful();
+        $response->assertJsonStructure([
+            'channel_data' => [
+                'user_id',
+                'user_info' => ['id', 'name', 'email'],
+            ],
+        ]);
     }
 
     public function test_dual_broadcaster_driver_can_be_resolved_and_dispatches_cleanly(): void
