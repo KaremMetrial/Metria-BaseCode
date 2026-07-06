@@ -6,8 +6,8 @@ namespace App\Core\Exceptions;
 
 class DomainException extends ApiException
 {
-    public function __construct(string $message, string $errorCode = 'domain_error', array $context = [])
+    public function __construct(string $message, string $errorCode = 'domain_error', array $context = [], ?\Throwable $previous = null)
     {
-        parent::__construct($message, status: 422, errorCode: $errorCode, context: $context);
+        parent::__construct($message, status: 422, errorCode: $errorCode, context: $context, previous: $previous);
     }
 }

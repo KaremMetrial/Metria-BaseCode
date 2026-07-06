@@ -6,8 +6,8 @@ namespace App\Core\Exceptions;
 
 class PaymentException extends ApiException
 {
-    public function __construct(string $message, string $errorCode = 'payment_error', array $context = [])
+    public function __construct(string $message, string $errorCode = 'payment_error', array $context = [], ?\Throwable $previous = null)
     {
-        parent::__construct($message, status: 402, errorCode: $errorCode, context: $context);
+        parent::__construct($message, status: 402, errorCode: $errorCode, context: $context, previous: $previous);
     }
 }

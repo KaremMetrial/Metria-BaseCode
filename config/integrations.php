@@ -46,7 +46,8 @@ return [
     */
     'push' => [
         'fcm' => [
-            'server_key' => env('FCM_SERVER_KEY'),
+            'credentials' => env('FCM_CREDENTIALS'), // Path to JSON file or raw JSON string
+            'project_id' => env('FCM_PROJECT_ID'),
         ],
     ],
 
