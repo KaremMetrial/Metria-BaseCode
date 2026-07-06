@@ -56,6 +56,8 @@ class RbacTenantScopingTest extends TestCase
 
     public function test_tenant_header_sets_tenant_context_in_middleware(): void
     {
+        config(['tenancy.enabled' => true]);
+
         \Illuminate\Support\Facades\DB::table('tenants')->insert([
             'id' => 'org-default-123',
             'name' => 'Default Org',
@@ -70,6 +72,6 @@ class RbacTenantScopingTest extends TestCase
         $response = $this->actingAs($user)->withHeader('X-Tenant', 'org-custom-456')->getJson('/api/v1/auth/me');
 
         $response->assertStatus(200);
-        $this->assertEquals('org-custom-456', app(\App\Core\Tenancy\TenantManager::class)->get());
+        $this->assertEquals('org-custom-456', app(\App\Core\Tenancy\TenantManager::class)->id());
     }
 }
