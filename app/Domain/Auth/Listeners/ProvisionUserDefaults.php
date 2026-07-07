@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Listeners;
 
+use App\Domain\Auth\Notifications\WelcomeNotification;
 use App\Domain\Wallet\Services\WalletService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -25,5 +26,7 @@ class ProvisionUserDefaults implements ShouldQueue
         if (method_exists($event->user, 'hasAnyRole') && ! $event->user->hasAnyRole()) {
             $event->user->assignRole('customer');
         }
+
+        $event->user->notify(new WelcomeNotification);
     }
 }
