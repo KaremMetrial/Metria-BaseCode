@@ -49,7 +49,7 @@ class CurrencyConversionService
         }
 
         // Find default/base currency
-        $baseCurrencyCode = config('payments.currency', 'EGP');
+        $baseCurrencyCode = config('currencies.base_currency', config('payments.currency', 'EGP'));
 
         // Fetch rates to base
         $sourceRate = null;

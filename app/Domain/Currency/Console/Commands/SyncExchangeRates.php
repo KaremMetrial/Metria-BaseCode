@@ -24,7 +24,7 @@ class SyncExchangeRates extends Command
     ): int {
         $this->info('Starting exchange rate synchronization...');
 
-        $baseCurrency = config('payments.currency', 'EGP');
+        $baseCurrency = config('currencies.base_currency', config('payments.currency', 'EGP'));
         $activeCurrencies = Currency::where('is_active', true)
             ->where('code', '!=', $baseCurrency)
             ->get();
