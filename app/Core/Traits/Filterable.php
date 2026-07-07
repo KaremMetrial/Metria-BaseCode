@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Traits;
 
-use App\Core\Support\Filters\QueryFilter;
+use App\Core\Abstracts\QueryFilter;
 use Illuminate\Database\Eloquent\Builder;
 
 /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Currency\Services;
 
-use App\Core\Support\CurrencyRegistryResolver;
+use App\Core\Contracts\CurrencyRegistryResolver;
 use App\Domain\Currency\Models\Currency;
 use Illuminate\Support\Facades\Cache;
 

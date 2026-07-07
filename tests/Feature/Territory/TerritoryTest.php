@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Feature\Territory;
 
 use App\Domain\Territory\Events\ZoneStatusChanged;
 use App\Domain\Territory\Models\Country;

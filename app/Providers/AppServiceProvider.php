@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Core\Support\CurrencyRegistryResolver;
+use App\Core\Contracts\CurrencyRegistryResolver;
 use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
 use App\Domain\Currency\Providers\CurrencyExchangeApiProvider;
 use App\Domain\Currency\Providers\ExchangeRateProviderChain;

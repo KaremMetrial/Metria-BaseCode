@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Core\Abstracts;
 
 use App\Core\Contracts\RepositoryInterface;
-use App\Core\Support\Filters\QueryFilter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;

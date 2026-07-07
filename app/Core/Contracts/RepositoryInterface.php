@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Contracts;
 
-use App\Core\Support\Filters\QueryFilter;
+use App\Core\Abstracts\QueryFilter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;

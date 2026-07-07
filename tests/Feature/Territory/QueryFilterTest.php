@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Feature\Territory;
 
 use Database\Seeders\TerritorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

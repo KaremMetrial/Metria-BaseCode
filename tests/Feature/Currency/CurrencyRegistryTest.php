@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Feature\Currency;
 
 use App\Core\Support\Money;
 use App\Domain\Auth\Models\User;

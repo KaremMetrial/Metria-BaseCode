@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Feature\Integration;
 
 use App\Core\Exceptions\IntegrationException;
 use App\Domain\Integration\Push\FcmPushProvider;

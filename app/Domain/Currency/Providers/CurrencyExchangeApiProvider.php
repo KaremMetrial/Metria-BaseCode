@@ -34,6 +34,7 @@ class CurrencyExchangeApiProvider implements ExchangeRateProviderInterface
      * Fetch the exchange rate for a currency code relative to base currency.
      *
      * @return array{rate: string, response_hash: string, original_payload: string, request_id: string}
+     *
      * @throws Exception If API call fails, times out, or returns an invalid schema.
      */
     public function fetchRate(string $currencyCode): array
@@ -54,7 +55,7 @@ class CurrencyExchangeApiProvider implements ExchangeRateProviderInterface
 
         if ($response->failed()) {
             throw new Exception(
-                "CurrencyExchangeAPI failed syncing {$targetCurrency}: HTTP {$response->status()} - " . $response->body()
+                "CurrencyExchangeAPI failed syncing {$targetCurrency}: HTTP {$response->status()} - ".$response->body()
             );
         }
 
@@ -73,7 +74,7 @@ class CurrencyExchangeApiProvider implements ExchangeRateProviderInterface
             'rate' => $rateString,
             'response_hash' => hash('sha256', $rawPayload),
             'original_payload' => $rawPayload,
-            'request_id' => 'ceapi-' . uniqid('', true),
+            'request_id' => 'ceapi-'.uniqid('', true),
         ];
     }
 }

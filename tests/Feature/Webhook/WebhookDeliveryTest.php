@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Feature\Webhook;
 
 use App\Domain\Webhook\Jobs\DeliverWebhook;
 use App\Domain\Webhook\Models\WebhookDelivery;

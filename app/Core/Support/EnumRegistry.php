@@ -23,7 +23,7 @@ class EnumRegistry
     /**
      * Register an enum class dynamically (useful for third-party modules or plugins).
      *
-     * @param class-string<UnitEnum|BackedEnum> $enumClass
+     * @param  class-string<UnitEnum|BackedEnum>  $enumClass
      */
     public static function register(string $key, string $enumClass): void
     {
@@ -66,7 +66,7 @@ class EnumRegistry
     /**
      * Format an enum class into a standardized list of objects.
      *
-     * @param class-string<UnitEnum|BackedEnum> $enumClass
+     * @param  class-string<UnitEnum|BackedEnum>  $enumClass
      * @return list<array{name: string, value: string|int, label: string}>
      */
     private static function formatEnum(string $enumClass): array

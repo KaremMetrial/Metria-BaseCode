@@ -18,7 +18,6 @@ use App\Domain\Payment\Events\PaymentFailed;
 use App\Domain\Payment\Events\PaymentRefunded;
 use App\Domain\Payment\Events\PaymentSucceeded;
 use App\Domain\Payment\Models\Payment;
-use App\Domain\Payment\Services\PaymentManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
