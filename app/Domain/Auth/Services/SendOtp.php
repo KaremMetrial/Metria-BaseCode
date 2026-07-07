@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Auth\Services;
 
 use App\Core\Events\EventBus;
+use App\Core\Exceptions\ApiException;
 use App\Domain\Auth\Events\OtpGenerated;
 use App\Domain\Auth\Models\OtpCode;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,22 @@ class SendOtp
     public function __invoke(string $identifier, string $action, string $guard = 'web'): OtpCode
     {
         return DB::transaction(function () use ($identifier, $action, $guard) {
+            // Enforce a 60-second cooldown on resending OTP
+            $recentOtp = OtpCode::query()
+                ->where('identifier', $identifier)
+                ->where('guard', $guard)
+                ->where('action', $action)
+                ->where('created_at', '>=', now()->subSeconds(60))
+                ->first();
+
+            if ($recentOtp) {
+                throw new ApiException(
+                    __('auth.otp_cooldown', ['seconds' => max(1, 60 - now()->diffInSeconds($recentOtp->created_at))]),
+                    status: 429,
+                    errorCode: 'otp_throttle'
+                );
+            }
+
             // Deactivate any existing active OTP codes for this identifier, guard, and action
             OtpCode::query()
                 ->where('identifier', $identifier)

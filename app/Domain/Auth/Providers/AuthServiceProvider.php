@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Providers;
 
+use App\Domain\Auth\Console\PruneExpiredTokens;
 use App\Domain\Auth\Events\OtpGenerated;
 use App\Domain\Auth\Events\UserLoggedIn;
 use App\Domain\Auth\Events\UserLoggedInByOtp;
@@ -22,5 +23,11 @@ class AuthServiceProvider extends ServiceProvider
         Event::listen(UserRegisteredByOtp::class, ProvisionUserDefaults::class);
         Event::listen(UserLoggedIn::class, SendLoginAlert::class);
         Event::listen(UserLoggedInByOtp::class, SendLoginAlert::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PruneExpiredTokens::class,
+            ]);
+        }
     }
 }
