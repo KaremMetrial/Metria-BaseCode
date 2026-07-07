@@ -19,15 +19,19 @@ class SettingsService
 
     public function get(string $key, mixed $default = null): mixed
     {
-        return Cache::remember(
+        $cached = Cache::remember(
             self::CACHE_PREFIX.$key,
             self::TTL,
-            function () use ($key, $default) {
+            function () use ($key) {
                 $setting = Setting::query()->where('key', $key)->first();
 
-                return $setting?->value['data'] ?? $default;
+                return $setting
+                    ? ['exists' => true, 'value' => $setting->value['data']]
+                    : ['exists' => false, 'value' => null];
             },
         );
+
+        return $cached['exists'] ? $cached['value'] : $default;
     }
 
     public function set(string $key, mixed $value, ?string $description = null): void
