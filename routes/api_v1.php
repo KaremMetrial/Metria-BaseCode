@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Governance\SettingsController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentWebhookController;
+use App\Http\Controllers\Api\V1\TerritoryController;
 use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Controllers\Api\V1\WebhookEndpointController;
 use Illuminate\Support\Facades\Route;
@@ -26,12 +27,12 @@ Route::get('/health', HealthController::class)->name('health');
 |--------------------------------------------------------------------------
 */
 Route::prefix('territories')->name('territories.')->group(function () {
-    Route::get('/countries', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'countries'])->name('countries');
-    Route::get('/countries/{country}/governorates', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'governorates'])->name('governorates');
-    Route::get('/governorates/{governorate}/cities', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'cities'])->name('cities');
-    Route::get('/cities/{city}/districts', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'districts'])->name('districts');
-    Route::get('/zones', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'zones'])->name('zones');
-    Route::post('/zones/resolve', [\App\Http\Controllers\Api\V1\TerritoryController::class, 'resolveZone'])->name('zones.resolve');
+    Route::get('/countries', [TerritoryController::class, 'countries'])->name('countries');
+    Route::get('/countries/{country}/governorates', [TerritoryController::class, 'governorates'])->name('governorates');
+    Route::get('/governorates/{governorate}/cities', [TerritoryController::class, 'cities'])->name('cities');
+    Route::get('/cities/{city}/districts', [TerritoryController::class, 'districts'])->name('districts');
+    Route::get('/zones', [TerritoryController::class, 'zones'])->name('zones');
+    Route::post('/zones/resolve', [TerritoryController::class, 'resolveZone'])->name('zones.resolve');
 });
 
 Route::middleware('throttle:auth')->group(function () {

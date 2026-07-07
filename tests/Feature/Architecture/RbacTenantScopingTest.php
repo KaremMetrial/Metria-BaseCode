@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Architecture;
 
+use App\Core\Tenancy\TenantManager;
 use App\Domain\Auth\Actions\IssueApiToken;
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\AuditLogger;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -58,7 +59,7 @@ class RbacTenantScopingTest extends TestCase
     {
         config(['tenancy.enabled' => true]);
 
-        \Illuminate\Support\Facades\DB::table('tenants')->insert([
+        DB::table('tenants')->insert([
             'id' => 'org-default-123',
             'name' => 'Default Org',
             'slug' => 'default-org',
@@ -72,6 +73,6 @@ class RbacTenantScopingTest extends TestCase
         $response = $this->actingAs($user)->withHeader('X-Tenant', 'org-custom-456')->getJson('/api/v1/auth/me');
 
         $response->assertStatus(200);
-        $this->assertEquals('org-custom-456', app(\App\Core\Tenancy\TenantManager::class)->id());
+        $this->assertEquals('org-custom-456', app(TenantManager::class)->id());
     }
 }

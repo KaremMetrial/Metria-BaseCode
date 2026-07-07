@@ -43,52 +43,60 @@ class ApprovalService
 
     public function approve(ApprovalRequest $request, User $approver): ApprovalRequest
     {
-        $this->assertPending($request);
-
         if ((string) $request->requested_by === (string) $approver->getKey()) {
             throw new DomainException(__('governance.cannot_approve_own_request'), 'self_approval_forbidden');
         }
 
         return DB::transaction(function () use ($request, $approver) {
-            $request->forceFill([
+            /** @var ApprovalRequest $lockedRequest */
+            $lockedRequest = ApprovalRequest::query()->lockForUpdate()->findOrFail($request->getKey());
+
+            $this->assertPending($lockedRequest);
+
+            $lockedRequest->forceFill([
                 'status' => ApprovalStatus::Approved,
                 'decided_by' => $approver->getKey(),
                 'decided_at' => now(),
             ])->save();
 
             try {
-                $handler = app($this->handlerFor($request->action));
-                $handler($request->payload, $request);
+                $handler = app($this->handlerFor($lockedRequest->action));
+                $handler($lockedRequest->payload, $lockedRequest);
 
-                $request->forceFill(['status' => ApprovalStatus::Executed])->save();
+                $lockedRequest->forceFill(['status' => ApprovalStatus::Executed])->save();
             } catch (Throwable $e) {
                 report($e);
-                $request->forceFill([
+                $lockedRequest->forceFill([
                     'status' => ApprovalStatus::Failed,
                     'reason' => mb_substr($e->getMessage(), 0, 500),
                 ])->save();
             }
 
-            $this->audit->log('approval.decided', $request, newValues: ['status' => $request->status->value]);
+            $this->audit->log('approval.decided', $lockedRequest, newValues: ['status' => $lockedRequest->status->value]);
 
-            return $request->refresh();
+            return $lockedRequest->refresh();
         });
     }
 
     public function reject(ApprovalRequest $request, User $approver, ?string $reason = null): ApprovalRequest
     {
-        $this->assertPending($request);
+        return DB::transaction(function () use ($request, $approver, $reason) {
+            /** @var ApprovalRequest $lockedRequest */
+            $lockedRequest = ApprovalRequest::query()->lockForUpdate()->findOrFail($request->getKey());
 
-        $request->forceFill([
-            'status' => ApprovalStatus::Rejected,
-            'decided_by' => $approver->getKey(),
-            'decided_at' => now(),
-            'reason' => $reason,
-        ])->save();
+            $this->assertPending($lockedRequest);
 
-        $this->audit->log('approval.rejected', $request, newValues: ['reason' => $reason]);
+            $lockedRequest->forceFill([
+                'status' => ApprovalStatus::Rejected,
+                'decided_by' => $approver->getKey(),
+                'decided_at' => now(),
+                'reason' => $reason,
+            ])->save();
 
-        return $request;
+            $this->audit->log('approval.rejected', $lockedRequest, newValues: ['reason' => $reason]);
+
+            return $lockedRequest->refresh();
+        });
     }
 
     private function assertPending(ApprovalRequest $request): void
@@ -107,6 +115,6 @@ class ApprovalService
 
     private function handlerFor(string $action): string
     {
-        return config("governance.approvals.handlers.{$action}");
+        return config('governance.approvals.handlers')[$action];
     }
 }

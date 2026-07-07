@@ -95,6 +95,6 @@ class TerritoryFilter extends QueryFilter
         [$latMin, $lngMin, $latMax, $lngMax] = array_map('floatval', $parts);
 
         $this->builder->whereBetween('latitude', [min($latMin, $latMax), max($latMin, $latMax)])
-                      ->whereBetween('longitude', [min($lngMin, $lngMax), max($lngMin, $lngMax)]);
+            ->whereBetween('longitude', [min($lngMin, $lngMax), max($lngMin, $lngMax)]);
     }
 }

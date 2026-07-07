@@ -36,7 +36,7 @@ class PublishOutboxMessages extends Command
                 ->where('attempts', '<', $maxAttempts)
                 ->orderBy('occurred_at')
                 ->limit($batch)
-                ->lockForUpdate()
+                ->lock('FOR UPDATE SKIP LOCKED')
                 ->get();
 
             foreach ($messages as $message) {

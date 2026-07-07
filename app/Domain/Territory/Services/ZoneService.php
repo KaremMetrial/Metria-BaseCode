@@ -31,7 +31,7 @@ class ZoneService
             if ($tenantId !== null) {
                 $query->where(function ($q) use ($tenantId) {
                     $q->where('tenant_id', $tenantId)
-                      ->orWhereNull('tenant_id');
+                        ->orWhereNull('tenant_id');
                 });
             }
 

@@ -91,6 +91,7 @@ class PaymentService
             ->firstOrFail();
 
         return DB::transaction(function () use ($payment, $webhook) {
+            $payment = Payment::query()->lockForUpdate()->findOrFail($payment->id);
             $previous = $payment->status;
 
             if ($previous === $webhook->status) {
@@ -147,6 +148,9 @@ class PaymentService
         $result = $driver->refund($payment, $amount);
 
         return DB::transaction(function () use ($payment, $amount, $result) {
+            $payment = Payment::query()->lockForUpdate()->findOrFail($payment->id);
+            $this->assertRefundable($payment, $amount);
+
             $refunded = ($amount ?? $payment->remainingRefundable())->amount;
 
             $payment->update([

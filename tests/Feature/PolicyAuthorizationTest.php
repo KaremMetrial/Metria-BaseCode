@@ -22,7 +22,7 @@ class PolicyAuthorizationTest extends TestCase
         return Payment::create([
             'user_id' => $user->id,
             'gateway' => 'stripe',
-            'gateway_reference' => 'pi_test_' . uniqid(),
+            'gateway_reference' => 'pi_test_'.uniqid(),
             'amount' => 5000,
             'currency' => 'EGP',
             'status' => PaymentStatus::Succeeded,

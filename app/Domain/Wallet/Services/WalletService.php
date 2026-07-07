@@ -121,6 +121,15 @@ class WalletService
     public function settleHold(Wallet $from, Wallet $to, Money $amount, ?string $description = null, ?Model $reference = null): void
     {
         DB::transaction(function () use ($from, $to, $amount, $description, $reference) {
+            // Deterministic lock ordering to prevent deadlocks:
+            if (strcmp((string) $from->getKey(), (string) $to->getKey()) < 0) {
+                $this->locked($from);
+                $this->locked($to);
+            } else {
+                $this->locked($to);
+                $this->locked($from);
+            }
+
             $this->captureHold($from, $amount, $description, $reference);
             $this->credit($to, $amount, $description, $reference);
         });

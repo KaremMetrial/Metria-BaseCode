@@ -14,10 +14,10 @@ return new class extends Migration
             $table->foreignUuid('city_id')->nullable()->constrained('cities')->nullOnDelete();
             $table->json('name'); // {"en": "New Cairo Logistics Zone", "ar": "نطاق توصيل القاهرة الجديدة"}
             $table->string('code', 100)->index(); // unique per tenant handled in app logic
-            
+
             // Flexible geospatial storage (JSON array of [lat, lng] polygon points)
             $table->json('polygon_coordinates')->nullable();
-            
+
             $table->boolean('is_active')->default(true)->index();
             $table->softDeletes();
             $table->timestamps();
