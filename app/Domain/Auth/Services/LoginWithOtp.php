@@ -29,10 +29,12 @@ class LoginWithOtp
         $provider = config("auth.guards.{$guard}.provider");
         $modelClass = config("auth.providers.{$provider}.model") ?? User::class;
 
-        // 3. Find the user by phone or email
+        // 3. Find the user by phone or email (scoped correctly within tenant bounds)
         $user = $modelClass::query()
-            ->where('email', $identifier)
-            ->orWhere('phone', $identifier)
+            ->where(function ($q) use ($identifier) {
+                $q->where('email', $identifier)
+                    ->orWhere('phone', $identifier);
+            })
             ->first();
 
         if (! $user) {
