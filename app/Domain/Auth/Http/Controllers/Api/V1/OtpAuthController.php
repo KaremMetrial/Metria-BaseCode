@@ -39,6 +39,15 @@ class OtpAuthController extends ApiController
             $request->string('device_name', 'api')->value()
         );
 
+        if ($request->filled('device_token') && method_exists($user, 'updateFcmDeviceToken')) {
+            $user->updateFcmDeviceToken(
+                $request->string('device_token')->value(),
+                $request->string('device_id')->value() ?: null,
+                $request->string('device_name')->value() ?: null,
+                $request->string('platform')->value() ?: null
+            );
+        }
+
         $userData = ($user instanceof User)
             ? (new UserResource($user->load('roles')))->resolve()
             : $user->toArray();
@@ -56,6 +65,15 @@ class OtpAuthController extends ApiController
             $request->string('guard', 'web')->value(),
             $request->string('device_name', 'api')->value()
         );
+
+        if ($request->filled('device_token') && method_exists($user, 'updateFcmDeviceToken')) {
+            $user->updateFcmDeviceToken(
+                $request->string('device_token')->value(),
+                $request->string('device_id')->value() ?: null,
+                $request->string('device_name')->value() ?: null,
+                $request->string('platform')->value() ?: null
+            );
+        }
 
         $userData = ($user instanceof User)
             ? (new UserResource($user->load('roles')))->resolve()

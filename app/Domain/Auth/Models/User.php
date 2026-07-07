@@ -10,6 +10,7 @@ use App\Domain\Governance\Traits\Auditable;
 use App\Domain\Wallet\Models\Wallet;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -49,6 +50,25 @@ class User extends Authenticatable
     public function wallet(): HasOne
     {
         return $this->hasOne(Wallet::class);
+    }
+
+    public function fcmDeviceTokens(): HasMany
+    {
+        return $this->hasMany(FcmDeviceToken::class);
+    }
+
+    public function updateFcmDeviceToken(string $token, ?string $deviceId = null, ?string $deviceName = null, ?string $platform = null): FcmDeviceToken
+    {
+        FcmDeviceToken::query()->where('device_token', $token)->where('user_id', '!=', $this->id)->delete();
+
+        return $this->fcmDeviceTokens()->updateOrCreate(
+            ['device_token' => $token],
+            [
+                'device_id' => $deviceId,
+                'device_name' => $deviceName,
+                'platform' => $platform,
+            ]
+        );
     }
 
     protected static function newFactory()

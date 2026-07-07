@@ -22,6 +22,10 @@ class OtpRegisterRequest extends FormRequest
             'guard' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'string', 'email', 'max:255'],
             'locale' => ['nullable', 'string', 'in:'.implode(',', config('localization.supported', ['en', 'ar']))],
+            'device_token' => ['nullable', 'string', 'max:1000'],
+            'device_id' => ['nullable', 'string', 'max:255'],
+            'device_name' => ['nullable', 'string', 'max:255'],
+            'platform' => ['nullable', 'string', 'in:ios,android,web'],
         ];
     }
 }

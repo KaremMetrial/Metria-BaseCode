@@ -72,6 +72,7 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
     Route::prefix('auth')->name('auth.')->group(function () {
         Route::get('/me', [AuthController::class, 'me'])->name('me');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::post('/fcm-token', [AuthController::class, 'updateFcmToken'])->name('fcm-token');
     });
 
     // Wallet Ledger

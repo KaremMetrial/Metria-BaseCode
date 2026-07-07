@@ -22,6 +22,10 @@ class RegisterRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:32'],
             'password' => ['required', 'string', Password::min(8), 'confirmed'],
             'locale' => ['nullable', 'string', 'in:'.implode(',', config('localization.supported', ['en', 'ar']))],
+            'device_token' => ['nullable', 'string', 'max:1000'],
+            'device_id' => ['nullable', 'string', 'max:255'],
+            'device_name' => ['nullable', 'string', 'max:255'],
+            'platform' => ['nullable', 'string', 'in:ios,android,web'],
         ];
     }
 }

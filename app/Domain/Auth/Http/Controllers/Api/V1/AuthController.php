@@ -7,6 +7,7 @@ namespace App\Domain\Auth\Http\Controllers\Api\V1;
 use App\Core\Http\Controllers\ApiController;
 use App\Domain\Auth\Http\Requests\LoginRequest;
 use App\Domain\Auth\Http\Requests\RegisterRequest;
+use App\Domain\Auth\Http\Requests\UpdateFcmTokenRequest;
 use App\Domain\Auth\Http\Resources\UserResource;
 use App\Domain\Auth\Services\IssueApiToken;
 use App\Domain\Auth\Services\RegisterUser;
@@ -20,6 +21,15 @@ class AuthController extends ApiController
         $user = $register($request->validated());
 
         ['token' => $token] = $issueToken($user->email, $request->string('password')->value());
+
+        if ($request->filled('device_token')) {
+            $user->updateFcmDeviceToken(
+                $request->string('device_token')->value(),
+                $request->string('device_id')->value() ?: null,
+                $request->string('device_name')->value() ?: null,
+                $request->string('platform')->value() ?: null
+            );
+        }
 
         return $this->respondCreated([
             'user' => (new UserResource($user->load('roles')))->resolve(),
@@ -35,6 +45,15 @@ class AuthController extends ApiController
             $request->string('device_name', 'api')->value(),
         );
 
+        if ($request->filled('device_token')) {
+            $user->updateFcmDeviceToken(
+                $request->string('device_token')->value(),
+                $request->string('device_id')->value() ?: null,
+                $request->string('device_name')->value() ?: null,
+                $request->string('platform')->value() ?: null
+            );
+        }
+
         return $this->respond([
             'user' => (new UserResource($user->load('roles')))->resolve(),
             'token' => $token,
@@ -48,8 +67,27 @@ class AuthController extends ApiController
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()?->delete();
+        $token = $request->user()->currentAccessToken();
+        if ($token && method_exists($token, 'delete')) {
+            $token->delete();
+        }
+
+        if ($tokenVal = $request->string('device_token')->value()) {
+            $request->user()->fcmDeviceTokens()->where('device_token', $tokenVal)->delete();
+        }
 
         return $this->respondNoContent();
+    }
+
+    public function updateFcmToken(UpdateFcmTokenRequest $request): JsonResponse
+    {
+        $request->user()->updateFcmDeviceToken(
+            $request->string('device_token')->value(),
+            $request->string('device_id')->value() ?: null,
+            $request->string('device_name')->value() ?: null,
+            $request->string('platform')->value() ?: null
+        );
+
+        return $this->respond(message: __('auth.fcm_token_updated', ['default' => 'FCM device token updated successfully.']));
     }
 }
