@@ -24,4 +24,6 @@ return [
     IntegrationServiceProvider::class,
     GovernanceServiceProvider::class,
     AuthServiceProvider::class,
+    App\Domain\Media\Providers\MediaServiceProvider::class,
 ];
+
