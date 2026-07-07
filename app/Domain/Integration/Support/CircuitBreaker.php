@@ -22,8 +22,8 @@ class CircuitBreaker
     public static function make(): self
     {
         return new self(
-            (int) config('integrations.circuit_breaker.threshold', 5),
-            (int) config('integrations.circuit_breaker.cooldown', 60),
+            (int) config('integrations.circuit_breaker.failure_threshold', 5),
+            (int) config('integrations.circuit_breaker.cooldown_seconds', 60),
         );
     }
 

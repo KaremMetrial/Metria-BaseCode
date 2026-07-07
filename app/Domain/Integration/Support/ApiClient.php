@@ -80,7 +80,7 @@ abstract class ApiClient
                 ->timeout((int) config('integrations.http.timeout', 15))
                 ->retry(
                     (int) config('integrations.http.retries', 2),
-                    (int) config('integrations.http.retry_delay', 250),
+                    (int) config('integrations.http.retry_delay_ms', 250),
                     throw: false,
                 ),
         );
