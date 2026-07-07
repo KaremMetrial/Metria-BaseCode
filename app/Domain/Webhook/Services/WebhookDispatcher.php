@@ -31,7 +31,7 @@ class WebhookDispatcher
                     'attempts' => 0,
                 ]);
 
-                DeliverWebhook::dispatch($delivery->id);
+                DeliverWebhook::dispatch($delivery->id)->afterCommit();
             });
     }
 }
