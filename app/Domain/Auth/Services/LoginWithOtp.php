@@ -1,0 +1,57 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\Auth\Services;
+
+use App\Core\Events\EventBus;
+use App\Core\Exceptions\ApiException;
+use App\Domain\Auth\Events\UserLoggedInByOtp;
+use App\Domain\Auth\Models\User;
+use Illuminate\Database\Eloquent\Model;
+
+class LoginWithOtp
+{
+    public function __construct(
+        private readonly VerifyOtp $verifyOtp,
+        private readonly EventBus $events
+    ) {}
+
+    /**
+     * @return array{user: Model, token: string}
+     */
+    public function __invoke(string $identifier, string $code, string $guard = 'web', string $deviceName = 'api'): array
+    {
+        // 1. Verify the OTP code
+        $this->verifyOtp->__invoke($identifier, $code, 'login', $guard);
+
+        // 2. Resolve the model class for the guard
+        $provider = config("auth.guards.{$guard}.provider");
+        $modelClass = config("auth.providers.{$provider}.model") ?? User::class;
+
+        // 3. Find the user by phone or email
+        $user = $modelClass::query()
+            ->where('email', $identifier)
+            ->orWhere('phone', $identifier)
+            ->first();
+
+        if (! $user) {
+            throw new ApiException(__('auth.user_not_found', ['default' => 'No user account found with this identifier.']), status: 404, errorCode: 'user_not_found');
+        }
+
+        // 4. Generate abilities & Sanctum token
+        $abilities = [];
+        if (method_exists($user, 'hasPermissionTo') && method_exists($user, 'getPermissionsViaRoles')) {
+            $abilities = $user->hasPermissionTo('admin.super')
+                ? ['*']
+                : $user->getPermissionsViaRoles()->pluck('name')->toArray();
+        }
+
+        $token = $user->createToken($deviceName, $abilities)->plainTextToken;
+
+        // 5. Fire Login event
+        $this->events->publish(new UserLoggedInByOtp($user, $guard));
+
+        return ['user' => $user, 'token' => $token];
+    }
+}

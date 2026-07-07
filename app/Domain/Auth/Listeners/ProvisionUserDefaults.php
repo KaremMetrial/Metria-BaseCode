@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Listeners;
 
-use App\Domain\Auth\Events\UserRegistered;
 use App\Domain\Wallet\Services\WalletService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,11 +18,11 @@ class ProvisionUserDefaults implements ShouldQueue
 
     public function __construct(private readonly WalletService $wallets) {}
 
-    public function handle(UserRegistered $event): void
+    public function handle(object $event): void
     {
         $this->wallets->firstOrCreateFor($event->user);
 
-        if (! $event->user->hasAnyRole()) {
+        if (method_exists($event->user, 'hasAnyRole') && ! $event->user->hasAnyRole()) {
             $event->user->assignRole('customer');
         }
     }

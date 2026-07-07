@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Domain\Auth\Http\Controllers\Api\V1\AuthController;
+use App\Domain\Auth\Http\Controllers\Api\V1\OtpAuthController;
 use App\Domain\Governance\Http\Controllers\Api\V1\ApprovalController;
 use App\Domain\Governance\Http\Controllers\Api\V1\AuditLogController;
 use App\Domain\Governance\Http\Controllers\Api\V1\FeatureFlagController;
@@ -45,6 +46,12 @@ Route::prefix('territories')->name('territories.')->group(function () {
 Route::middleware('throttle:auth')->prefix('auth')->name('auth.')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+    Route::prefix('otp')->name('otp.')->group(function () {
+        Route::post('/send', [OtpAuthController::class, 'send'])->name('send');
+        Route::post('/login', [OtpAuthController::class, 'login'])->name('login');
+        Route::post('/register', [OtpAuthController::class, 'register'])->name('register');
+    });
 });
 
 // Payment Gateway Callbacks (Signed Webhooks)

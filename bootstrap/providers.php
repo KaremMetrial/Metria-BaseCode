@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Providers\CoreServiceProvider;
+use App\Domain\Auth\Providers\AuthServiceProvider;
 use App\Domain\Currency\Providers\CurrencyServiceProvider;
 use App\Domain\Governance\Providers\GovernanceServiceProvider;
 use App\Domain\Integration\Providers\IntegrationServiceProvider;
@@ -22,4 +23,5 @@ return [
     WebhookServiceProvider::class,
     IntegrationServiceProvider::class,
     GovernanceServiceProvider::class,
+    AuthServiceProvider::class,
 ];
