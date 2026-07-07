@@ -13,7 +13,7 @@ return [
     | or micro-hedging support.
     |
     */
-    'precision' => 24,
+    'precision' => 30,
     'scale' => 14,
 
     /*
@@ -56,11 +56,28 @@ return [
     |
     */
     'providers' => [
-        'primary' => 'open_exchange_rates',
+        'primary' => 'currency_exchange_api',
         'failovers' => [
+            'open_exchange_rates',
             'ecb',
             'mock',
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | CurrencyExchangeAPI Credentials & Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the live CurrencyExchangeAPI (currencyapi.com / v3)
+    | exchange rate provider.
+    |
+    */
+    'api' => [
+        'api_key' => env('CURRENCY_EXCHANGE_API_KEY', ''),
+        'base_url' => env('CURRENCY_EXCHANGE_BASE_URL', 'https://api.currencyapi.com/v3'),
+        'base_currency' => env('CURRENCY_EXCHANGE_BASE_CURRENCY', 'USD'),
+        'timeout' => 10,
     ],
 
     /*

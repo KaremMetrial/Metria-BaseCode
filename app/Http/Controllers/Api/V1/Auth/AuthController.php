@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Core\Http\Controllers\ApiController;
-use App\Domain\Auth\Actions\IssueApiToken;
-use App\Domain\Auth\Actions\RegisterUser;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Resources\UserResource;
+use App\Domain\Auth\Services\IssueApiToken;
+use App\Domain\Auth\Services\RegisterUser;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Resources\Auth\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

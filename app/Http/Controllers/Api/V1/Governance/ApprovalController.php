@@ -8,7 +8,7 @@ use App\Core\Http\Controllers\ApiController;
 use App\Domain\Governance\Enums\ApprovalStatus;
 use App\Domain\Governance\Models\ApprovalRequest;
 use App\Domain\Governance\Services\ApprovalService;
-use App\Http\Resources\ApprovalRequestResource;
+use App\Http\Resources\Governance\ApprovalRequestResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

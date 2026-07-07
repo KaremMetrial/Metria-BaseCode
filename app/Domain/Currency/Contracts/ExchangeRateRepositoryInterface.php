@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domain\Currency\Contracts;
 
+use App\Core\Contracts\RepositoryInterface;
 use App\Domain\Currency\Models\CurrencyExchangeRate;
 use DateTimeInterface;
 
-interface ExchangeRateRepositoryInterface
+interface ExchangeRateRepositoryInterface extends RepositoryInterface
 {
     /**
      * Retrieve the active exchange rate for a currency at a specific point in time.

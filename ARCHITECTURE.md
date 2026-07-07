@@ -49,20 +49,20 @@ events (e.g. `UserRegistered` → Wallet provisioning), not direct calls.
 
 ## Patterns in use (and why)
 
-| Pattern | Where | Why |
-| --- | --- | --- |
-| **Manager / Driver (Strategy)** | `PaymentManager`, `SmsManager` | Swap Stripe↔Paymob↔Fawry↔PayTabs per env/market with config; add gateways without touching callers. |
-| **Transactional Outbox** | `EventBus` + `outbox_messages` + `outbox:publish` | External side effects (webhooks) never fire for rolled-back state and are never lost — at-least-once delivery with retries. |
-| **Action classes** | `RegisterUser`, `IssueApiToken` | One use case per class: testable, discoverable, no god-services. |
-| **Application services** | `PaymentService`, `WalletService`, `ApprovalService` | Orchestrate transactions + events; controllers stay 5–15 lines. |
-| **Value Object** | `Money` | Integer minor units end float-rounding bugs; currency-mismatch guarded at the type level. |
-| **Append-only ledger** | `wallet_transactions`, `audit_logs` | Financial and compliance history is immutable and reconstructable. |
-| **Maker-checker (four-eyes)** | `ApprovalService` + `governance.approvals.handlers` | Sensitive ops (refunds) need a second approver; self-approval is blocked. |
-| **Pessimistic locking** | `WalletService` (`lockForUpdate`) | Concurrent spends serialize — no double-spending under race. |
-| **Idempotency keys** | `IdempotencyMiddleware` | Client retries of `POST /payments` replay the response instead of double-charging. |
-| **Circuit breaker** | `CircuitBreaker`, `ApiClient` | A dead third party fails fast instead of exhausting workers. |
-| **Observer** | `AuditableObserver` | Every create/update/delete on audited models is logged with masked secrets. |
-| **Repository (optional)** | `BaseRepository` | Available for complex query encapsulation; simple domains use Eloquent directly — no ceremony for its own sake. |
+| Pattern                               | Where                                                      | Why                                                                                                                          |
+| ------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Manager / Driver (Strategy)** | `PaymentManager`, `SmsManager`                         | Swap Stripe↔Paymob↔Fawry↔PayTabs per env/market with config; add gateways without touching callers.                       |
+| **Transactional Outbox**        | `EventBus` + `outbox_messages` + `outbox:publish`    | External side effects (webhooks) never fire for rolled-back state and are never lost — at-least-once delivery with retries. |
+| **Action classes**              | `RegisterUser`, `IssueApiToken`                        | One use case per class: testable, discoverable, no god-services.                                                             |
+| **Application services**        | `PaymentService`, `WalletService`, `ApprovalService` | Orchestrate transactions + events; controllers stay 5–15 lines.                                                             |
+| **Value Object**                | `Money`                                                  | Integer minor units end float-rounding bugs; currency-mismatch guarded at the type level.                                    |
+| **Append-only ledger**          | `wallet_transactions`, `audit_logs`                    | Financial and compliance history is immutable and reconstructable.                                                           |
+| **Maker-checker (four-eyes)**   | `ApprovalService` + `governance.approvals.handlers`    | Sensitive ops (refunds) need a second approver; self-approval is blocked.                                                    |
+| **Pessimistic locking**         | `WalletService` (`lockForUpdate`)                      | Concurrent spends serialize — no double-spending under race.                                                                |
+| **Idempotency keys**            | `IdempotencyMiddleware`                                  | Client retries of`POST /payments` replay the response instead of double-charging.                                          |
+| **Circuit breaker**             | `CircuitBreaker`, `ApiClient`                          | A dead third party fails fast instead of exhausting workers.                                                                 |
+| **Observer**                    | `AuditableObserver`                                      | Every create/update/delete on audited models is logged with masked secrets.                                                  |
+| **Repository (optional)**       | `BaseRepository`                                         | Available for complex query encapsulation; simple domains use Eloquent directly — no ceremony for its own sake.             |
 
 ## Event flow (end to end)
 

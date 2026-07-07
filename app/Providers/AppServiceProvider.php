@@ -6,14 +6,15 @@ namespace App\Providers;
 
 use App\Core\Support\CurrencyRegistryResolver;
 use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
+use App\Domain\Currency\Providers\CurrencyExchangeApiProvider;
 use App\Domain\Currency\Providers\ExchangeRateProviderChain;
 use App\Domain\Currency\Providers\MockExchangeRateProvider;
 use App\Domain\Currency\Repositories\ExchangeRateRepository;
 use App\Domain\Currency\Services\CurrencyRegistryResolverImpl;
 use App\Domain\Integration\Sms\SmsManager;
 use App\Domain\Payment\Models\Payment;
-use App\Domain\Payment\PaymentManager;
 use App\Domain\Payment\Policies\PaymentPolicy;
+use App\Domain\Payment\Services\PaymentManager;
 use App\Domain\Wallet\Models\Wallet;
 use App\Domain\Wallet\Policies\WalletPolicy;
 use App\Domain\Webhook\Models\WebhookEndpoint;
@@ -41,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(ExchangeRateProviderChain::class, function ($app) {
             $chain = new ExchangeRateProviderChain;
+            $chain->registerProvider('currency_exchange_api', new CurrencyExchangeApiProvider(config('currencies.api', [])));
             $chain->registerProvider('mock', new MockExchangeRateProvider);
 
             return $chain;

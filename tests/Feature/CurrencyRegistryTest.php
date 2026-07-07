@@ -8,6 +8,7 @@ use App\Core\Support\Money;
 use App\Domain\Auth\Models\User;
 use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
 use App\Domain\Currency\Models\Currency;
+use App\Domain\Currency\Providers\CurrencyExchangeApiProvider;
 use App\Domain\Currency\Providers\ExchangeRateProviderChain;
 use App\Domain\Currency\Providers\MockExchangeRateProvider;
 use App\Domain\Currency\Services\CurrencyConversionService;
@@ -19,6 +20,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class CurrencyRegistryTest extends TestCase
@@ -250,6 +252,34 @@ class CurrencyRegistryTest extends TestCase
 
         $this->assertEquals('49.00000000000000', $rateData['rate']);
         $this->assertEquals('mock', $rateData['provider_name']); // ecb uses mock driver
+    }
+
+    /**
+     * Test CurrencyExchangeAPI provider fetching and 14-decimal string formatting.
+     */
+    public function test_currency_exchange_api_provider(): void
+    {
+        Http::fake([
+            'https://api.currencyapi.com/v3/latest*' => Http::response([
+                'data' => [
+                    'EUR' => ['value' => 0.9254321],
+                ],
+            ], 200),
+        ]);
+
+        $provider = new CurrencyExchangeApiProvider([
+            'api_key' => 'test_key',
+            'base_url' => 'https://api.currencyapi.com/v3',
+            'base_currency' => 'USD',
+        ]);
+
+        $rateData = $provider->fetchRate('EUR');
+
+        $this->assertEquals('0.92543210000000', $rateData['rate']);
+        $this->assertNotEmpty($rateData['response_hash']);
+        $this->assertNotEmpty($rateData['request_id']);
+        $this->assertEquals('currency_exchange_api', $provider->getName());
+        $this->assertEquals('1.0', $provider->getVersion());
     }
 
     /**

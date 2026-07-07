@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Core\Outbox\OutboxMessage;
-use App\Domain\Webhook\WebhookDispatcher;
+use App\Domain\Webhook\Services\WebhookDispatcher;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Throwable;

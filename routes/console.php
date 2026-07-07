@@ -13,3 +13,6 @@ Schedule::command('outbox:publish')->everyMinute()->withoutOverlapping();
 
 // Prune expired governance data.
 Schedule::command('governance:prune')->daily();
+
+// Synchronize foreign currency exchange rates hourly.
+Schedule::command('currencies:sync')->hourly()->withoutOverlapping();

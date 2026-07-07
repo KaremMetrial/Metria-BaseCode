@@ -19,9 +19,13 @@ class CurrencyRegistryResolverImpl implements CurrencyRegistryResolver
         $currency = strtoupper($currency);
 
         return Cache::remember("currency_minor_units_{$currency}", now()->addDays(7), function () use ($currency) {
-            $dbCurrency = Currency::find($currency);
-            if ($dbCurrency !== null) {
-                return $dbCurrency->minor_units;
+            try {
+                $dbCurrency = Currency::find($currency);
+                if ($dbCurrency !== null) {
+                    return $dbCurrency->minor_units;
+                }
+            } catch (\Throwable $e) {
+                // Fallback to configuration during transient database outages or early bootstrap
             }
 
             // Fallback to configuration

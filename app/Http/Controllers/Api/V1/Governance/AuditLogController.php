@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api\V1\Governance;
 
 use App\Core\Http\Controllers\ApiController;
 use App\Domain\Governance\Models\AuditLog;
-use App\Http\Resources\AuditLogResource;
+use App\Http\Resources\Governance\AuditLogResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

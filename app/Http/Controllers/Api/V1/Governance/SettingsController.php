@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api\V1\Governance;
 
 use App\Core\Http\Controllers\ApiController;
 use App\Domain\Governance\Services\SettingsService;
-use App\Http\Requests\UpdateSettingRequest;
+use App\Http\Requests\Governance\UpdateSettingRequest;
 use Illuminate\Http\JsonResponse;
 
 class SettingsController extends ApiController

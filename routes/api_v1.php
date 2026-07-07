@@ -5,12 +5,13 @@ use App\Http\Controllers\Api\V1\Governance\ApprovalController;
 use App\Http\Controllers\Api\V1\Governance\AuditLogController;
 use App\Http\Controllers\Api\V1\Governance\FeatureFlagController;
 use App\Http\Controllers\Api\V1\Governance\SettingsController;
-use App\Http\Controllers\Api\V1\HealthController;
-use App\Http\Controllers\Api\V1\PaymentController;
-use App\Http\Controllers\Api\V1\PaymentWebhookController;
-use App\Http\Controllers\Api\V1\TerritoryController;
-use App\Http\Controllers\Api\V1\WalletController;
-use App\Http\Controllers\Api\V1\WebhookEndpointController;
+use App\Http\Controllers\Api\V1\Payment\PaymentController;
+use App\Http\Controllers\Api\V1\Payment\PaymentWebhookController;
+use App\Http\Controllers\Api\V1\System\EnumController;
+use App\Http\Controllers\Api\V1\System\HealthController;
+use App\Http\Controllers\Api\V1\Territory\TerritoryController;
+use App\Http\Controllers\Api\V1\Wallet\WalletController;
+use App\Http\Controllers\Api\V1\Webhook\WebhookEndpointController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/health', HealthController::class)->name('health');
+
+/*
+|--------------------------------------------------------------------------
+| System Enums (Frontend UI Support)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('enums')->name('enums.')->group(function () {
+    Route::get('/', [EnumController::class, 'index'])->name('index');
+    Route::get('/{key}', [EnumController::class, 'show'])->name('show');
+});
 
 /*
 |--------------------------------------------------------------------------

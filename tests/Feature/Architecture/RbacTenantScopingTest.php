@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Architecture;
 
 use App\Core\Tenancy\TenantManager;
-use App\Domain\Auth\Actions\IssueApiToken;
 use App\Domain\Auth\Models\User;
+use App\Domain\Auth\Services\IssueApiToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
@@ -74,5 +74,16 @@ class RbacTenantScopingTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals('org-custom-456', app(TenantManager::class)->id());
+    }
+
+    public function test_unprivileged_user_receives_empty_token_abilities(): void
+    {
+        $user = User::factory()->create(['password' => bcrypt('password123')]);
+
+        $action = app(IssueApiToken::class);
+        ['token' => $token] = $action($user->email, 'password123', 'test-device');
+
+        $this->assertNotEmpty($token);
+        $this->assertEmpty($user->tokens()->first()->abilities);
     }
 }
