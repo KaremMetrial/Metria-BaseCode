@@ -43,7 +43,17 @@ final readonly class Money implements JsonSerializable, Stringable
 
     public static function minorUnitsFor(string $currency): int
     {
-        return (int) (config('payments.minor_units.'.strtoupper($currency)) ?? 2);
+        $currency = strtoupper($currency);
+
+        try {
+            if (function_exists('app') && app()->bound(CurrencyRegistryResolver::class)) {
+                return app(CurrencyRegistryResolver::class)->minorUnitsFor($currency);
+            }
+        } catch (\Throwable $e) {
+            // Fallback during early bootstrap or tests without container
+        }
+
+        return (int) (config('payments.minor_units.'.$currency) ?? 2);
     }
 
     public function add(self $other): self

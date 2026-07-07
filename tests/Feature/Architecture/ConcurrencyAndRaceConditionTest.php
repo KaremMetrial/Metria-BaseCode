@@ -17,6 +17,7 @@ use App\Domain\Wallet\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class ConcurrencyAndRaceConditionTest extends TestCase
@@ -86,6 +87,67 @@ class ConcurrencyAndRaceConditionTest extends TestCase
 
         $this->expectException(DomainException::class);
         $service->approve($request, $approver);
+    }
+
+    public function test_non_admin_cannot_self_approve_request(): void
+    {
+        $user = User::factory()->create();
+
+        $request = ApprovalRequest::create([
+            'action' => 'payments.refund',
+            'payload' => [],
+            'status' => ApprovalStatus::Pending,
+            'requested_by' => $user->id,
+        ]);
+
+        $service = app(ApprovalService::class);
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage(__('governance.cannot_approve_own_request'));
+
+        $service->approve($request, $user);
+    }
+
+    public function test_super_admin_can_self_approve_request(): void
+    {
+        Http::fake([
+            'api.stripe.com/v1/refunds' => Http::response([
+                'id' => 're_test_123',
+                'status' => 'succeeded',
+            ]),
+        ]);
+
+        // Register the Spatie permission for admin.super
+        Permission::findOrCreate('admin.super', 'web');
+
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.super');
+
+        // Create a payment for the refund handler to reference
+        $payment = Payment::create([
+            'user_id' => $admin->id,
+            'gateway' => 'stripe',
+            'gateway_reference' => 'pi_test_123',
+            'amount' => 5000,
+            'currency' => 'EGP',
+            'status' => PaymentStatus::Succeeded,
+        ]);
+
+        $request = ApprovalRequest::create([
+            'action' => 'payments.refund',
+            'payload' => [
+                'payment_id' => $payment->id,
+                'amount' => 2000,
+            ],
+            'status' => ApprovalStatus::Pending,
+            'requested_by' => $admin->id,
+        ]);
+
+        $service = app(ApprovalService::class);
+
+        $approved = $service->approve($request, $admin);
+
+        $this->assertEquals(ApprovalStatus::Executed, $approved->status);
     }
 
     public function test_wallet_settle_hold_enforces_deterministic_lock_ordering(): void

@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Core\Support\CurrencyRegistryResolver;
+use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
+use App\Domain\Currency\Providers\ExchangeRateProviderChain;
+use App\Domain\Currency\Providers\MockExchangeRateProvider;
+use App\Domain\Currency\Repositories\ExchangeRateRepository;
+use App\Domain\Currency\Services\CurrencyRegistryResolverImpl;
 use App\Domain\Integration\Sms\SmsManager;
 use App\Domain\Payment\Models\Payment;
 use App\Domain\Payment\PaymentManager;
@@ -26,6 +32,24 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(PaymentManager::class, fn ($app) => new PaymentManager($app));
         $this->app->singleton(SmsManager::class, fn ($app) => new SmsManager($app));
+
+        // Currency Domain Bindings
+        $this->app->singleton(
+            ExchangeRateRepositoryInterface::class,
+            ExchangeRateRepository::class
+        );
+
+        $this->app->singleton(ExchangeRateProviderChain::class, function ($app) {
+            $chain = new ExchangeRateProviderChain;
+            $chain->registerProvider('mock', new MockExchangeRateProvider);
+
+            return $chain;
+        });
+
+        $this->app->singleton(
+            CurrencyRegistryResolver::class,
+            CurrencyRegistryResolverImpl::class
+        );
     }
 
     public function boot(): void

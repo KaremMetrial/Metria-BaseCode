@@ -43,7 +43,7 @@ class ApprovalService
 
     public function approve(ApprovalRequest $request, User $approver): ApprovalRequest
     {
-        if ((string) $request->requested_by === (string) $approver->getKey()) {
+        if ((string) $request->requested_by === (string) $approver->getKey() && ! $approver->can('admin.super')) {
             throw new DomainException(__('governance.cannot_approve_own_request'), 'self_approval_forbidden');
         }
 

@@ -35,6 +35,19 @@ class Payment extends Model
         'description',
         'metadata',
         'paid_at',
+
+        // Conversion Snapshots
+        'source_currency',
+        'target_currency',
+        'converted_amount',
+        'converted_amount_decimal',
+        'exchange_rate',
+        'rate_provider',
+        'rate_provider_version',
+        'conversion_direction',
+        'rounding_mode_used',
+        'conversion_algorithm_version',
+        'rate_captured_at',
     ];
 
     protected function casts(): array
@@ -45,6 +58,10 @@ class Payment extends Model
             'amount' => 'integer',
             'refunded_amount' => 'integer',
             'paid_at' => 'datetime',
+            'converted_amount' => 'integer',
+            'converted_amount_decimal' => 'decimal:4',
+            'exchange_rate' => 'decimal:14',
+            'rate_captured_at' => 'datetime',
         ];
     }
 
