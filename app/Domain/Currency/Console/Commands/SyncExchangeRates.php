@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace App\Domain\Currency\Console\Commands;
 
 use App\Domain\Currency\Models\Currency;
 use App\Domain\Currency\Providers\ExchangeRateProviderChain;

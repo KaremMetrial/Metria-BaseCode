@@ -5,18 +5,21 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Core\Contracts\CurrencyRegistryResolver;
+use App\Domain\Currency\Console\Commands\SyncExchangeRates;
 use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
 use App\Domain\Currency\Providers\CurrencyExchangeApiProvider;
 use App\Domain\Currency\Providers\ExchangeRateProviderChain;
 use App\Domain\Currency\Providers\MockExchangeRateProvider;
 use App\Domain\Currency\Repositories\ExchangeRateRepository;
 use App\Domain\Currency\Services\CurrencyRegistryResolverImpl;
+use App\Domain\Governance\Console\Commands\PruneGovernanceData;
 use App\Domain\Integration\Sms\SmsManager;
 use App\Domain\Payment\Models\Payment;
 use App\Domain\Payment\Policies\PaymentPolicy;
 use App\Domain\Payment\Services\PaymentManager;
 use App\Domain\Wallet\Models\Wallet;
 use App\Domain\Wallet\Policies\WalletPolicy;
+use App\Domain\Webhook\Console\Commands\PublishOutboxMessages;
 use App\Domain\Webhook\Models\WebhookEndpoint;
 use App\Domain\Webhook\Policies\WebhookEndpointPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -71,5 +74,14 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('webhooks', function (Request $request) {
             return Limit::perMinute(60)->by($request->ip());
         });
+
+        // Register modular console commands
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PruneGovernanceData::class,
+                PublishOutboxMessages::class,
+                SyncExchangeRates::class,
+            ]);
+        }
     }
 }

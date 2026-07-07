@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace App\Domain\Webhook\Console\Commands;
 
 use App\Core\Outbox\OutboxMessage;
 use App\Domain\Webhook\Services\WebhookDispatcher;

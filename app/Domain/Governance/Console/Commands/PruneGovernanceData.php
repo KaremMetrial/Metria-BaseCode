@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace App\Domain\Governance\Console\Commands;
 
 use App\Core\Models\IdempotencyKey;
 use App\Domain\Governance\Models\AuditLog;
