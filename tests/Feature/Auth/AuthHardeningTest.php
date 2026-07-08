@@ -121,4 +121,49 @@ class AuthHardeningTest extends TestCase
         $this->assertDatabaseMissing('personal_access_tokens', ['id' => $token2->accessToken->id]);
         $this->assertDatabaseHas('personal_access_tokens', ['id' => $token3->accessToken->id]);
     }
+
+    public function test_mfa_totp_code_cannot_be_replayed(): void
+    {
+        $secret = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        $user = User::factory()->create([
+            'two_factor_secret' => $secret,
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        $mfaService = app(\App\Domain\Auth\Services\MfaService::class);
+        $code = $this->generateTotp($secret);
+
+        // First verification should succeed
+        $this->assertTrue($mfaService->verify($user, $code));
+
+        // Second verification with the same code (replay) should fail
+        $this->assertFalse($mfaService->verify($user, $code));
+    }
+
+    private function generateTotp(string $secret): string
+    {
+        $secret = strtoupper($secret);
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        $bits = '';
+        for ($i = 0, $len = strlen($secret); $i < $len; $i++) {
+            $char = $secret[$i];
+            $val = strpos($alphabet, $char);
+            if ($val === false) continue;
+            $bits .= str_pad(decbin($val), 5, '0', STR_PAD_LEFT);
+        }
+        $decoded = '';
+        for ($i = 0, $len = strlen($bits); $i + 8 <= $len; $i += 8) {
+            $decoded .= chr((int) bindec(substr($bits, $i, 8)));
+        }
+
+        $timeSlice = (int) floor(time() / 30);
+        $binaryTimeSlice = pack('N', 0).pack('N', $timeSlice);
+        $hmac = hash_hmac('sha1', $binaryTimeSlice, $decoded, true);
+        $offsetIndex = ord($hmac[19]) & 0xf;
+        $value = ((ord($hmac[$offsetIndex]) & 0x7f) << 24)
+            | ((ord($hmac[$offsetIndex + 1]) & 0xff) << 16)
+            | ((ord($hmac[$offsetIndex + 2]) & 0xff) << 8)
+            | (ord($hmac[$offsetIndex + 3]) & 0xff);
+        return str_pad((string) ($value % 1000000), 6, '0', STR_PAD_LEFT);
+    }
 }

@@ -27,15 +27,41 @@ class MediaProcessingService
         }
 
         $disk = Storage::disk($blob->disk);
-        $filePath = $disk->path($blob->path);
+        
+        $isLocal = false;
+        try {
+            $filePath = $disk->path($blob->path);
+            $isLocal = true;
+        } catch (\Throwable) {
+            $tempPath = tempnam(sys_get_temp_dir(), 'media_process_');
+            $source = $disk->readStream($blob->path);
+            $target = fopen($tempPath, 'wb');
+            if ($source && $target) {
+                stream_copy_to_stream($source, $target);
+            }
+            if ($source) fclose($source);
+            if ($target) fclose($target);
+            $filePath = $tempPath;
+        }
 
         $startTime = microtime(true);
 
         try {
+            $modified = false;
             if ($media->media_type === MediaType::Image) {
                 $this->processImage($media, $filePath, $disk);
+                $modified = class_exists('Imagick');
             } elseif ($media->media_type === MediaType::Video) {
                 $this->processVideo($media, $filePath, $disk);
+            }
+
+            // If file was modified (EXIF stripped) and disk is not local, upload it back
+            if (! $isLocal && $modified) {
+                $fh = fopen($filePath, 'r');
+                if ($fh) {
+                    $disk->put($blob->path, $fh);
+                    fclose($fh);
+                }
             }
 
             // Transition status to Active
@@ -54,6 +80,10 @@ class MediaProcessingService
             $media->update([
                 'processing_error' => 'Processing failed: ' . $e->getMessage(),
             ]);
+        } finally {
+            if (! $isLocal && file_exists($filePath)) {
+                @unlink($filePath);
+            }
         }
     }
 

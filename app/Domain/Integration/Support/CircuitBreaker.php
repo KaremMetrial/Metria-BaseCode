@@ -62,16 +62,17 @@ class CircuitBreaker
 
     public function recordFailure(string $service): void
     {
-        $failures = (int) Cache::increment($this->failureKey($service));
+        $key = $this->failureKey($service);
+        $ttl = $this->cooldownSeconds * 5;
 
-        if ($failures === 1) {
-            // First failure sets the counting window.
-            Cache::put($this->failureKey($service), 1, $this->cooldownSeconds * 5);
-        }
+        // Initialize the counting window atomically if the key doesn't exist yet.
+        Cache::add($key, 0, $ttl);
+
+        $failures = (int) Cache::increment($key);
 
         if ($failures >= $this->threshold) {
             Cache::put($this->openKey($service), true, $this->cooldownSeconds);
-            Cache::forget($this->failureKey($service));
+            Cache::forget($key);
         }
     }
 

@@ -53,10 +53,9 @@ class IdempotencyMiddleware
                 ], 409);
             }
 
-            return response()->json(
-                json_decode($existing->response_body, true),
-                $existing->response_status,
-            )->header('Idempotency-Replayed', 'true');
+            return response($existing->response_body, $existing->response_status)
+                ->header('Content-Type', 'application/json')
+                ->header('Idempotency-Replayed', 'true');
         }
 
         try {

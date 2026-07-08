@@ -60,19 +60,24 @@ class RbacTenantScopingTest extends TestCase
         config(['tenancy.enabled' => true]);
 
         DB::table('tenants')->insert([
-            'id' => 'org-default-123',
-            'name' => 'Default Org',
-            'slug' => 'default-org',
-            'active' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
+            ['id' => 'org-default-123', 'name' => 'Default Org', 'slug' => 'default-org', 'active' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 'org-custom-456', 'name' => 'Custom Org', 'slug' => 'custom-org', 'active' => 1, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         $user = User::factory()->create(['tenant_id' => 'org-default-123']);
 
+        // 1. Regular user trying to spoof tenant is restricted/corrected to their own tenant
         $response = $this->actingAs($user)->withHeader('X-Tenant', 'org-custom-456')->getJson('/api/v1/auth/me');
-
         $response->assertStatus(200);
+        $this->assertEquals('org-default-123', app(TenantManager::class)->id());
+
+        // 2. Super admin is allowed to access other tenants
+        $admin = User::factory()->create(['tenant_id' => 'org-default-123']);
+        $permission = Permission::firstOrCreate(['name' => 'admin.super', 'guard_name' => 'web']);
+        $admin->givePermissionTo($permission);
+
+        $responseAdmin = $this->actingAs($admin)->withHeader('X-Tenant', 'org-custom-456')->getJson('/api/v1/auth/me');
+        $responseAdmin->assertStatus(200);
         $this->assertEquals('org-custom-456', app(TenantManager::class)->id());
     }
 

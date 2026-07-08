@@ -146,15 +146,20 @@ class PaymentService
         $driver = $this->gateways->driver($payment->gateway);
         $result = $driver->refund($payment, $amount);
 
-        return DB::transaction(function () use ($payment, $amount, $result) {
+        return DB::transaction(function () use ($payment, $amount) {
             $payment = Payment::query()->lockForUpdate()->findOrFail($payment->id);
             $this->assertRefundable($payment, $amount);
 
             $refunded = ($amount ?? $payment->remainingRefundable())->amount;
+            $newRefundedAmount = $payment->refunded_amount + $refunded;
+
+            $status = $newRefundedAmount >= $payment->amount
+                ? PaymentStatus::Refunded
+                : PaymentStatus::PartiallyRefunded;
 
             $payment->update([
-                'refunded_amount' => $payment->refunded_amount + $refunded,
-                'status' => $result->status,
+                'refunded_amount' => $newRefundedAmount,
+                'status' => $status,
             ]);
 
             $this->events->publish(new PaymentRefunded($payment, $refunded));

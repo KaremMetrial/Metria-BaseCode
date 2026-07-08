@@ -126,4 +126,36 @@ class PaymentFlowTest extends TestCase
             ->assertForbidden()
             ->assertJsonPath('error.code', 'invalid_signature');
     }
+
+    public function test_successive_partial_refunds_transition_to_refunded_at_the_end(): void
+    {
+        $user = $this->createPaymentUser();
+        $payment = Payment::create([
+            'user_id' => $user->id,
+            'gateway' => 'stripe',
+            'gateway_reference' => 'pi_refund_test',
+            'amount' => 10000,
+            'currency' => 'EGP',
+            'status' => PaymentStatus::Succeeded,
+        ]);
+
+        Http::fake([
+            'api.stripe.com/v1/refunds' => Http::response([
+                'id' => 're_test_123',
+                'status' => 'succeeded',
+            ]),
+        ]);
+
+        $paymentService = app(\App\Domain\Payment\Services\PaymentService::class);
+
+        // 1. First refund of 4000 (40 EGP)
+        $payment = $paymentService->executeRefund($payment, 4000);
+        $this->assertEquals(4000, $payment->refunded_amount);
+        $this->assertEquals(PaymentStatus::PartiallyRefunded, $payment->status);
+
+        // 2. Second refund of 6000 (60 EGP) - makes it fully refunded
+        $payment = $paymentService->executeRefund($payment, 6000);
+        $this->assertEquals(10000, $payment->refunded_amount);
+        $this->assertEquals(PaymentStatus::Refunded, $payment->status);
+    }
 }

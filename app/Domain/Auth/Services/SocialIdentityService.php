@@ -41,7 +41,10 @@ class SocialIdentityService
             $user = null;
 
             if ($identity) {
-                $user = $identity->user;
+                $user = User::query()->withoutGlobalScopes()->find($identity->user_id);
+                if ($user && $tenantId !== null && (string) $user->tenant_id !== (string) $tenantId) {
+                    throw new DomainException(__('auth.social.tenant_mismatch'), errorCode: 'social_tenant_mismatch');
+                }
                 $identity->update([
                     'provider_email' => $socialUser['email'] ?? null,
                     'access_token' => $socialUser['token'] ?? null,
@@ -52,7 +55,10 @@ class SocialIdentityService
                 // Check if user exists by email
                 $email = $socialUser['email'] ?? null;
                 if ($email) {
-                    $user = User::query()->where('email', $email)->first();
+                    $user = User::query()->withoutGlobalScopes()->where('email', $email)->first();
+                    if ($user && $tenantId !== null && (string) $user->tenant_id !== (string) $tenantId) {
+                        throw new DomainException(__('auth.social.tenant_mismatch'), errorCode: 'social_tenant_mismatch');
+                    }
                 }
 
                 if (! $user) {

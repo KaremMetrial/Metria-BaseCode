@@ -47,35 +47,38 @@ class ApprovalService
             throw new DomainException(__('governance.cannot_approve_own_request'), 'self_approval_forbidden');
         }
 
-        return DB::transaction(function () use ($request, $approver) {
-            /** @var ApprovalRequest $lockedRequest */
-            $lockedRequest = ApprovalRequest::query()->lockForUpdate()->findOrFail($request->getKey());
+        /** @var ApprovalRequest $lockedRequest */
+        $lockedRequest = DB::transaction(function () use ($request, $approver) {
+            /** @var ApprovalRequest $lr */
+            $lr = ApprovalRequest::query()->lockForUpdate()->findOrFail($request->getKey());
 
-            $this->assertPending($lockedRequest);
+            $this->assertPending($lr);
 
-            $lockedRequest->forceFill([
+            $lr->forceFill([
                 'status' => ApprovalStatus::Approved,
                 'decided_by' => $approver->getKey(),
                 'decided_at' => now(),
             ])->save();
 
-            try {
-                $handler = app($this->handlerFor($lockedRequest->action));
-                $handler($lockedRequest->payload, $lockedRequest);
-
-                $lockedRequest->forceFill(['status' => ApprovalStatus::Executed])->save();
-            } catch (Throwable $e) {
-                report($e);
-                $lockedRequest->forceFill([
-                    'status' => ApprovalStatus::Failed,
-                    'reason' => mb_substr($e->getMessage(), 0, 500),
-                ])->save();
-            }
-
-            $this->audit->log('approval.decided', $lockedRequest, newValues: ['status' => $lockedRequest->status->value]);
-
-            return $lockedRequest->refresh();
+            return $lr;
         });
+
+        try {
+            $handler = app($this->handlerFor($lockedRequest->action));
+            $handler($lockedRequest->payload, $lockedRequest);
+
+            $lockedRequest->forceFill(['status' => ApprovalStatus::Executed])->save();
+        } catch (Throwable $e) {
+            report($e);
+            $lockedRequest->forceFill([
+                'status' => ApprovalStatus::Failed,
+                'reason' => mb_substr($e->getMessage(), 0, 500),
+            ])->save();
+        }
+
+        $this->audit->log('approval.decided', $lockedRequest, newValues: ['status' => $lockedRequest->status->value]);
+
+        return $lockedRequest->refresh();
     }
 
     public function reject(ApprovalRequest $request, User $approver, ?string $reason = null): ApprovalRequest

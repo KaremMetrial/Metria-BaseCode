@@ -32,9 +32,14 @@ class WalletService
 
     public function firstOrCreateFor(User $user, ?string $currency = null): Wallet
     {
-        return Wallet::query()->firstOrCreate(
+        return Wallet::query()->withoutGlobalScopes()->firstOrCreate(
             ['user_id' => $user->id],
-            ['currency' => strtoupper($currency ?? config('payments.currency', 'EGP')), 'balance' => 0, 'held' => 0],
+            [
+                'tenant_id' => $user->getAttributes()['tenant_id'] ?? null,
+                'currency' => strtoupper($currency ?? config('payments.currency', 'EGP')),
+                'balance' => 0,
+                'held' => 0
+            ],
         );
     }
 

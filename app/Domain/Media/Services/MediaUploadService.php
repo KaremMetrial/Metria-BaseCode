@@ -139,11 +139,15 @@ class MediaUploadService
                 // Verify actual file size
                 $actualSize = $disk->size($storagePath);
 
-                // Read raw contents to verify actual MIME type (MIME Sniffing)
-                $filePath = $disk->path($storagePath);
-                
-                // Server-side compute checksum to prevent spoofing
-                $actualHash = hash_file('sha256', $filePath);
+                // Server-side compute checksum to prevent spoofing and support cloud/S3
+                $stream = $disk->readStream($storagePath);
+                if (! $stream) {
+                    throw new DomainException(__('media.file_not_found'), errorCode: 'file_not_found');
+                }
+                $ctx = hash_init('sha256');
+                hash_update_stream($ctx, $stream);
+                fclose($stream);
+                $actualHash = hash_final($ctx);
 
                 if ($actualHash !== $clientChecksum) {
                     throw new DomainException(__('media.checksum_mismatch'), errorCode: 'checksum_mismatch');

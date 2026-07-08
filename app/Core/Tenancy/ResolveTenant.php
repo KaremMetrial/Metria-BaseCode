@@ -28,6 +28,14 @@ class ResolveTenant
             ?? $request->header('X-Tenant')
             ?? $request->user()?->tenant_id;
 
+        $user = $request->user();
+        if ($user && $tenantId !== null) {
+            $userTenantId = $user->getAttributes()['tenant_id'] ?? null;
+            if ($userTenantId !== null && (string) $userTenantId !== (string) $tenantId && ! $user->can('admin.super')) {
+                $tenantId = $userTenantId;
+            }
+        }
+
         $this->manager->set($tenantId);
 
         if ($tenantId !== null && function_exists('setPermissionsTeamId')) {

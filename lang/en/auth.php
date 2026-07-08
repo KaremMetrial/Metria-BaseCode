@@ -23,6 +23,7 @@ return [
         'conflict' => 'This social account is already linked to another user profile.',
         'cannot_unlink_only' => 'Cannot unlink your only authentication method without setting a password or linking another social account.',
         'provider_disabled' => 'OAuth provider [:provider] is not configured or is currently disabled.',
+        'tenant_mismatch' => 'Your account belongs to a different organization.',
     ],
 
     'governance' => [
