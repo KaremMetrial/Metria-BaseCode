@@ -44,7 +44,7 @@ class StripeGateway implements PaymentGateway
 
         if ($response->failed()) {
             throw new PaymentException(
-                $response->json('error.message', 'Stripe payment creation failed.'),
+                $response->json('error.message', __('payments.gateway_creation_failed', ['gateway' => 'stripe'])),
                 context: ['gateway' => 'stripe', 'status' => $response->status()],
             );
         }
@@ -136,7 +136,7 @@ class StripeGateway implements PaymentGateway
 
         if ($response->failed()) {
             throw new PaymentException(
-                $response->json('error.message', 'Stripe refund failed.'),
+                $response->json('error.message', __('payments.gateway_refund_failed', ['gateway' => 'stripe'])),
                 context: ['gateway' => 'stripe', 'status' => $response->status()],
             );
         }

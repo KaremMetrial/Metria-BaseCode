@@ -8,6 +8,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class OtpRegisterRequest extends FormRequest
 {
+    /**
+     * Public authentication flow; rate limiting and credential verification handle authorization.
+     */
     public function authorize(): bool
     {
         return true;

@@ -15,9 +15,9 @@ class GovernorateRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function getActiveByCountry(string $countryId): Collection
+    public function getActiveByCountry(string $countryId, ?string $tenantId = null): Collection
     {
-        return $this->query()
+        return $this->query($tenantId)
             ->where('country_id', $countryId)
             ->where('is_active', true)
             ->get();

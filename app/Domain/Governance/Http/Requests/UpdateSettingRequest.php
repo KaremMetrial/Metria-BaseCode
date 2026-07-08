@@ -10,7 +10,9 @@ class UpdateSettingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null && (
+            $this->user()->can('governance.settings.manage') || $this->user()->can('admin.super')
+        );
     }
 
     public function rules(): array

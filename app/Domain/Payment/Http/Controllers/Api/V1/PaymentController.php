@@ -23,6 +23,7 @@ class PaymentController extends ApiController
 
     public function index(Request $request): JsonResponse
     {
+        Gate::authorize('viewAny', Payment::class);
         $payments = Payment::query()
             ->where('user_id', $request->user()->id)
             ->latest()

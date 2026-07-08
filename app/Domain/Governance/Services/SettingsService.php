@@ -17,10 +17,19 @@ class SettingsService
 
     private const TTL = 3600;
 
+    protected function cacheKey(string $key): string
+    {
+        $tenantId = app(\App\Core\Tenancy\TenantManager::class)->id() ?: 'global';
+
+        return self::CACHE_PREFIX."{$tenantId}:{$key}";
+    }
+
     public function get(string $key, mixed $default = null): mixed
     {
+        $cacheKey = $this->cacheKey($key);
+
         $cached = Cache::remember(
-            self::CACHE_PREFIX.$key,
+            $cacheKey,
             self::TTL,
             function () use ($key) {
                 $setting = Setting::query()->where('key', $key)->first();
@@ -41,13 +50,13 @@ class SettingsService
             ['value' => ['data' => $value], 'description' => $description],
         );
 
-        Cache::forget(self::CACHE_PREFIX.$key);
+        Cache::forget($this->cacheKey($key));
     }
 
     public function forget(string $key): void
     {
         Setting::query()->where('key', $key)->delete();
-        Cache::forget(self::CACHE_PREFIX.$key);
+        Cache::forget($this->cacheKey($key));
     }
 
     public function all(): array

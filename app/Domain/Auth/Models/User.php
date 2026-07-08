@@ -29,6 +29,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'tenant_id', 'name', 'email', 'phone', 'password', 'locale',
+        'email_verified_at', 'phone_verified_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -55,6 +56,31 @@ class User extends Authenticatable
     public function fcmDeviceTokens(): HasMany
     {
         return $this->hasMany(FcmDeviceToken::class);
+    }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(UserSession::class);
+    }
+
+    public function socialIdentities(): HasMany
+    {
+        return $this->hasMany(UserSocialIdentity::class);
+    }
+
+    public function hasMfaEnabled(): bool
+    {
+        return ! empty($this->two_factor_secret) && ! empty($this->two_factor_confirmed_at);
+    }
+
+    public function hasPasswordSet(): bool
+    {
+        return ! empty($this->password);
+    }
+
+    public function canUnlinkIdentity(): bool
+    {
+        return $this->hasPasswordSet() || $this->socialIdentities()->count() > 1;
     }
 
     public function updateFcmDeviceToken(string $token, ?string $deviceId = null, ?string $deviceName = null, ?string $platform = null): FcmDeviceToken

@@ -51,7 +51,7 @@ abstract class ApiClient
                 ]);
 
                 throw new IntegrationException(
-                    "Could not reach [{$this->service()}].",
+                    __('integrations.connection_failed', ['service' => $this->service()]),
                     provider: $this->service(),
                 );
             }
@@ -62,7 +62,7 @@ abstract class ApiClient
                 ]);
 
                 throw new IntegrationException(
-                    "[{$this->service()}] responded with {$response->status()}.",
+                    __('integrations.service_error', ['service' => $this->service(), 'status' => $response->status()]),
                     provider: $this->service(),
                     context: ['status' => $response->status()],
                 );

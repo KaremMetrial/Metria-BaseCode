@@ -15,9 +15,9 @@ class DistrictRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function getActiveByCity(string $cityId): Collection
+    public function getActiveByCity(string $cityId, ?string $tenantId = null): Collection
     {
-        return $this->query()
+        return $this->query($tenantId)
             ->where('city_id', $cityId)
             ->where('is_active', true)
             ->get();

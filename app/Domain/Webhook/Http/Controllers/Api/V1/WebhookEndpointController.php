@@ -10,16 +10,21 @@ use App\Domain\Webhook\Http\Resources\WebhookEndpointResource;
 use App\Domain\Webhook\Models\WebhookEndpoint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class WebhookEndpointController extends ApiController
 {
     public function index(): JsonResponse
     {
+        Gate::authorize('viewAny', WebhookEndpoint::class);
+
         return $this->respond(WebhookEndpointResource::collection(WebhookEndpoint::query()->latest()->get()));
     }
 
     public function store(StoreWebhookEndpointRequest $request): JsonResponse
     {
+        Gate::authorize('create', WebhookEndpoint::class);
+
         $endpoint = WebhookEndpoint::create([
             ...$request->validated(),
             'secret' => WebhookEndpoint::generateSecret(),
@@ -33,6 +38,8 @@ class WebhookEndpointController extends ApiController
 
     public function update(StoreWebhookEndpointRequest $request, WebhookEndpoint $webhookEndpoint): JsonResponse
     {
+        Gate::authorize('update', $webhookEndpoint);
+
         $webhookEndpoint->update($request->validated());
 
         return $this->respond(new WebhookEndpointResource($webhookEndpoint));
@@ -40,6 +47,8 @@ class WebhookEndpointController extends ApiController
 
     public function destroy(WebhookEndpoint $webhookEndpoint): JsonResponse
     {
+        Gate::authorize('delete', $webhookEndpoint);
+
         $webhookEndpoint->delete();
 
         return $this->respondNoContent();
@@ -48,6 +57,8 @@ class WebhookEndpointController extends ApiController
     /** Rotate the signing secret (old signatures stop validating immediately). */
     public function rotateSecret(Request $request, WebhookEndpoint $webhookEndpoint): JsonResponse
     {
+        Gate::authorize('update', $webhookEndpoint);
+
         $webhookEndpoint->update(['secret' => WebhookEndpoint::generateSecret()]);
 
         $resource = (new WebhookEndpointResource($webhookEndpoint->refresh()))->additional(['reveal_secret' => true]);

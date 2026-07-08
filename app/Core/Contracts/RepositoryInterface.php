@@ -12,21 +12,21 @@ use Illuminate\Database\Eloquent\Model;
 
 interface RepositoryInterface
 {
-    public function find(int|string $id): ?Model;
+    public function find(int|string $id, ?string $tenantId = null): ?Model;
 
-    public function findOrFail(int|string $id): Model;
+    public function findOrFail(int|string $id, ?string $tenantId = null): Model;
 
-    public function all(array $columns = ['*']): Collection;
+    public function all(array $columns = ['*'], ?string $tenantId = null): Collection;
 
-    public function paginate(?int $perPage = null): LengthAwarePaginator;
+    public function paginate(?int $perPage = null, ?string $tenantId = null): LengthAwarePaginator;
 
-    public function filter(QueryFilter $filter): Builder;
+    public function filter(QueryFilter $filter, ?string $tenantId = null): Builder;
 
-    public function getFiltered(QueryFilter $filter, ?int $perPage = null): LengthAwarePaginator;
+    public function getFiltered(QueryFilter $filter, ?int $perPage = null, ?string $tenantId = null): LengthAwarePaginator;
 
-    public function create(array $attributes): Model;
+    public function create(array $attributes, ?string $tenantId = null): Model;
 
-    public function update(Model $model, array $attributes): Model;
+    public function update(Model $model, array $attributes, ?string $tenantId = null): Model;
 
-    public function delete(Model $model): bool;
+    public function delete(Model $model, ?string $tenantId = null): bool;
 }

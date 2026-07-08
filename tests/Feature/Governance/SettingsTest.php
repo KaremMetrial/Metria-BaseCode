@@ -87,4 +87,23 @@ class SettingsTest extends TestCase
 
         $this->assertEquals('new_value', $this->settings->get('my_config'));
     }
+
+    public function test_settings_service_isolates_cache_and_db_per_tenant(): void
+    {
+        $manager = app(\App\Core\Tenancy\TenantManager::class);
+
+        // Tenant A sets setting
+        $manager->set('tenant-a');
+        $this->settings->set('tax_rate', 0.15);
+        $this->assertEquals(0.15, $this->settings->get('tax_rate'));
+
+        // Tenant B sets setting with same key
+        $manager->set('tenant-b');
+        $this->settings->set('tax_rate', 0.05);
+        $this->assertEquals(0.05, $this->settings->get('tax_rate'));
+
+        // Switch back to Tenant A and verify cache/db isolation
+        $manager->set('tenant-a');
+        $this->assertEquals(0.15, $this->settings->get('tax_rate'));
+    }
 }

@@ -7,6 +7,7 @@ namespace App\Domain\Auth\Services;
 use App\Core\Events\EventBus;
 use App\Domain\Auth\Events\UserRegistered;
 use App\Domain\Auth\Models\User;
+use App\Domain\Governance\Services\AuditLogger;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -16,12 +17,16 @@ use Illuminate\Support\Facades\DB;
  */
 class RegisterUser
 {
-    public function __construct(private readonly EventBus $events) {}
+    public function __construct(
+        private readonly EventBus $events,
+        private readonly AuditLogger $audit
+    ) {}
 
-    public function __invoke(array $data): User
+    public function __invoke(array $data, ?string $tenantId = null): User
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data, $tenantId) {
             $user = User::query()->create([
+                'tenant_id' => $tenantId ?? ($data['tenant_id'] ?? null),
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
@@ -32,6 +37,7 @@ class RegisterUser
             $user->assignRole('customer');
 
             $this->events->publish(new UserRegistered($user));
+            $this->audit->log('auth.registered', $user, tenantId: $tenantId);
 
             return $user;
         });

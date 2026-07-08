@@ -68,7 +68,7 @@ class FawryGateway implements PaymentGateway
 
         if ($response->failed() || ($statusCode !== '' && $statusCode !== '200')) {
             throw new PaymentException(
-                (string) $response->json('statusDescription', 'Fawry charge failed.'),
+                (string) $response->json('statusDescription', __('payments.gateway_creation_failed', ['gateway' => 'fawry'])),
                 context: ['gateway' => 'fawry', 'status' => $response->status(), 'body' => $response->json()],
             );
         }
@@ -139,7 +139,7 @@ class FawryGateway implements PaymentGateway
 
         if ($fawryRef === '') {
             throw new PaymentException(
-                'Fawry refund requires the Fawry reference number (stored from the webhook).',
+                __('payments.missing_fawry_ref'),
                 errorCode: 'refund_unavailable',
             );
         }
@@ -161,7 +161,7 @@ class FawryGateway implements PaymentGateway
 
         if ($response->failed() || ($statusCode !== '' && $statusCode !== '200')) {
             throw new PaymentException(
-                (string) $response->json('statusDescription', 'Fawry refund failed.'),
+                (string) $response->json('statusDescription', __('payments.gateway_refund_failed', ['gateway' => 'fawry'])),
                 context: ['gateway' => 'fawry', 'status' => $response->status(), 'body' => $response->json()],
             );
         }

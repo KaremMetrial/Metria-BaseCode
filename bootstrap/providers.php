@@ -11,6 +11,8 @@ use App\Domain\Webhook\Providers\WebhookServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\BroadcastServiceProvider;
 use App\Providers\DomainEventServiceProvider;
+use App\Domain\Media\Providers\MediaServiceProvider;
+use App\Domain\Territory\Providers\TerritoryServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -24,6 +26,7 @@ return [
     IntegrationServiceProvider::class,
     GovernanceServiceProvider::class,
     AuthServiceProvider::class,
-    App\Domain\Media\Providers\MediaServiceProvider::class,
+    MediaServiceProvider::class,
+    TerritoryServiceProvider::class,
 ];
 

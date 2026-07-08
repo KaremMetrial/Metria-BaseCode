@@ -58,7 +58,7 @@ class Currency extends Model
         static::deleting(function (Currency $currency) {
             // Currencies are master data and should never be deleted once referenced
             if ($currency->exchangeRates()->exists()) {
-                throw new DomainException("Cannot delete currency {$currency->code} because it has referenced historical exchange rates. Retire it by setting is_active = false.");
+                throw new DomainException(__('currency.cannot_delete_historical', ['currency' => $currency->code]));
             }
 
             $hasPayments = DB::table('payments')
@@ -68,7 +68,7 @@ class Currency extends Model
                 ->exists();
 
             if ($hasPayments) {
-                throw new DomainException("Cannot delete currency {$currency->code} because it has referenced transaction/payment records. Retire it by setting is_active = false.");
+                throw new DomainException(__('currency.cannot_delete_referenced', ['currency' => $currency->code]));
             }
         });
     }

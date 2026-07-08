@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Currency\Services;
 
+use App\Core\Contracts\CurrencyRegistryResolver;
 use App\Core\Support\Money;
 
 class CurrencyConversionService
@@ -12,7 +13,7 @@ class CurrencyConversionService
 
     public function __construct(
         protected ExchangeRateService $rateService,
-        protected CurrencyRegistryResolverImpl $registryResolver
+        protected CurrencyRegistryResolver $registryResolver
     ) {}
 
     /**

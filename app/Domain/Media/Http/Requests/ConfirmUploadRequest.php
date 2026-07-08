@@ -10,7 +10,11 @@ class ConfirmUploadRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null && (
+            $this->user()->can('media.upload') ||
+            $this->user()->can('media.manage') ||
+            $this->user()->can('admin.super')
+        );
     }
 
     public function rules(): array

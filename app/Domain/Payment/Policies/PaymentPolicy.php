@@ -24,12 +24,31 @@ class PaymentPolicy
         return null;
     }
 
-    public function view(User $user, Payment $payment): bool
+    public function viewAny(User $user): bool
     {
+        return $user->can('payments.view') || $user->can('payments.create');
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->can('payments.create');
+    }
+
+    public function manage(User $user): bool
+    {
+        return $user->can('payments.manage');
+    }
+
+    public function view(User $user, ?Payment $payment = null): bool
+    {
+        if ($payment === null) {
+            return $user->can('payments.view');
+        }
+
         return (string) $user->id === (string) $payment->user_id || $user->can('payments.view');
     }
 
-    public function refund(User $user, Payment $payment): bool
+    public function refund(User $user, ?Payment $payment = null): bool
     {
         return $user->can('payments.refund');
     }

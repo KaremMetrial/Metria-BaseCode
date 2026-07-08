@@ -19,12 +19,16 @@ class AuditLogger
         array $oldValues = [],
         array $newValues = [],
         array $context = [],
+        ?string $tenantId = null,
     ): ?AuditLog {
         if (! config('governance.audit.enabled', true)) {
             return null;
         }
 
+        $resolvedTenantId = $tenantId ?? $auditable?->tenant_id ?? app(\App\Core\Tenancy\TenantManager::class)->id();
+
         return AuditLog::query()->create([
+            'tenant_id' => $resolvedTenantId,
             'user_id' => auth()->id(),
             'action' => $action,
             'auditable_type' => $auditable?->getMorphClass(),

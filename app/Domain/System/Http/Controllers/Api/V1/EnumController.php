@@ -22,7 +22,7 @@ class EnumController extends ApiController
         $enum = EnumRegistry::get($key);
 
         if ($enum === null) {
-            return $this->respondError("Enum not found for key: [{$key}].", 404, 'enum_not_found');
+            return $this->respondError(__('api.enum_not_found', ['key' => $key]), 404, 'enum_not_found');
         }
 
         return $this->respond(['key' => $key, 'cases' => $enum]);

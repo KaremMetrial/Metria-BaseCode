@@ -32,7 +32,7 @@ class TwilioDriver implements SmsProvider
 
             if ($response->failed()) {
                 throw new IntegrationException(
-                    (string) $response->json('message', 'Twilio SMS failed.'),
+                    (string) $response->json('message', __('integrations.sms_send_failed', ['provider' => 'twilio'])),
                     provider: 'twilio',
                     context: ['status' => $response->status()],
                 );

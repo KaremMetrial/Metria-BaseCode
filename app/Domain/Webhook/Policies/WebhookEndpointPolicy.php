@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Webhook\Policies;
 
 use App\Domain\Auth\Models\User;
+use App\Domain\Webhook\Models\WebhookEndpoint;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class WebhookEndpointPolicy
@@ -18,6 +19,31 @@ class WebhookEndpointPolicy
         }
 
         return null;
+    }
+
+    public function viewAny(User $user): bool
+    {
+        return $user->can('webhooks.view') || $user->can('webhooks.manage');
+    }
+
+    public function view(User $user, ?WebhookEndpoint $endpoint = null): bool
+    {
+        return $user->can('webhooks.view') || $user->can('webhooks.manage');
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->can('webhooks.manage');
+    }
+
+    public function update(User $user, ?WebhookEndpoint $endpoint = null): bool
+    {
+        return $user->can('webhooks.manage');
+    }
+
+    public function delete(User $user, ?WebhookEndpoint $endpoint = null): bool
+    {
+        return $user->can('webhooks.manage');
     }
 
     public function manage(User $user): bool

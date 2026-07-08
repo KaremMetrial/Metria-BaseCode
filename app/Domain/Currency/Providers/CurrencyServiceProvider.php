@@ -7,8 +7,13 @@ namespace App\Domain\Currency\Providers;
 use App\Core\Contracts\CurrencyRegistryResolver;
 use App\Domain\Currency\Console\Commands\SyncExchangeRates;
 use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
+use App\Domain\Currency\Models\Currency;
+use App\Domain\Currency\Models\CurrencyExchangeRate;
+use App\Domain\Currency\Policies\CurrencyExchangeRatePolicy;
+use App\Domain\Currency\Policies\CurrencyPolicy;
 use App\Domain\Currency\Repositories\ExchangeRateRepository;
 use App\Domain\Currency\Services\CurrencyRegistryResolverImpl;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class CurrencyServiceProvider extends ServiceProvider
@@ -36,6 +41,9 @@ class CurrencyServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Gate::policy(Currency::class, CurrencyPolicy::class);
+        Gate::policy(CurrencyExchangeRate::class, CurrencyExchangeRatePolicy::class);
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 SyncExchangeRates::class,

@@ -34,7 +34,7 @@ class ExchangeRateService
         }
 
         if ($rate === null) {
-            throw new DomainException("No exchange rate registered for currency: {$currencyCode}");
+            throw new DomainException(__('currency.exchange_rate_missing', ['currency' => $currencyCode]));
         }
 
         // Stale rate check
@@ -42,7 +42,7 @@ class ExchangeRateService
         $expirationWithGrace = Carbon::instance($rate->expires_at)->addHours($thresholdHours);
 
         if (Carbon::instance($at)->greaterThan($expirationWithGrace)) {
-            throw new DomainException("Exchange rate for {$currencyCode} is stale. Expired at: {$rate->expires_at->toIso8601String()}");
+            throw new DomainException(__('currency.exchange_rate_stale', ['currency' => $currencyCode, 'expired_at' => $rate->expires_at->toIso8601String()]));
         }
 
         return $rate;
@@ -70,7 +70,7 @@ class ExchangeRateService
                     ->exists();
 
                 if ($hasLockedOverride) {
-                    throw new DomainException("Cannot override rate for {$currencyCode} because a locked manual override covers this period.");
+                    throw new DomainException(__('currency.override_locked', ['currency' => $currencyCode]));
                 }
             }
 

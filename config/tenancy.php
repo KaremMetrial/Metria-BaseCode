@@ -12,5 +12,5 @@ return [
     */
     'enabled' => env('TENANCY_ENABLED', false),
 
-    'header' => env('TENANCY_HEADER', 'X-Tenant'),
+    'header' => env('TENANCY_HEADER', 'X-Tenant-ID'),
 ];

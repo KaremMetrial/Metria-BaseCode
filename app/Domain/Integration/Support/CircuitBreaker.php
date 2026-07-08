@@ -37,7 +37,7 @@ class CircuitBreaker
     {
         if ($this->isOpen($service)) {
             throw new IntegrationException(
-                "Circuit open for [{$service}] — provider temporarily disabled after repeated failures.",
+                __('integrations.circuit_open', ['service' => $service]),
                 provider: $service,
                 context: ['circuit' => 'open'],
             );

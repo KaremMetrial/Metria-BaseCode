@@ -33,6 +33,7 @@ class IdempotencyMiddleware
             $request->method(),
             $request->path(),
             (string) $request->user()?->getAuthIdentifier(),
+            (string) app(\App\Core\Tenancy\TenantManager::class)->id(),
         ]));
 
         $existing = IdempotencyKey::query()

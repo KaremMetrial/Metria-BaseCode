@@ -22,14 +22,19 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissions = [
             // Super Admin override
             'admin.super',
-            // Users
+            // Users & Sessions
             'users.view', 'users.create', 'users.update', 'users.delete',
+            'sessions.view', 'sessions.manage',
             // Roles
             'roles.view', 'roles.manage',
+            // Integrations
+            'integrations.oauth.view', 'integrations.oauth.manage',
             // Payments
-            'payments.view', 'payments.create', 'payments.refund',
+            'payments.view', 'payments.create', 'payments.refund', 'payments.manage',
             // Wallets
-            'wallets.view', 'wallets.adjust',
+            'wallets.view', 'wallets.adjust', 'wallets.manage',
+            // Currencies
+            'currencies.view', 'currencies.manage',
             // Territories & Logistics
             'territories.view', 'territories.manage',
             'zones.view', 'zones.manage',
@@ -39,8 +44,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'governance.flags.manage',
             'governance.audit.view',
             'governance.approvals.view', 'governance.approvals.decide',
+            // Media
+            'media.view', 'media.upload', 'media.delete', 'media.manage',
             // Webhooks
-            'webhooks.manage',
+            'webhooks.view', 'webhooks.manage',
         ];
 
         foreach ($permissions as $permission) {
@@ -51,8 +58,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'super-admin' => $permissions,
             'admin' => array_diff($permissions, ['roles.manage', 'admin.super']),
             'finance' => [
-                'payments.view', 'payments.refund',
-                'wallets.view', 'wallets.adjust',
+                'payments.view', 'payments.refund', 'payments.manage',
+                'wallets.view', 'wallets.adjust', 'wallets.manage',
+                'currencies.view', 'currencies.manage',
                 'governance.approvals.view', 'governance.approvals.decide',
             ],
             'logistics-dispatcher' => [
@@ -63,8 +71,17 @@ class RolesAndPermissionsSeeder extends Seeder
             'courier' => [
                 'territories.view', 'zones.view', 'couriers.track',
             ],
-            'support' => ['users.view', 'payments.view', 'wallets.view', 'territories.view', 'zones.view'],
-            'customer' => [],
+            'support' => [
+                'users.view', 'sessions.view', 'payments.view', 'wallets.view',
+                'territories.view', 'zones.view', 'currencies.view', 'integrations.oauth.view',
+                'media.view', 'webhooks.view',
+            ],
+            'user' => [
+                'currencies.view', 'territories.view', 'zones.view', 'media.view', 'media.upload', 'payments.create',
+            ],
+            'customer' => [
+                'currencies.view', 'territories.view', 'zones.view', 'media.view', 'media.upload', 'payments.create',
+            ],
         ];
 
         foreach ($roles as $role => $rolePermissions) {

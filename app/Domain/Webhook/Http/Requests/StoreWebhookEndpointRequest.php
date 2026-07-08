@@ -10,7 +10,10 @@ class StoreWebhookEndpointRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null && (
+            $this->user()->can('webhooks.manage') ||
+            $this->user()->can('admin.super')
+        );
     }
 
     public function rules(): array

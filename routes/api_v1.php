@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Domain\Auth\Http\Controllers\Api\V1\AuthController;
 use App\Domain\Auth\Http\Controllers\Api\V1\OtpAuthController;
+use App\Domain\Auth\Http\Controllers\Api\V1\SocialAuthController;
+use App\Domain\Integration\Http\Controllers\Api\V1\OAuthProviderController;
 use App\Domain\Governance\Http\Controllers\Api\V1\ApprovalController;
 use App\Domain\Governance\Http\Controllers\Api\V1\AuditLogController;
 use App\Domain\Governance\Http\Controllers\Api\V1\FeatureFlagController;
@@ -15,6 +17,7 @@ use App\Domain\System\Http\Controllers\Api\V1\HealthController;
 use App\Domain\Territory\Http\Controllers\Api\V1\TerritoryController;
 use App\Domain\Wallet\Http\Controllers\Api\V1\WalletController;
 use App\Domain\Webhook\Http\Controllers\Api\V1\WebhookEndpointController;
+use App\Domain\Media\Http\Controllers\Api\V1\MediaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +49,14 @@ Route::prefix('territories')->name('territories.')->group(function () {
 Route::middleware('throttle:auth')->prefix('auth')->name('auth.')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/mfa/verify', [AuthController::class, 'verifyMfa'])->name('mfa.verify');
+    Route::post('/password/forgot', [AuthController::class, 'forgotPassword'])->name('password.forgot');
+    Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.reset');
+
+    Route::prefix('social')->name('social.')->group(function () {
+        Route::get('/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('redirect');
+        Route::post('/{provider}/callback', [SocialAuthController::class, 'callback'])->name('callback');
+    });
 
     Route::prefix('otp')->name('otp.')->group(function () {
         Route::post('/send', [OtpAuthController::class, 'send'])->name('send');
@@ -73,6 +84,22 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
         Route::get('/me', [AuthController::class, 'me'])->name('me');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::post('/fcm-token', [AuthController::class, 'updateFcmToken'])->name('fcm-token');
+
+        Route::get('/sessions', [AuthController::class, 'sessions'])->name('sessions.index');
+        Route::delete('/sessions/{id}', [AuthController::class, 'revokeSession'])->name('sessions.destroy');
+
+        Route::prefix('mfa')->name('mfa.')->group(function () {
+            Route::post('/enable', [AuthController::class, 'enableMfa'])->name('enable');
+            Route::post('/confirm', [AuthController::class, 'confirmMfa'])->name('confirm');
+            Route::post('/disable', [AuthController::class, 'disableMfa'])->name('disable');
+        });
+
+        Route::prefix('social')->name('social.')->group(function () {
+            Route::post('/{provider}/link', [SocialAuthController::class, 'link'])->name('link');
+            Route::delete('/{provider}/unlink', [SocialAuthController::class, 'unlink'])->name('unlink');
+        });
+
+        Route::apiResource('oauth-providers', OAuthProviderController::class);
     });
 
     // Wallet Ledger
@@ -145,5 +172,12 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
         Route::put('/{webhookEndpoint}', [WebhookEndpointController::class, 'update'])->name('update');
         Route::delete('/{webhookEndpoint}', [WebhookEndpointController::class, 'destroy'])->name('destroy');
         Route::post('/{webhookEndpoint}/rotate-secret', [WebhookEndpointController::class, 'rotateSecret'])->name('rotate');
+    });
+
+    // Media Upload & Download
+    Route::prefix('media')->name('media.')->group(function () {
+        Route::post('/presign', [MediaController::class, 'presign'])->name('presign');
+        Route::post('/{media}/confirm', [MediaController::class, 'confirm'])->name('confirm');
+        Route::get('/{media}/download', [MediaController::class, 'download'])->name('download');
     });
 });

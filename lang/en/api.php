@@ -11,4 +11,5 @@ return [
     'server_error' => 'Something went wrong on our side. Please try again later.',
     'invalid_signature' => 'Invalid webhook signature.',
     'idempotency_in_flight' => 'A request with this idempotency key is already being processed.',
+    'enum_not_found' => 'Enum not found for key: [:key].',
 ];

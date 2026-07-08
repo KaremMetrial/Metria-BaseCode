@@ -21,8 +21,22 @@ class MediaPolicy
         return null;
     }
 
-    public function view(User $user, Media $media): bool
+    public function viewAny(User $user): bool
     {
+        return true;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->can('media.upload') || $user->can('media.manage');
+    }
+
+    public function view(User $user, ?Media $media = null): bool
+    {
+        if ($media === null) {
+            return true;
+        }
+
         // Public files can be viewed by anyone authenticated.
         if ($media->is_public) {
             return true;
@@ -33,17 +47,21 @@ class MediaPolicy
             return true;
         }
 
-        // If it is attached to a mediable model, check ownership or specific permissions.
-        return $user->can('media.view');
+        // For private files owned by others, only managers can view.
+        return $user->can('media.manage');
     }
 
-    public function download(User $user, Media $media): bool
+    public function download(User $user, ?Media $media = null): bool
     {
         return $this->view($user, $media);
     }
 
-    public function delete(User $user, Media $media): bool
+    public function delete(User $user, ?Media $media = null): bool
     {
+        if ($media === null) {
+            return $user->can('media.delete');
+        }
+
         return (string) $media->created_by === (string) $user->id || $user->can('media.delete');
     }
 }

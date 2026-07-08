@@ -34,12 +34,12 @@ class MediaUploadService
     ): array {
         $maxSize = config('media.max_file_size_bytes', 500 * 1024 * 1024);
         if ($size > $maxSize) {
-            throw new DomainException("File size exceeds maximum permitted limit.", errorCode: 'file_too_large');
+            throw new DomainException(__('media.file_too_large'), errorCode: 'file_too_large');
         }
 
         $allowedMimes = config('media.allowed_mimes', []);
         if (! in_array($mimeType, $allowedMimes, true)) {
-            throw new DomainException("File MIME type [{$mimeType}] is not allowed.", errorCode: 'disallowed_mime_type');
+            throw new DomainException(__('media.disallowed_mime_type', ['mime' => $mimeType]), errorCode: 'disallowed_mime_type');
         }
 
         // Determine media category type
@@ -115,96 +115,103 @@ class MediaUploadService
 
     public function confirmUpload(string $mediaId, string $clientChecksum, ?string $idempotencyKey = null): Media
     {
-        return DB::transaction(function () use ($mediaId, $clientChecksum) {
-            // Pessimistic locking to prevent double confirmation race conditions
-            /** @var Media $media */
-            $media = Media::query()->lockForUpdate()->findOrFail($mediaId);
+        try {
+            return DB::transaction(function () use ($mediaId, $clientChecksum) {
+                // Pessimistic locking to prevent double confirmation race conditions
+                /** @var Media $media */
+                $media = Media::query()->lockForUpdate()->findOrFail($mediaId);
 
-            // If already confirmed or processing, return early (idempotent)
-            if ($media->status !== MediaStatus::Pending && $media->status !== MediaStatus::Uploading) {
-                return $media;
-            }
+                // If already confirmed or processing, return early (idempotent)
+                if ($media->status !== MediaStatus::Pending && $media->status !== MediaStatus::Uploading) {
+                    return $media;
+                }
 
-            $diskName = $media->custom_properties['disk'];
-            $storagePath = $media->custom_properties['path'];
-            $filename = $media->custom_properties['filename'];
-            $disk = Storage::disk($diskName);
+                $diskName = $media->custom_properties['disk'];
+                $storagePath = $media->custom_properties['path'];
+                $filename = $media->custom_properties['filename'];
+                $disk = Storage::disk($diskName);
 
-            // Ensure physical file exists in storage
-            if (! $disk->exists($storagePath)) {
-                throw new DomainException("Uploaded file does not exist in target storage.", errorCode: 'file_not_found');
-            }
+                // Ensure physical file exists in storage
+                if (! $disk->exists($storagePath)) {
+                    throw new DomainException(__('media.file_not_found'), errorCode: 'file_not_found');
+                }
 
-            // Verify actual file size
-            $actualSize = $disk->size($storagePath);
+                // Verify actual file size
+                $actualSize = $disk->size($storagePath);
 
-            // Read raw contents to verify actual MIME type (MIME Sniffing)
-            $filePath = $disk->path($storagePath);
-            
-            // Server-side compute checksum to prevent spoofing
-            $actualHash = hash_file('sha256', $filePath);
+                // Read raw contents to verify actual MIME type (MIME Sniffing)
+                $filePath = $disk->path($storagePath);
+                
+                // Server-side compute checksum to prevent spoofing
+                $actualHash = hash_file('sha256', $filePath);
 
-            if ($actualHash !== $clientChecksum) {
+                if ($actualHash !== $clientChecksum) {
+                    throw new DomainException(__('media.checksum_mismatch'), errorCode: 'checksum_mismatch');
+                }
+
+                $actualMime = $disk->mimeType($storagePath) ?: 'application/octet-stream';
+
+                // Check if tenant-scoped deduplication is possible
+                $tenantId = $media->tenant_id;
+                
+                /** @var MediaBlob|null $existingBlob */
+                $existingBlob = MediaBlob::query()
+                    ->where('tenant_id', $tenantId)
+                    ->where('sha256', $actualHash)
+                    ->where('virus_status', 'safe') // Only link to clean blobs
+                    ->first();
+
+                if ($existingBlob) {
+                    // Link logical Media to the existing clean Blob
+                    $media->media_blob_id = $existingBlob->id;
+                    $media->save();
+
+                    // Deduplication: Delete redundant physical file since we already have it!
+                    $disk->delete($storagePath);
+                } else {
+                    // Create a new physical Blob entry
+                    $blob = MediaBlob::query()->create([
+                        'tenant_id' => $tenantId,
+                        'sha256' => $actualHash,
+                        'disk' => $diskName,
+                        'path' => $storagePath,
+                        'filename' => $filename,
+                        'original_filename' => $filename,
+                        'mime_type' => $actualMime,
+                        'size' => $actualSize,
+                        'virus_status' => 'pending',
+                        'uploaded_at' => now(),
+                    ]);
+
+                    $media->media_blob_id = $blob->id;
+                    $media->save();
+                }
+
+                // Set checksum on Logical media
+                $media->checksum = $actualHash;
+                $media->hash_algorithm = 'sha256';
+                $media->save();
+
+                // Transition status to uploaded
+                $this->stateMachine->transition($media, MediaStatus::Uploaded);
+
+                // Transition to verifying and queue asynchronous scan pipeline
+                $this->stateMachine->transition($media, MediaStatus::Verifying);
+                
+                event(new MediaUploaded($media));
+
+                VerifyMediaUpload::dispatch($media->id);
+
+                return $media->refresh();
+            });
+        } catch (DomainException $e) {
+            if ($e->errorCode === 'checksum_mismatch') {
+                $media = Media::query()->findOrFail($mediaId);
                 $this->stateMachine->transition($media, MediaStatus::Failed);
-                $media->update(['processing_error' => 'Checksum verification failed.']);
-                throw new DomainException("Integrity check failed: checksum mismatch.", errorCode: 'checksum_mismatch');
+                $media->update(['processing_error' => __('media.checksum_failed')]);
             }
-
-            $actualMime = $disk->mimeType($storagePath) ?: 'application/octet-stream';
-
-            // Check if tenant-scoped deduplication is possible
-            $tenantId = $media->tenant_id;
-            
-            /** @var MediaBlob|null $existingBlob */
-            $existingBlob = MediaBlob::query()
-                ->where('tenant_id', $tenantId)
-                ->where('sha256', $actualHash)
-                ->where('virus_status', 'safe') // Only link to clean blobs
-                ->first();
-
-            if ($existingBlob) {
-                // Link logical Media to the existing clean Blob
-                $media->media_blob_id = $existingBlob->id;
-                $media->save();
-
-                // Deduplication: Delete redundant physical file since we already have it!
-                $disk->delete($storagePath);
-            } else {
-                // Create a new physical Blob entry
-                $blob = MediaBlob::query()->create([
-                    'tenant_id' => $tenantId,
-                    'sha256' => $actualHash,
-                    'disk' => $diskName,
-                    'path' => $storagePath,
-                    'filename' => $filename,
-                    'original_filename' => $filename,
-                    'mime_type' => $actualMime,
-                    'size' => $actualSize,
-                    'virus_status' => 'pending',
-                    'uploaded_at' => now(),
-                ]);
-
-                $media->media_blob_id = $blob->id;
-                $media->save();
-            }
-
-            // Set checksum on Logical media
-            $media->checksum = $actualHash;
-            $media->hash_algorithm = 'sha256';
-            $media->save();
-
-            // Transition status to uploaded
-            $this->stateMachine->transition($media, MediaStatus::Uploaded);
-
-            // Transition to verifying and queue asynchronous scan pipeline
-            $this->stateMachine->transition($media, MediaStatus::Verifying);
-            
-            event(new MediaUploaded($media));
-
-            VerifyMediaUpload::dispatch($media->id);
-
-            return $media->refresh();
-        });
+            throw $e;
+        }
     }
 
     private function determineMediaType(string $mimeType): MediaType

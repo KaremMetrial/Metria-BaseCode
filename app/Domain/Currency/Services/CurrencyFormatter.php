@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Domain\Currency\Services;
 
+use App\Core\Contracts\CurrencyRegistryResolver;
 use App\Core\Support\Money;
 use NumberFormatter;
 
 class CurrencyFormatter
 {
     public function __construct(
-        protected CurrencyRegistryResolverImpl $resolver
+        protected CurrencyRegistryResolver $resolver
     ) {}
 
     /**

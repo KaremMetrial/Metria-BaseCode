@@ -29,6 +29,7 @@ class Media extends Model
     protected $table = 'media';
 
     protected $fillable = [
+        'id',
         'tenant_id',
         'media_blob_id',
         'mediable_type',

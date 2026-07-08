@@ -73,7 +73,7 @@ class FcmPushProvider
 
                 return is_array($result) ? ($result['name'] ?? 'sent') : (string) $result;
             } catch (FirebaseException|Throwable $e) {
-                throw new IntegrationException('FCM push failed.', provider: 'fcm', context: [
+                throw new IntegrationException(__('integrations.push_send_failed', ['provider' => 'fcm']), provider: 'fcm', context: [
                     'error' => $e->getMessage(),
                 ], previous: $e);
             }

@@ -10,7 +10,10 @@ class RefundPaymentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // permission middleware guards the route
+        return $this->user() !== null && (
+            $this->user()->can('payments.refund') ||
+            $this->user()->can('admin.super')
+        );
     }
 
     public function rules(): array

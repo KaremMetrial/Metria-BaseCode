@@ -15,9 +15,9 @@ class CityRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function getActiveByGovernorate(string $governorateId): Collection
+    public function getActiveByGovernorate(string $governorateId, ?string $tenantId = null): Collection
     {
-        return $this->query()
+        return $this->query($tenantId)
             ->where('governorate_id', $governorateId)
             ->where('is_active', true)
             ->get();

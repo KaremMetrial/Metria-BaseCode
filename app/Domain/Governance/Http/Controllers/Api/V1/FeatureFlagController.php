@@ -9,6 +9,7 @@ use App\Domain\Governance\Models\FeatureFlag;
 use App\Domain\Governance\Services\FeatureFlagService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class FeatureFlagController extends ApiController
 {
@@ -16,6 +17,7 @@ class FeatureFlagController extends ApiController
 
     public function index(): JsonResponse
     {
+        Gate::authorize('viewAny', FeatureFlag::class);
         return $this->respond(FeatureFlag::query()->orderBy('name')->get());
     }
 
@@ -30,6 +32,7 @@ class FeatureFlagController extends ApiController
 
     public function toggle(Request $request, string $name): JsonResponse
     {
+        Gate::authorize('toggle', FeatureFlag::class);
         $request->validate(['enabled' => ['required', 'boolean']]);
 
         $flag = $this->flags->toggle($name, $request->boolean('enabled'));

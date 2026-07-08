@@ -109,7 +109,7 @@ class ApprovalService
     private function assertActionRegistered(string $action): void
     {
         if (! array_key_exists($action, config('governance.approvals.handlers', []))) {
-            throw new DomainException("No approval handler registered for [{$action}].", 'unknown_approval_action');
+            throw new DomainException(__('governance.unknown_action', ['action' => $action]), 'unknown_approval_action');
         }
     }
 

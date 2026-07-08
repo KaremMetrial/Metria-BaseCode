@@ -11,4 +11,5 @@ return [
     'server_error' => 'حدث خطأ من جانبنا. يُرجى المحاولة لاحقًا.',
     'invalid_signature' => 'توقيع Webhook غير صالح.',
     'idempotency_in_flight' => 'يوجد طلب قيد المعالجة بنفس مفتاح Idempotency.',
+    'enum_not_found' => 'لم يتم العثور على التعداد المفهرس بالرمز: [:key].',
 ];

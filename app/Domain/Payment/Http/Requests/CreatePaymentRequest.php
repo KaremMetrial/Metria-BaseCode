@@ -10,7 +10,10 @@ class CreatePaymentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // any authenticated user can pay; route enforces auth
+        return $this->user() !== null && (
+            $this->user()->can('payments.create') ||
+            $this->user()->can('admin.super')
+        );
     }
 
     public function rules(): array

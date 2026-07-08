@@ -9,6 +9,9 @@ use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends FormRequest
 {
+    /**
+     * Public authentication flow; rate limiting and credential verification handle authorization.
+     */
     public function authorize(): bool
     {
         return true;

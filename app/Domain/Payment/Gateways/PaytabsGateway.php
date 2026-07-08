@@ -55,7 +55,7 @@ class PaytabsGateway implements PaymentGateway
 
         if ($response->failed() || ! $response->json('tran_ref')) {
             throw new PaymentException(
-                (string) $response->json('message', 'PayTabs payment creation failed.'),
+                (string) $response->json('message', __('payments.gateway_creation_failed', ['gateway' => 'paytabs'])),
                 context: ['gateway' => 'paytabs', 'status' => $response->status(), 'body' => $response->json()],
             );
         }
@@ -131,7 +131,7 @@ class PaytabsGateway implements PaymentGateway
 
         if (! $ok) {
             throw new PaymentException(
-                (string) data_get($response->json(), 'payment_result.response_message', 'PayTabs refund failed.'),
+                (string) data_get($response->json(), 'payment_result.response_message', __('payments.gateway_refund_failed', ['gateway' => 'paytabs'])),
                 context: ['gateway' => 'paytabs', 'status' => $response->status(), 'body' => $response->json()],
             );
         }

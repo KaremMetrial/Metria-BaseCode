@@ -15,9 +15,9 @@ class CountryRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function getActiveCountries(): Collection
+    public function getActiveCountries(?string $tenantId = null): Collection
     {
-        return $this->query()
+        return $this->query($tenantId)
             ->where('is_active', true)
             ->orderBy('iso_code_2')
             ->get();

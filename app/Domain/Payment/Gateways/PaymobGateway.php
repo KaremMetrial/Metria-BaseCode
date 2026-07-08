@@ -61,7 +61,7 @@ class PaymobGateway implements PaymentGateway
         ]);
 
         if ($order->failed()) {
-            throw new PaymentException('Paymob order creation failed.', context: [
+            throw new PaymentException(__('payments.gateway_creation_failed', ['gateway' => 'paymob']), context: [
                 'gateway' => 'paymob', 'status' => $order->status(), 'body' => $order->json(),
             ]);
         }
@@ -92,7 +92,7 @@ class PaymobGateway implements PaymentGateway
         ]);
 
         if ($key->failed()) {
-            throw new PaymentException('Paymob payment key creation failed.', context: [
+            throw new PaymentException(__('payments.gateway_creation_failed', ['gateway' => 'paymob']), context: [
                 'gateway' => 'paymob', 'status' => $key->status(), 'body' => $key->json(),
             ]);
         }
@@ -172,7 +172,7 @@ class PaymobGateway implements PaymentGateway
 
         if (! $transactionId) {
             throw new PaymentException(
-                'Paymob refund requires the captured transaction id (stored from the webhook).',
+                __('payments.missing_transaction_id'),
                 errorCode: 'refund_unavailable',
             );
         }
@@ -184,7 +184,7 @@ class PaymobGateway implements PaymentGateway
         ]);
 
         if ($response->failed()) {
-            throw new PaymentException('Paymob refund failed.', context: [
+            throw new PaymentException(__('payments.gateway_refund_failed', ['gateway' => 'paymob']), context: [
                 'gateway' => 'paymob', 'status' => $response->status(), 'body' => $response->json(),
             ]);
         }
@@ -206,7 +206,7 @@ class PaymobGateway implements PaymentGateway
         ]);
 
         if ($response->failed() || ! $response->json('token')) {
-            throw new PaymentException('Paymob authentication failed.', context: [
+            throw new PaymentException(__('payments.gateway_auth_failed', ['gateway' => 'paymob']), context: [
                 'gateway' => 'paymob', 'status' => $response->status(),
             ]);
         }

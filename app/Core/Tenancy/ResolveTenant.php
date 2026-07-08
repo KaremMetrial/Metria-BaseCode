@@ -22,7 +22,10 @@ class ResolveTenant
             return $next($request);
         }
 
-        $tenantId = $request->header(config('tenancy.header', 'X-Tenant'))
+        $headerName = config('tenancy.header', 'X-Tenant-ID');
+        $tenantId = $request->header($headerName)
+            ?? $request->header('X-Tenant-ID')
+            ?? $request->header('X-Tenant')
             ?? $request->user()?->tenant_id;
 
         $this->manager->set($tenantId);

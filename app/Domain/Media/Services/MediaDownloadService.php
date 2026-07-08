@@ -37,8 +37,8 @@ class MediaDownloadService
         }
 
         // Increment download count and update timing details (auditing)
-        $media->increment('download_count');
         $media->update([
+            'download_count' => $media->download_count + 1,
             'last_downloaded_at' => now(),
         ]);
 

@@ -16,6 +16,15 @@ class PaymentFlowTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function createPaymentUser(): User
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('customer');
+
+        return $user;
+    }
+
     private function fakeStripe(): void
     {
         Http::fake([
@@ -30,7 +39,7 @@ class PaymentFlowTest extends TestCase
     public function test_payment_creation_returns_next_action_from_gateway(): void
     {
         $this->fakeStripe();
-        $user = User::factory()->create();
+        $user = $this->createPaymentUser();
 
         $response = $this->actingAs($user)->postJson('/api/v1/payments', [
             'amount' => '150.50',
@@ -54,7 +63,7 @@ class PaymentFlowTest extends TestCase
     public function test_idempotency_key_replays_the_original_response(): void
     {
         $this->fakeStripe();
-        $user = User::factory()->create();
+        $user = $this->createPaymentUser();
         $key = (string) Str::uuid();
         $body = ['amount' => '99.99', 'gateway' => 'stripe'];
 
@@ -77,7 +86,7 @@ class PaymentFlowTest extends TestCase
         $this->fakeStripe();
         config(['payments.gateways.stripe.webhook_secret' => 'whsec_test']);
 
-        $user = User::factory()->create();
+        $user = $this->createPaymentUser();
         $this->actingAs($user)->postJson('/api/v1/payments', [
             'amount' => '10.00', 'gateway' => 'stripe',
         ], ['Idempotency-Key' => (string) Str::uuid()])->assertCreated();

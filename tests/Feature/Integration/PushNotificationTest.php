@@ -47,7 +47,7 @@ class PushNotificationTest extends TestCase
         });
 
         $this->expectException(IntegrationException::class);
-        $this->expectExceptionMessage('FCM push failed.');
+        $this->expectExceptionMessage(__('integrations.push_send_failed', ['provider' => 'fcm']));
 
         $provider = new FcmPushProvider;
         $provider->send('invalid-token', 'Title', 'Body');

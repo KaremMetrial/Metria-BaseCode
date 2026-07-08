@@ -11,6 +11,7 @@ use App\Domain\Governance\Models\ApprovalRequest;
 use App\Domain\Governance\Services\ApprovalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ApprovalController extends ApiController
 {
@@ -18,6 +19,7 @@ class ApprovalController extends ApiController
 
     public function index(Request $request): JsonResponse
     {
+        Gate::authorize('viewAny', ApprovalRequest::class);
         $requests = ApprovalRequest::query()
             ->with(['requester', 'approver'])
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', ApprovalStatus::from($status)))
@@ -29,6 +31,7 @@ class ApprovalController extends ApiController
 
     public function approve(Request $request, ApprovalRequest $approvalRequest): JsonResponse
     {
+        Gate::authorize('decide', $approvalRequest);
         $approved = $this->approvals->approve($approvalRequest, $request->user());
 
         return $this->respond(new ApprovalRequestResource($approved->load(['requester', 'approver'])), __('governance.approved'));
@@ -36,6 +39,7 @@ class ApprovalController extends ApiController
 
     public function reject(Request $request, ApprovalRequest $approvalRequest): JsonResponse
     {
+        Gate::authorize('decide', $approvalRequest);
         $request->validate(['reason' => ['nullable', 'string', 'max:500']]);
 
         $rejected = $this->approvals->reject($approvalRequest, $request->user(), $request->input('reason'));

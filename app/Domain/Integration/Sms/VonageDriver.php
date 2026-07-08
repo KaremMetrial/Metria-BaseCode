@@ -34,7 +34,7 @@ class VonageDriver implements SmsProvider
 
             if ($response->failed() || $status !== '0') {
                 throw new IntegrationException(
-                    (string) data_get($response->json(), 'messages.0.error-text', 'Vonage SMS failed.'),
+                    (string) data_get($response->json(), 'messages.0.error-text', __('integrations.sms_send_failed', ['provider' => 'vonage'])),
                     provider: 'vonage',
                     context: ['status' => $response->status(), 'provider_status' => $status],
                 );

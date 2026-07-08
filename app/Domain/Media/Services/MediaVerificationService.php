@@ -50,7 +50,7 @@ class MediaVerificationService
             if (! $scanResult->isClean()) {
                 $this->stateMachine->transition($media, MediaStatus::Quarantined);
                 $media->update([
-                    'processing_error' => 'Virus scan failed: File is infected.',
+                    'processing_error' => __('media.virus_detected'),
                     'quarantined_at' => now(),
                 ]);
                 event(new MediaQuarantined($media, 'virus_detected'));
@@ -75,7 +75,7 @@ class MediaVerificationService
             if (! $modResult->approved) {
                 $this->stateMachine->transition($media, MediaStatus::Quarantined);
                 $media->update([
-                    'processing_error' => 'Content moderation failed: NSFW/18+ content detected.',
+                    'processing_error' => __('media.nsfw_detected'),
                     'quarantined_at' => now(),
                 ]);
                 event(new MediaQuarantined($media, 'nsfw_detected'));

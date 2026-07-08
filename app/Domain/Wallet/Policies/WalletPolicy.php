@@ -21,13 +21,31 @@ class WalletPolicy
         return null;
     }
 
-    public function view(User $user, Wallet $wallet): bool
+    public function viewAny(User $user): bool
     {
+        return $user->can('wallets.view');
+    }
+
+    public function manage(User $user): bool
+    {
+        return $user->can('wallets.manage');
+    }
+
+    public function view(User $user, ?Wallet $wallet = null): bool
+    {
+        if ($wallet === null) {
+            return $user->can('wallets.view');
+        }
+
         return (string) $user->id === (string) $wallet->user_id || $user->can('wallets.view');
     }
 
-    public function viewTransactions(User $user, Wallet $wallet): bool
+    public function viewTransactions(User $user, ?Wallet $wallet = null): bool
     {
+        if ($wallet === null) {
+            return $user->can('wallets.view');
+        }
+
         return (string) $user->id === (string) $wallet->user_id || $user->can('wallets.view');
     }
 }
