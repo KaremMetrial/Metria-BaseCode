@@ -18,7 +18,7 @@ class ApproveRefundHandler
     public function __invoke(array $payload, ApprovalRequest $request): void
     {
         /** @var Payment $payment */
-        $payment = Payment::query()->findOrFail($payload['payment_id']);
+        $payment = Payment::query()->withoutGlobalScopes()->findOrFail($payload['payment_id']);
 
         $this->payments->executeRefund($payment, $payload['amount'] ?? null);
     }

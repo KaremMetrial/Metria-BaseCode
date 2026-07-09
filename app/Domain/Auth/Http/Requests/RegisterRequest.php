@@ -29,6 +29,7 @@ class RegisterRequest extends FormRequest
             'device_id' => ['nullable', 'string', 'max:255'],
             'device_name' => ['nullable', 'string', 'max:255'],
             'platform' => ['nullable', 'string', 'in:ios,android,web'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ];
     }
 }

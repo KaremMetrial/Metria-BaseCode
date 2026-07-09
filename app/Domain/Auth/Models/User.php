@@ -97,6 +97,12 @@ class User extends Authenticatable
         );
     }
 
+    public function avatar(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(\App\Domain\Media\Models\Media::class, 'mediable')
+            ->where('purpose', 'avatar');
+    }
+
     protected static function newFactory()
     {
         return UserFactory::new();

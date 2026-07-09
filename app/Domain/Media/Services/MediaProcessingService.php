@@ -34,13 +34,21 @@ class MediaProcessingService
             $isLocal = true;
         } catch (\Throwable) {
             $tempPath = tempnam(sys_get_temp_dir(), 'media_process_');
-            $source = $disk->readStream($blob->path);
-            $target = fopen($tempPath, 'wb');
-            if ($source && $target) {
-                stream_copy_to_stream($source, $target);
+            if ($tempPath === false) {
+                throw new \RuntimeException("Failed to create temporary file.");
             }
-            if ($source) fclose($source);
-            if ($target) fclose($target);
+            $source = $disk->readStream($blob->path);
+            if (! $source) {
+                throw new \RuntimeException("Failed to open read stream for path: {$blob->path}");
+            }
+            $target = fopen($tempPath, 'wb');
+            if (! $target) {
+                fclose($source);
+                throw new \RuntimeException("Failed to open write stream for path: {$tempPath}");
+            }
+            stream_copy_to_stream($source, $target);
+            fclose($source);
+            fclose($target);
             $filePath = $tempPath;
         }
 
@@ -78,7 +86,7 @@ class MediaProcessingService
             report($e);
             $this->stateMachine->transition($media, MediaStatus::Failed);
             $media->update([
-                'processing_error' => 'Processing failed: ' . $e->getMessage(),
+                'processing_error' => __('media.processing_failed', ['error' => $e->getMessage()]),
             ]);
         } finally {
             if (! $isLocal && file_exists($filePath)) {
@@ -127,8 +135,14 @@ class MediaProcessingService
         foreach ($variants as $name => $specs) {
             $variantPath = str_replace('.', "_{$name}.", $media->blob->path);
             
-            // In a real application, resize image here. We copy the file for high reliability.
-            $disk->copy($media->blob->path, $variantPath);
+            // Upload the EXIF-stripped/modified local file stream to the variant path
+            $fh = fopen($filePath, 'r');
+            if ($fh) {
+                $disk->put($variantPath, $fh);
+                fclose($fh);
+            } else {
+                throw new \RuntimeException("Failed to open local path {$filePath} for reading variant.");
+            }
 
             $processingTime = (int) ((microtime(true) - microtime(true)) * 1000);
 

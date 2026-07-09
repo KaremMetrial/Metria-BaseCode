@@ -218,6 +218,82 @@ class MediaUploadService
         }
     }
 
+    public function storeUploadedFile(
+        \Illuminate\Http\UploadedFile $file,
+        ?User $user,
+        ?string $tenantId = null,
+        string $purpose = 'attachment',
+        bool $isPublic = false,
+        array $options = [],
+        ?string $mediableType = null,
+        ?string $mediableId = null
+    ): Media {
+        $maxSize = config('media.max_file_size_bytes', 500 * 1024 * 1024);
+        if ($file->getSize() > $maxSize) {
+            throw new DomainException(__('media.file_too_large'), errorCode: 'file_too_large');
+        }
+
+        $allowedMimes = config('media.allowed_mimes', []);
+        $mimeType = $file->getMimeType();
+        if (! in_array($mimeType, $allowedMimes, true)) {
+            throw new DomainException(__('media.disallowed_mime_type', ['mime' => $mimeType]), errorCode: 'disallowed_mime_type');
+        }
+
+        $mediaType = $this->determineMediaType($mimeType);
+        $mediaId = (string) Str::uuid();
+
+        $sanitizedName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($file->getClientOriginalName()));
+        $extension = pathinfo($sanitizedName, PATHINFO_EXTENSION);
+        $diskName = $isPublic ? config('media.default_disk', 'public') : config('media.private_disk', 'local');
+        $storagePath = sprintf('tenants/%s/%s/%s.%s', $tenantId ?? 'global', $mediaType->value, $mediaId, $extension ?: 'bin');
+
+        $disk = Storage::disk($diskName);
+        $disk->putFileAs(dirname($storagePath), $file, basename($storagePath));
+
+        $checksum = hash_file('sha256', $file->getRealPath());
+
+        return DB::transaction(function () use ($user, $tenantId, $mediaId, $mediaType, $purpose, $isPublic, $sanitizedName, $mimeType, $checksum, $diskName, $storagePath, $options, $mediableType, $mediableId) {
+            $blob = MediaBlob::query()->create([
+                'tenant_id' => $tenantId,
+                'sha256' => $checksum,
+                'disk' => $diskName,
+                'path' => $storagePath,
+                'filename' => $sanitizedName,
+                'original_filename' => $sanitizedName,
+                'mime_type' => $mimeType,
+                'size' => Storage::disk($diskName)->size($storagePath),
+                'virus_status' => 'pending',
+                'uploaded_at' => now(),
+            ]);
+
+            $media = Media::query()->create([
+                'id' => $mediaId,
+                'tenant_id' => $tenantId,
+                'media_blob_id' => $blob->id,
+                'mediable_type' => $mediableType,
+                'mediable_id' => $mediableId,
+                'media_type' => $mediaType,
+                'purpose' => $purpose,
+                'is_public' => $isPublic,
+                'status' => MediaStatus::Verifying,
+                'checksum' => $checksum,
+                'hash_algorithm' => 'sha256',
+                'custom_properties' => array_merge($options, [
+                    'filename' => $sanitizedName,
+                    'disk' => $diskName,
+                    'path' => $storagePath,
+                ]),
+                'created_by' => $user?->id,
+            ]);
+
+            event(new MediaUploaded($media));
+
+            VerifyMediaUpload::dispatch($media->id);
+
+            return $media;
+        });
+    }
+
     private function determineMediaType(string $mimeType): MediaType
     {
         if (str_starts_with($mimeType, 'image/')) {

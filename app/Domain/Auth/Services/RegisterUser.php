@@ -7,7 +7,7 @@ namespace App\Domain\Auth\Services;
 use App\Core\Events\EventBus;
 use App\Domain\Auth\Events\UserRegistered;
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\AuditLogger;
+use App\Domain\Media\Services\MediaUploadService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -19,7 +19,8 @@ class RegisterUser
 {
     public function __construct(
         private readonly EventBus $events,
-        private readonly AuditLogger $audit
+        private readonly AuditLogger $audit,
+        private readonly MediaUploadService $mediaUpload
     ) {}
 
     public function __invoke(array $data, ?string $tenantId = null): User
@@ -35,6 +36,19 @@ class RegisterUser
             ]);
 
             $user->assignRole('customer');
+
+            if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
+                $this->mediaUpload->storeUploadedFile(
+                    $data['avatar'],
+                    $user,
+                    $user->tenant_id,
+                    'avatar',
+                    true,
+                    [],
+                    User::class,
+                    $user->id
+                );
+            }
 
             $this->events->publish(new UserRegistered($user));
             $this->audit->log('auth.registered', $user, tenantId: $tenantId);

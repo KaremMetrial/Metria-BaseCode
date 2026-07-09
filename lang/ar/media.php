@@ -8,4 +8,5 @@ return [
     'checksum_failed' => 'فشل التحقق من المجموع الاختباري (Checksum).',
     'virus_detected' => 'فحص الفيروسات فشل: الملف مصاب بفيروس.',
     'nsfw_detected' => 'فحص المحتوى فشل: تم اكتشاف محتوى غير مناسب (18+ / محظور).',
+    'processing_failed' => 'فشل المعالجة: :error',
 ];

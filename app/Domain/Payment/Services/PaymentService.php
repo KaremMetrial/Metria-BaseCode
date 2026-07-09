@@ -85,12 +85,13 @@ class PaymentService
 
         /** @var Payment $payment */
         $payment = Payment::query()
+            ->withoutGlobalScopes()
             ->where('gateway', $driver->name())
             ->where('gateway_reference', $webhook->gatewayReference)
             ->firstOrFail();
 
         return DB::transaction(function () use ($payment, $webhook) {
-            $payment = Payment::query()->lockForUpdate()->findOrFail($payment->id);
+            $payment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
             $previous = $payment->status;
 
             if ($previous === $webhook->status) {
@@ -147,7 +148,7 @@ class PaymentService
         $result = $driver->refund($payment, $amount);
 
         return DB::transaction(function () use ($payment, $amount) {
-            $payment = Payment::query()->lockForUpdate()->findOrFail($payment->id);
+            $payment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
             $this->assertRefundable($payment, $amount);
 
             $refunded = ($amount ?? $payment->remainingRefundable())->amount;

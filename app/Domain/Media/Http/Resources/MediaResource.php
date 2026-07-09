@@ -20,7 +20,7 @@ class MediaResource extends JsonResource
         $downloadService = app(MediaDownloadService::class);
 
         $downloadUrl = '';
-        if ($this->resource->status === \App\Domain\Media\Enums\MediaStatus::Active) {
+        if ($this->resource->status === \App\Domain\Media\Enums\MediaStatus::Active && $this->resource->blob !== null) {
             try {
                 if ($this->resource->is_public) {
                     $downloadUrl = Storage::disk($this->resource->blob->disk)->url($this->resource->blob->path);
@@ -39,8 +39,8 @@ class MediaResource extends JsonResource
             'is_public' => $this->resource->is_public,
             'status' => $this->resource->status->value,
             'filename' => $this->resource->custom_properties['filename'] ?? '',
-            'size' => $this->resource->blob->size ?? 0,
-            'mime_type' => $this->resource->blob->mime_type ?? '',
+            'size' => $this->resource->blob?->size ?? 0,
+            'mime_type' => $this->resource->blob?->mime_type ?? '',
             'download_url' => $downloadUrl,
             'moderation_status' => $this->resource->moderation_status,
             'processing_error' => $this->resource->processing_error,

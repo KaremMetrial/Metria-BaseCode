@@ -431,4 +431,29 @@ class MediaUploadTest extends TestCase
         $response = $this->getJson("/api/v1/media/{$presign['data']['media_id']}/download");
         $response->assertStatus(200);
     }
+
+    public function test_pending_media_resource_serialization_does_not_crash(): void
+    {
+        $user = $this->createTenantUser('org-1');
+        $media = Media::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'tenant_id' => 'org-1',
+            'media_type' => MediaType::Image,
+            'purpose' => 'avatar',
+            'is_public' => true,
+            'status' => MediaStatus::Pending,
+            'custom_properties' => [
+                'filename' => 'photo.jpg',
+            ],
+            'created_by' => $user->id,
+        ]);
+
+        $resource = new \App\Domain\Media\Http\Resources\MediaResource($media);
+        $array = $resource->toArray(request());
+
+        $this->assertEquals($media->id, $array['id']);
+        $this->assertEquals(0, $array['size']);
+        $this->assertEquals('', $array['mime_type']);
+        $this->assertEquals('', $array['download_url']);
+    }
 }

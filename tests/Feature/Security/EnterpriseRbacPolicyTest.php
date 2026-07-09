@@ -162,4 +162,58 @@ class EnterpriseRbacPolicyTest extends TestCase
 
         $this->assertTrue(Gate::forUser($customer)->allows('viewAny', \App\Domain\Payment\Models\Payment::class));
     }
+
+    public function test_cross_tenant_wallet_approval_and_payment_operations(): void
+    {
+        // 1. Enable Tenancy
+        config(['tenancy.enabled' => true]);
+
+        // Insert Tenant records to satisfy foreign key constraints
+        \Illuminate\Support\Facades\DB::table('tenants')->insert([
+            ['id' => 'tenant-1', 'name' => 'Tenant 1', 'slug' => 'tenant-1', 'active' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 'tenant-2', 'name' => 'Tenant 2', 'slug' => 'tenant-2', 'active' => 1, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        // Create users on different tenants
+        $tenant1User = User::factory()->create(['tenant_id' => 'tenant-1']);
+        $tenant2User = User::factory()->create(['tenant_id' => 'tenant-2']);
+
+        // Create wallets
+        $walletService = app(\App\Domain\Wallet\Services\WalletService::class);
+        $w1 = $walletService->firstOrCreateFor($tenant1User, 'USD');
+        $w2 = $walletService->firstOrCreateFor($tenant2User, 'USD');
+
+        $this->assertEquals('tenant-1', $w1->tenant_id);
+        $this->assertEquals('tenant-2', $w2->tenant_id);
+
+        // Credit w1
+        $walletService->credit($w1, \App\Core\Support\Money::of(1000, 'USD'));
+
+        // Settle from tenant-1 to tenant-2 wallet under tenant-1 context
+        app(\App\Core\Tenancy\TenantManager::class)->set('tenant-1');
+        
+        $walletService->hold($w1, \App\Core\Support\Money::of(500, 'USD'));
+
+        // Settle hold from w1 to w2 should not fail due to tenant scopes
+        $walletService->settleHold($w1, $w2, \App\Core\Support\Money::of(500, 'USD'), 'Cross-tenant settlement');
+
+        $this->assertEquals(500, $w1->fresh()->balance);
+        $this->assertEquals(500, $w2->fresh()->balance);
+
+        // 2. Cross-tenant approvals
+        $admin = User::factory()->create(['tenant_id' => 'tenant-2']);
+        $admin->givePermissionTo('admin.super');
+
+        $approvalService = app(\App\Domain\Governance\Services\ApprovalService::class);
+        $approvalRequest = $approvalService->request('payments.refund', [
+            'payment_id' => (string) \Illuminate\Support\Str::uuid(),
+            'amount' => 100,
+        ], $tenant1User);
+
+        // Admin (in tenant-2 context) approves request (in tenant-1)
+        app(\App\Core\Tenancy\TenantManager::class)->set('tenant-2');
+        $updatedRequest = $approvalService->approve($approvalRequest, $admin);
+
+        $this->assertEquals(\App\Domain\Governance\Enums\ApprovalStatus::Failed, $updatedRequest->status);
+    }
 }

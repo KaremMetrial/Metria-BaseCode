@@ -50,7 +50,7 @@ class ApprovalService
         /** @var ApprovalRequest $lockedRequest */
         $lockedRequest = DB::transaction(function () use ($request, $approver) {
             /** @var ApprovalRequest $lr */
-            $lr = ApprovalRequest::query()->lockForUpdate()->findOrFail($request->getKey());
+            $lr = ApprovalRequest::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($request->getKey());
 
             $this->assertPending($lr);
 
@@ -85,7 +85,7 @@ class ApprovalService
     {
         return DB::transaction(function () use ($request, $approver, $reason) {
             /** @var ApprovalRequest $lockedRequest */
-            $lockedRequest = ApprovalRequest::query()->lockForUpdate()->findOrFail($request->getKey());
+            $lockedRequest = ApprovalRequest::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($request->getKey());
 
             $this->assertPending($lockedRequest);
 

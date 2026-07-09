@@ -8,4 +8,5 @@ return [
     'checksum_failed' => 'Checksum verification failed.',
     'virus_detected' => 'Virus scan failed: File is infected.',
     'nsfw_detected' => 'Content moderation failed: NSFW/18+ content detected.',
+    'processing_failed' => 'Processing failed: :error',
 ];

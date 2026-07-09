@@ -38,13 +38,21 @@ class MediaVerificationService
             $isLocal = true;
         } catch (\Throwable) {
             $tempPath = tempnam(sys_get_temp_dir(), 'media_verify_');
-            $source = $disk->readStream($blob->path);
-            $target = fopen($tempPath, 'wb');
-            if ($source && $target) {
-                stream_copy_to_stream($source, $target);
+            if ($tempPath === false) {
+                throw new \RuntimeException("Failed to create temporary file.");
             }
-            if ($source) fclose($source);
-            if ($target) fclose($target);
+            $source = $disk->readStream($blob->path);
+            if (! $source) {
+                throw new \RuntimeException("Failed to open read stream for path: {$blob->path}");
+            }
+            $target = fopen($tempPath, 'wb');
+            if (! $target) {
+                fclose($source);
+                throw new \RuntimeException("Failed to open write stream for path: {$tempPath}");
+            }
+            stream_copy_to_stream($source, $target);
+            fclose($source);
+            fclose($target);
             $filePath = $tempPath;
         }
 

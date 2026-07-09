@@ -142,7 +142,7 @@ class WalletService
 
     private function locked(Wallet $wallet): Wallet
     {
-        return Wallet::query()->lockForUpdate()->findOrFail($wallet->id);
+        return Wallet::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($wallet->id);
     }
 
     private function ledger(Wallet $wallet, WalletTransactionType $type, int $amount, ?string $description, ?Model $reference): WalletTransaction
