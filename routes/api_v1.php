@@ -165,6 +165,31 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
             ->name('audit.index');
     });
 
+    // RBAC Engine
+    Route::prefix('rbac')->name('rbac.')->group(function () {
+        Route::get('/permissions', [\App\Domain\RBAC\Http\Controllers\Api\V1\PermissionController::class, 'index'])->name('permissions.index');
+        
+        Route::apiResource('roles', \App\Domain\RBAC\Http\Controllers\Api\V1\RoleController::class);
+        
+        Route::prefix('roles/{role}/permissions')->name('roles.permissions.')->group(function () {
+            Route::get('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'index'])->name('index');
+            Route::post('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'store'])->name('store');
+            Route::put('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'update'])->name('update');
+            Route::delete('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('users/{user}')->name('users.')->group(function () {
+            Route::get('/effective-permissions', [\App\Domain\RBAC\Http\Controllers\Api\V1\EffectivePermissionController::class, 'show'])->name('effective-permissions');
+            
+            Route::prefix('roles')->name('roles.')->group(function () {
+                Route::get('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'index'])->name('index');
+                Route::post('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'store'])->name('store');
+                Route::put('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'update'])->name('update');
+                Route::delete('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'destroy'])->name('destroy');
+            });
+        });
+    });
+
     // Outgoing Webhook Endpoints
     Route::prefix('webhook-endpoints')->name('webhook-endpoints.')->middleware('permission:webhooks.manage')->group(function () {
         Route::get('/', [WebhookEndpointController::class, 'index'])->name('index');

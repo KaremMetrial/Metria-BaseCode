@@ -1,0 +1,74 @@
+[
+    {
+        "id": 1,
+        "name": "super-admin",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 2,
+        "name": "admin",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 3,
+        "name": "finance",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 4,
+        "name": "logistics-dispatcher",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 5,
+        "name": "courier",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 6,
+        "name": "support",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 7,
+        "name": "user",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 8,
+        "name": "customer",
+        "guard_name": "web",
+        "tenant_id": null,
+        "created_at": "2026-07-13T09:58:00.000000Z",
+        "updated_at": "2026-07-13T09:58:00.000000Z"
+    },
+    {
+        "id": 9,
+        "name": "Senior Content Manager",
+        "guard_name": "sanctum",
+        "tenant_id": "964def4d-1890-4c26-ad0d-ee9c4b0aa57b",
+        "created_at": "2026-07-13T09:58:15.000000Z",
+        "updated_at": "2026-07-13T09:58:15.000000Z"
+    }
+]

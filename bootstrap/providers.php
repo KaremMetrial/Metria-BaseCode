@@ -13,6 +13,8 @@ use App\Providers\BroadcastServiceProvider;
 use App\Providers\DomainEventServiceProvider;
 use App\Domain\Media\Providers\MediaServiceProvider;
 use App\Domain\Territory\Providers\TerritoryServiceProvider;
+use App\Domain\RBAC\Providers\RbacServiceProvider;
+use App\Domain\RBAC\Providers\RbacAuthServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -28,5 +30,7 @@ return [
     AuthServiceProvider::class,
     MediaServiceProvider::class,
     TerritoryServiceProvider::class,
+    RbacServiceProvider::class,
+    RbacAuthServiceProvider::class,
 ];
 

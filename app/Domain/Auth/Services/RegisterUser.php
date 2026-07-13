@@ -7,6 +7,7 @@ namespace App\Domain\Auth\Services;
 use App\Core\Events\EventBus;
 use App\Domain\Auth\Events\UserRegistered;
 use App\Domain\Auth\Models\User;
+use App\Domain\Governance\Services\AuditLogger;
 use App\Domain\Media\Services\MediaUploadService;
 use Illuminate\Support\Facades\DB;
 

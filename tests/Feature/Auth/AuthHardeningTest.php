@@ -140,7 +140,7 @@ class AuthHardeningTest extends TestCase
         $this->assertFalse($mfaService->verify($user, $code));
     }
 
-    private function generateTotp(string $secret): string
+    protected function generateTotp(string $secret): string
     {
         $secret = strtoupper($secret);
         $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';

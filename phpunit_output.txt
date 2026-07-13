@@ -1,0 +1,757 @@
+PHPUnit 11.5.55 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.23
+Configuration: /home/metrial/Downloads/laravel-enterprise-base/phpunit.xml
+
+.............................F.............F.........F.........  63 / 164 ( 38%)
+.........................FFEEEEEEE.........F.FFFF..FF.FF.F..... 126 / 164 ( 76%)
+......................................                          164 / 164 (100%)
+
+Time: 00:13.894, Memory: 76.50 MB
+
+There were 7 errors:
+
+1) Tests\Feature\Media\MediaUploadTest::test_confirm_upload_verifies_file_and_executes_pipeline_to_active
+ErrorException: Undefined array key "data"
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:139
+
+2) Tests\Feature\Media\MediaUploadTest::test_confirm_upload_fails_on_checksum_mismatch
+ErrorException: Undefined array key "data"
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:194
+
+3) Tests\Feature\Media\MediaUploadTest::test_virus_detection_quarantines_media
+ErrorException: Undefined array key "data"
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:231
+
+4) Tests\Feature\Media\MediaUploadTest::test_nsfw_content_moderation_quarantines_media
+ErrorException: Undefined array key "data"
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:276
+
+5) Tests\Feature\Media\MediaUploadTest::test_tenant_scoped_deduplication_reuses_clean_blob
+ErrorException: Undefined array key "data"
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:315
+
+6) Tests\Feature\Media\MediaUploadTest::test_cross_tenant_upload_does_not_deduplicate_physically
+ErrorException: Undefined array key "data"
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:362
+
+7) Tests\Feature\Media\MediaUploadTest::test_secure_download_url_generation
+ErrorException: Undefined array key "data"
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:402
+
+--
+
+There were 15 failures:
+
+1) Tests\Feature\Auth\AuthTest::test_registration_returns_token_and_provisions_defaults
+Expected response status code [201] but received 500.
+Failed asserting that 500 is identical to 201.
+
+The following exception occurred during the last request:
+
+ReflectionException: Class "App\Domain\Auth\Services\AuditLogger" does not exist in /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php:1122
+Stack trace:
+#0 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1122): ReflectionClass->__construct()
+#1 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#2 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1336): Illuminate\Foundation\Application->make()
+#6 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1237): Illuminate\Container\Container->resolveClass()
+#7 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1162): Illuminate\Container\Container->resolveDependencies()
+#8 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#9 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#10 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#11 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#12 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(92): Illuminate\Foundation\Application->make()
+#13 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(51): Illuminate\Routing\ControllerDispatcher->transformDependency()
+#14 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(30): Illuminate\Routing\ControllerDispatcher->resolveMethodDependencies()
+#15 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(59): Illuminate\Routing\ControllerDispatcher->resolveClassMethodDependencies()
+#16 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(40): Illuminate\Routing\ControllerDispatcher->resolveParameters()
+#17 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#18 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#19 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#20 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#21 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#22 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#23 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#24 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#25 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#26 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#27 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/SetLocale.php(35): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#28 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\SetLocale->handle()
+#29 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/ForceJsonResponse.php(20): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#30 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\ForceJsonResponse->handle()
+#31 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#32 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#33 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#34 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#35 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#36 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#37 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#38 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#39 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#40 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#41 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#42 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#43 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#44 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#45 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#46 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#47 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#48 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#49 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#50 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#51 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#52 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#53 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#54 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#55 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#56 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#57 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#58 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#59 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#60 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#61 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#62 /home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/AuthTest.php(18): Illuminate\Foundation\Testing\TestCase->postJson()
+#63 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests\Feature\Auth\AuthTest->test_registration_returns_token_and_provisions_defaults()
+#64 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#65 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#66 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#67 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#68 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#69 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#70 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#71 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#72 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#73 /home/metrial/Downloads/laravel-enterprise-base/vendor/bin/phpunit(122): include('...')
+#74 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Domain\Auth\Services\AuditLogger] does not exist. in /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php:1124
+Stack trace:
+#0 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#1 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1336): Illuminate\Foundation\Application->make()
+#5 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1237): Illuminate\Container\Container->resolveClass()
+#6 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1162): Illuminate\Container\Container->resolveDependencies()
+#7 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#8 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#9 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#10 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#11 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(92): Illuminate\Foundation\Application->make()
+#12 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(51): Illuminate\Routing\ControllerDispatcher->transformDependency()
+#13 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(30): Illuminate\Routing\ControllerDispatcher->resolveMethodDependencies()
+#14 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(59): Illuminate\Routing\ControllerDispatcher->resolveClassMethodDependencies()
+#15 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(40): Illuminate\Routing\ControllerDispatcher->resolveParameters()
+#16 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#17 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#18 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#19 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#20 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#21 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#22 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#23 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#24 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#25 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#26 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/SetLocale.php(35): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#27 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\SetLocale->handle()
+#28 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/ForceJsonResponse.php(20): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#29 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\ForceJsonResponse->handle()
+#30 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#31 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#32 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#33 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#34 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#35 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#36 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#37 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#38 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#39 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#40 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#41 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#42 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#43 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#44 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#45 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#46 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#47 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#48 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#49 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#50 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#51 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#52 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#53 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#54 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#55 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#56 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#57 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#58 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#59 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#60 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#61 /home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/AuthTest.php(18): Illuminate\Foundation\Testing\TestCase->postJson()
+#62 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests\Feature\Auth\AuthTest->test_registration_returns_token_and_provisions_defaults()
+#63 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#64 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#65 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#66 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#67 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#68 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#69 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#70 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#71 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#72 /home/metrial/Downloads/laravel-enterprise-base/vendor/bin/phpunit(122): include('...')
+#73 {main}
+
+----------------------------------------------------------------------------------
+
+Target class [App\Domain\Auth\Services\AuditLogger] does not exist.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/AuthTest.php:27
+
+2) Tests\Feature\Auth\FcmTokenTest::test_can_register_fcm_token_during_standard_register
+Expected response status code [201] but received 500.
+Failed asserting that 500 is identical to 201.
+
+The following exception occurred during the last request:
+
+ReflectionException: Class "App\Domain\Auth\Services\AuditLogger" does not exist in /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php:1122
+Stack trace:
+#0 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1122): ReflectionClass->__construct()
+#1 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#2 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1336): Illuminate\Foundation\Application->make()
+#6 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1237): Illuminate\Container\Container->resolveClass()
+#7 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1162): Illuminate\Container\Container->resolveDependencies()
+#8 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#9 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#10 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#11 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#12 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(92): Illuminate\Foundation\Application->make()
+#13 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(51): Illuminate\Routing\ControllerDispatcher->transformDependency()
+#14 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(30): Illuminate\Routing\ControllerDispatcher->resolveMethodDependencies()
+#15 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(59): Illuminate\Routing\ControllerDispatcher->resolveClassMethodDependencies()
+#16 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(40): Illuminate\Routing\ControllerDispatcher->resolveParameters()
+#17 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#18 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#19 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#20 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#21 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#22 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#23 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#24 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#25 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#26 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#27 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/SetLocale.php(35): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#28 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\SetLocale->handle()
+#29 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/ForceJsonResponse.php(20): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#30 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\ForceJsonResponse->handle()
+#31 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#32 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#33 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#34 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#35 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#36 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#37 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#38 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#39 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#40 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#41 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#42 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#43 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#44 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#45 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#46 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#47 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#48 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#49 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#50 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#51 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#52 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#53 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#54 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#55 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#56 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#57 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#58 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#59 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#60 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#61 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#62 /home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/FcmTokenTest.php(23): Illuminate\Foundation\Testing\TestCase->postJson()
+#63 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests\Feature\Auth\FcmTokenTest->test_can_register_fcm_token_during_standard_register()
+#64 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#65 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#66 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#67 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#68 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#69 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#70 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#71 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#72 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#73 /home/metrial/Downloads/laravel-enterprise-base/vendor/bin/phpunit(122): include('...')
+#74 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Domain\Auth\Services\AuditLogger] does not exist. in /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php:1124
+Stack trace:
+#0 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#1 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1336): Illuminate\Foundation\Application->make()
+#5 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1237): Illuminate\Container\Container->resolveClass()
+#6 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1162): Illuminate\Container\Container->resolveDependencies()
+#7 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#8 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#9 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#10 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#11 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(92): Illuminate\Foundation\Application->make()
+#12 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(51): Illuminate\Routing\ControllerDispatcher->transformDependency()
+#13 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(30): Illuminate\Routing\ControllerDispatcher->resolveMethodDependencies()
+#14 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(59): Illuminate\Routing\ControllerDispatcher->resolveClassMethodDependencies()
+#15 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(40): Illuminate\Routing\ControllerDispatcher->resolveParameters()
+#16 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#17 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#18 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#19 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#20 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#21 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#22 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#23 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#24 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#25 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#26 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/SetLocale.php(35): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#27 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\SetLocale->handle()
+#28 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/ForceJsonResponse.php(20): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#29 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\ForceJsonResponse->handle()
+#30 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#31 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#32 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#33 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#34 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#35 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#36 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#37 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#38 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#39 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#40 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#41 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#42 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#43 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#44 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#45 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#46 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#47 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#48 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#49 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#50 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#51 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#52 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#53 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#54 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#55 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#56 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#57 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#58 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#59 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#60 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#61 /home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/FcmTokenTest.php(23): Illuminate\Foundation\Testing\TestCase->postJson()
+#62 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests\Feature\Auth\FcmTokenTest->test_can_register_fcm_token_during_standard_register()
+#63 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#64 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#65 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#66 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#67 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#68 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#69 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#70 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#71 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#72 /home/metrial/Downloads/laravel-enterprise-base/vendor/bin/phpunit(122): include('...')
+#73 {main}
+
+----------------------------------------------------------------------------------
+
+Target class [App\Domain\Auth\Services\AuditLogger] does not exist.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/FcmTokenTest.php:34
+
+3) Tests\Feature\Auth\NotificationFlowTest::test_standard_registration_triggers_welcome_notification
+Expected response status code [201] but received 500.
+Failed asserting that 500 is identical to 201.
+
+The following exception occurred during the last request:
+
+ReflectionException: Class "App\Domain\Auth\Services\AuditLogger" does not exist in /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php:1122
+Stack trace:
+#0 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1122): ReflectionClass->__construct()
+#1 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#2 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1336): Illuminate\Foundation\Application->make()
+#6 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1237): Illuminate\Container\Container->resolveClass()
+#7 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1162): Illuminate\Container\Container->resolveDependencies()
+#8 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#9 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#10 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#11 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#12 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(92): Illuminate\Foundation\Application->make()
+#13 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(51): Illuminate\Routing\ControllerDispatcher->transformDependency()
+#14 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(30): Illuminate\Routing\ControllerDispatcher->resolveMethodDependencies()
+#15 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(59): Illuminate\Routing\ControllerDispatcher->resolveClassMethodDependencies()
+#16 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(40): Illuminate\Routing\ControllerDispatcher->resolveParameters()
+#17 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#18 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#19 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#20 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#21 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#22 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#23 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#24 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#25 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#26 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#27 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/SetLocale.php(35): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#28 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\SetLocale->handle()
+#29 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/ForceJsonResponse.php(20): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#30 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\ForceJsonResponse->handle()
+#31 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#32 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#33 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#34 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#35 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#36 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#37 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#38 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#39 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#40 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#41 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#42 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#43 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#44 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#45 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#46 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#47 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#48 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#49 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#50 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#51 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#52 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#53 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#54 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#55 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#56 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#57 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#58 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#59 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#60 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#61 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#62 /home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/NotificationFlowTest.php(73): Illuminate\Foundation\Testing\TestCase->postJson()
+#63 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests\Feature\Auth\NotificationFlowTest->test_standard_registration_triggers_welcome_notification()
+#64 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#65 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#66 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#67 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#68 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#69 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#70 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#71 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#72 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#73 /home/metrial/Downloads/laravel-enterprise-base/vendor/bin/phpunit(122): include('...')
+#74 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Domain\Auth\Services\AuditLogger] does not exist. in /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php:1124
+Stack trace:
+#0 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#1 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1336): Illuminate\Foundation\Application->make()
+#5 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1237): Illuminate\Container\Container->resolveClass()
+#6 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(1162): Illuminate\Container\Container->resolveDependencies()
+#7 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(933): Illuminate\Container\Container->build()
+#8 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#9 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#10 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#11 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(92): Illuminate\Foundation\Application->make()
+#12 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(51): Illuminate\Routing\ControllerDispatcher->transformDependency()
+#13 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ResolvesRouteDependencies.php(30): Illuminate\Routing\ControllerDispatcher->resolveMethodDependencies()
+#14 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(59): Illuminate\Routing\ControllerDispatcher->resolveClassMethodDependencies()
+#15 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(40): Illuminate\Routing\ControllerDispatcher->resolveParameters()
+#16 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#17 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#18 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#19 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#20 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#21 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#22 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#23 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#24 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#25 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#26 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/SetLocale.php(35): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#27 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\SetLocale->handle()
+#28 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/ForceJsonResponse.php(20): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#29 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\ForceJsonResponse->handle()
+#30 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#31 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#32 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#33 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#34 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#35 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#36 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#37 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#38 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#39 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#40 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#41 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#42 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#43 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#44 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#45 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#46 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#47 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#48 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#49 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#50 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#51 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#52 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#53 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#54 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#55 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#56 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#57 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#58 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#59 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#60 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#61 /home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/NotificationFlowTest.php(73): Illuminate\Foundation\Testing\TestCase->postJson()
+#62 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests\Feature\Auth\NotificationFlowTest->test_standard_registration_triggers_welcome_notification()
+#63 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#64 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#65 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#66 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#67 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#68 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#69 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#70 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#71 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#72 /home/metrial/Downloads/laravel-enterprise-base/vendor/bin/phpunit(122): include('...')
+#73 {main}
+
+----------------------------------------------------------------------------------
+
+Target class [App\Domain\Auth\Services\AuditLogger] does not exist.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Auth/NotificationFlowTest.php:79
+
+4) Tests\Feature\Media\MediaUploadTest::test_initiate_upload_creates_pending_media_record
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:74
+
+5) Tests\Feature\Media\MediaUploadTest::test_initiate_upload_validates_file_constraints
+Expected response status code [422] but received 403.
+Failed asserting that 403 is identical to 422.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/Media/MediaUploadTest.php:109
+
+6) Tests\Feature\RBAC\Api\UserAssignmentApiTest::test_it_rejects_assignment_of_nonexistent_role
+Failed asserting that null is identical to 'The selected roles.0 is invalid.'.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/AssertableJsonString.php:243
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:880
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Api/UserAssignmentApiTest.php:61
+
+7) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Only Role Permissions" (['perm.a', 'perm.b'], [], ['perm.a', 'perm.b'])
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:50
+
+8) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Only Direct Permissions" ([], ['perm.c'], ['perm.c'])
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:50
+
+9) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Combined Permissions" (['perm.a'], ['perm.b'], ['perm.a', 'perm.b'])
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:50
+
+10) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Overlapping Permissions" (['perm.a', 'perm.b'], ['perm.b', 'perm.c'], ['perm.a', 'perm.b', 'perm.c'])
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:50
+
+11) Tests\Feature\RBAC\Authorization\PrivilegeEscalationTest::test_super_admin_can_bypass_priority_checks
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/PrivilegeEscalationTest.php:92
+
+12) Tests\Feature\RBAC\Authorization\TenantIsolationTest::test_tenant_cannot_see_roles_belonging_to_another_tenant
+Failed asserting that actual size 2 matches expected size 1.
+
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/TenantIsolationTest.php:34
+
+13) Tests\Feature\RBAC\Authorization\TenantIsolationTest::test_super_admin_bypasses_authorization_but_not_tenant_isolation
+Expected response status code [404] but received 500.
+Failed asserting that 500 is identical to 404.
+
+The following exception occurred during the last request:
+
+Spatie\Permission\Exceptions\PermissionDoesNotExist: There is no permission named `rbac.roles.view` for guard `web`. in /home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Exceptions/PermissionDoesNotExist.php:11
+Stack trace:
+#0 /home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Models/Permission.php(97): Spatie\Permission\Exceptions\PermissionDoesNotExist::create()
+#1 /home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Traits/HasPermissions.php(188): Spatie\Permission\Models\Permission::findByName()
+#2 /home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Traits/HasPermissions.php(215): App\Domain\Auth\Models\User->filterPermission()
+#3 /home/metrial/Downloads/laravel-enterprise-base/app/Domain/RBAC/Policies/RolePolicy.php(31): App\Domain\Auth\Models\User->hasPermissionTo()
+#4 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Auth/Access/Gate.php(844): App\Domain\RBAC\Policies\RolePolicy->view()
+#5 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Auth/Access/Gate.php(797): Illuminate\Auth\Access\Gate->callPolicyMethod()
+#6 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Auth/Access/Gate.php(553): Illuminate\Auth\Access\Gate->{closure:Illuminate\Auth\Access\Gate::resolvePolicyCallback():780}()
+#7 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Auth/Access/Gate.php(448): Illuminate\Auth\Access\Gate->callAuthCallback()
+#8 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Auth/Access/Gate.php(411): Illuminate\Auth\Access\Gate->raw()
+#9 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Auth/Access/Gate.php(398): Illuminate\Auth\Access\Gate->inspect()
+#10 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Auth/Access/AuthorizesRequests.php(25): Illuminate\Auth\Access\Gate->authorize()
+#11 /home/metrial/Downloads/laravel-enterprise-base/app/Domain/RBAC/Http/Controllers/Api/V1/RoleController.php(48): App\Core\Http\Controllers\ApiController->authorize()
+#12 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App\Domain\RBAC\Http\Controllers\Api\V1\RoleController->show()
+#13 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction()
+#14 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#15 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#16 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#17 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#18 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Tenancy/ResolveTenant.php(22): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#19 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Tenancy\ResolveTenant->handle()
+#20 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#21 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#22 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#23 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#24 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#25 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#26 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#27 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate->handle()
+#28 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/SetLocale.php(35): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#29 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\SetLocale->handle()
+#30 /home/metrial/Downloads/laravel-enterprise-base/app/Core/Http/Middleware/ForceJsonResponse.php(20): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#31 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Core\Http\Middleware\ForceJsonResponse->handle()
+#32 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#33 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#34 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#35 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#36 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#37 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#38 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#39 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#40 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#41 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#42 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#43 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#44 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#45 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#46 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#47 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#48 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#49 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#50 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#51 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#52 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#53 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#54 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#55 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#56 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#57 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#58 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#59 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#60 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#61 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#62 /home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(381): Illuminate\Foundation\Testing\TestCase->json()
+#63 /home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/TenantIsolationTest.php(73): Illuminate\Foundation\Testing\TestCase->getJson()
+#64 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): Tests\Feature\RBAC\Authorization\TenantIsolationTest->test_super_admin_bypasses_authorization_but_not_tenant_isolation()
+#65 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#66 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#67 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#68 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#69 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#70 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#71 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#72 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#73 /home/metrial/Downloads/laravel-enterprise-base/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application->run()
+#74 /home/metrial/Downloads/laravel-enterprise-base/vendor/bin/phpunit(122): include('...')
+#75 {main}
+
+----------------------------------------------------------------------------------
+
+There is no permission named `rbac.roles.view` for guard `web`.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/TenantIsolationTest.php:76
+
+14) Tests\Feature\RBAC\Infrastructure\AuditIntegrityTest::test_role_creation_writes_immutable_audit_history
+Failed asserting that null is not null.
+
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Infrastructure/AuditIntegrityTest.php:48
+
+15) Tests\Feature\RBAC\Infrastructure\CacheConsistencyTest::test_observable_cache_busting_on_permission_revocation
+Unable to find JSON fragment: 
+
+[{"revoke.me":["Role: Revoke Test"]}]
+
+within
+
+[{"data":{"direct_permissions":[],"effective_permissions":["rbac.permissions.view","revoke.me"],"roles":["Revoke Test"],"source_map":{"rbac.permissions.view":"Role: Revoke Test","revoke.me":"Role: Revoke Test"}},"message":null,"meta":{"direction":"ltr","locale":"en","request_id":"f000b4be-9bae-4d21-82c5-89c8b3be177b"},"success":true}].
+Failed asserting that false is true.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/AssertableJsonString.php:144
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:948
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Infrastructure/CacheConsistencyTest.php:80
+
+ERRORS!
+Tests: 164, Assertions: 804, Errors: 7, Failures: 15, PHPUnit Deprecations: 1.

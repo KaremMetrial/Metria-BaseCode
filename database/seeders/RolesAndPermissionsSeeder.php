@@ -25,8 +25,12 @@ class RolesAndPermissionsSeeder extends Seeder
             // Users & Sessions
             'users.view', 'users.create', 'users.update', 'users.delete',
             'sessions.view', 'sessions.manage',
-            // Roles
+            // Legacy Roles (kept for backward compat)
             'roles.view', 'roles.manage',
+            // RBAC Engine
+            'rbac.roles.view', 'rbac.roles.manage',
+            'rbac.permissions.view', 'rbac.permissions.manage',
+            'rbac.users.view', 'rbac.users.manage',
             // Integrations
             'integrations.oauth.view', 'integrations.oauth.manage',
             // Payments
@@ -56,7 +60,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $roles = [
             'super-admin' => $permissions,
-            'admin' => array_diff($permissions, ['roles.manage', 'admin.super']),
+            'admin' => array_diff($permissions, ['roles.manage', 'rbac.roles.manage', 'rbac.users.manage', 'admin.super']),
             'finance' => [
                 'payments.view', 'payments.refund', 'payments.manage',
                 'wallets.view', 'wallets.adjust', 'wallets.manage',

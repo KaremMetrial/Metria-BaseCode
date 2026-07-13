@@ -11,6 +11,12 @@ abstract class TestCase extends BaseTestCase
     /** Seed roles/permissions so registration + RBAC work in every test. */
     protected bool $seed = true;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
     /**
      * Generate a valid TOTP code from a Base32 secret for the current time window.
      * Use this in tests instead of the removed '000000' backdoor.

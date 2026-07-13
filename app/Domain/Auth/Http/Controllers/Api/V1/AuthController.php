@@ -75,7 +75,7 @@ class AuthController extends ApiController
         $user = $strategy->authenticate([
             'email'    => $request->string('email')->value(),
             'password' => $request->string('password')->value(),
-        ], $user->tenant_id ?? null);
+        ]);
 
         $context = new AuthContext(
             $request,

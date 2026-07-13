@@ -1,0 +1,101 @@
+PHPUnit 11.5.55 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.23
+Configuration: /home/metrial/Downloads/laravel-enterprise-base/phpunit.xml
+
+.......F.FFFE..EF.EF.F..................                          40 / 40 (100%)
+
+Time: 00:07.517, Memory: 64.50 MB
+
+There were 3 errors:
+
+1) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Overlapping Permissions" (['perm.a', 'perm.b'], ['perm.b', 'perm.c'], ['perm.a', 'perm.b', 'perm.c'])
+Spatie\Permission\Exceptions\PermissionAlreadyExists: A `perm.b` permission already exists for guard `web`.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Exceptions/PermissionAlreadyExists.php:11
+/home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Models/Permission.php:50
+/home/metrial/Downloads/laravel-enterprise-base/tests/Support/CreatesPermission.php:17
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:43
+
+2) Tests\Feature\RBAC\Authorization\PrivilegeEscalationTest::test_super_admin_can_bypass_priority_checks
+Spatie\Permission\Exceptions\RoleAlreadyExists: A role `super-admin` already exists for guard `web`.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Exceptions/RoleAlreadyExists.php:11
+/home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Models/Role.php:64
+/home/metrial/Downloads/laravel-enterprise-base/tests/Support/CreatesRole.php:18
+/home/metrial/Downloads/laravel-enterprise-base/tests/Support/CreatesRole.php:38
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/PrivilegeEscalationTest.php:80
+
+3) Tests\Feature\RBAC\Authorization\TenantIsolationTest::test_super_admin_bypasses_authorization_but_not_tenant_isolation
+Spatie\Permission\Exceptions\RoleAlreadyExists: A role `super-admin` already exists for guard `web`.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Exceptions/RoleAlreadyExists.php:11
+/home/metrial/Downloads/laravel-enterprise-base/vendor/spatie/laravel-permission/src/Models/Role.php:64
+/home/metrial/Downloads/laravel-enterprise-base/tests/Support/CreatesRole.php:18
+/home/metrial/Downloads/laravel-enterprise-base/tests/Support/CreatesRole.php:38
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/TenantIsolationTest.php:64
+
+--
+
+There were 7 failures:
+
+1) Tests\Feature\RBAC\Api\UserAssignmentApiTest::test_it_rejects_assignment_of_nonexistent_role
+Failed asserting that null is identical to 'The selected roles.0 is invalid.'.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/AssertableJsonString.php:243
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:880
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Api/UserAssignmentApiTest.php:61
+
+2) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Only Role Permissions" (['perm.a', 'perm.b'], [], ['perm.a', 'perm.b'])
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:50
+
+3) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Only Direct Permissions" ([], ['perm.c'], ['perm.c'])
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:50
+
+4) Tests\Feature\RBAC\Authorization\EffectivePermissionTest::test_effective_permissions_matrix with data set "Combined Permissions" (['perm.a'], ['perm.b'], ['perm.a', 'perm.b'])
+Expected response status code [200] but received 403.
+Failed asserting that 403 is identical to 200.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:175
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/EffectivePermissionTest.php:50
+
+5) Tests\Feature\RBAC\Authorization\TenantIsolationTest::test_tenant_cannot_see_roles_belonging_to_another_tenant
+Failed asserting that actual size 2 matches expected size 1.
+
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Authorization/TenantIsolationTest.php:34
+
+6) Tests\Feature\RBAC\Infrastructure\AuditIntegrityTest::test_role_creation_writes_immutable_audit_history
+Failed asserting that null is not null.
+
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Infrastructure/AuditIntegrityTest.php:48
+
+7) Tests\Feature\RBAC\Infrastructure\CacheConsistencyTest::test_observable_cache_busting_on_permission_revocation
+Unable to find JSON fragment: 
+
+[{"revoke.me":["Role: Revoke Test"]}]
+
+within
+
+[{"data":{"direct_permissions":[],"effective_permissions":["rbac.permissions.view","revoke.me"],"roles":["Revoke Test"],"source_map":{"rbac.permissions.view":"Role: Revoke Test","revoke.me":"Role: Revoke Test"}},"message":null,"meta":{"direction":"ltr","locale":"en","request_id":"24a3d7a3-c443-46b7-8633-7667b4f659b6"},"success":true}].
+Failed asserting that false is true.
+
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/AssertableJsonString.php:144
+/home/metrial/Downloads/laravel-enterprise-base/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:948
+/home/metrial/Downloads/laravel-enterprise-base/tests/Feature/RBAC/Infrastructure/CacheConsistencyTest.php:80
+
+ERRORS!
+Tests: 40, Assertions: 116, Errors: 3, Failures: 7, PHPUnit Deprecations: 1.
