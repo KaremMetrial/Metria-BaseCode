@@ -18,6 +18,12 @@ class TenantIsolationTest extends TestCase
     use RefreshDatabase;
     use CreatesTenant, CreatesRole, CreatesPermission, CreatesUser;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['tenancy.enabled' => true]);
+    }
+
     public function test_tenant_cannot_see_roles_belonging_to_another_tenant(): void
     {
         $tenantA = $this->setRandomTenant();
@@ -67,6 +73,7 @@ class TenantIsolationTest extends TestCase
         $tenantB = $this->setRandomTenant();
         $roleB = $this->createRole($tenantB, ['name' => 'Tenant B Role']);
 
+        $this->setTenant($tenantA);
         $this->actingAs($superAdmin);
 
         // Super Admin in Tenant A tries to hit API to view Tenant B's role

@@ -25,5 +25,9 @@ class RbacServiceProvider extends ServiceProvider
                 SyncPermissionsCommand::class,
             ]);
         }
+
+        // Register event subscribers
+        \Illuminate\Support\Facades\Event::subscribe(\App\Domain\RBAC\Listeners\AuditRbacEvent::class);
+        \Illuminate\Support\Facades\Event::subscribe(\App\Domain\RBAC\Listeners\ClearRbacCache::class);
     }
 }

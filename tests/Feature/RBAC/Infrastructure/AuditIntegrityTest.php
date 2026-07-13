@@ -39,7 +39,7 @@ class AuditIntegrityTest extends TestCase
         // If it doesn't, this test serves as the contract that it SHOULD exist.
         $creationAudit = AuditLog::where('auditable_type', 'App\\Domain\\RBAC\\Models\\Role')
             ->where('auditable_id', $roleId)
-            ->where('event', 'created')
+            ->where('action', 'created')
             ->first();
             
         // If AuditLog doesn't exist in Governance, this will fail or throw class not found.

@@ -13,17 +13,12 @@ class Role extends SpatieRole
 {
     protected $fillable = ['name', 'guard_name', 'tenant_id'];
 
-    /**
-     * Boot the model.
-     */
     protected static function boot()
     {
         parent::boot();
 
         // Enforce tenant isolation while preserving global system roles
-        if (config('tenancy.enabled', true)) {
-            static::addGlobalScope(new SystemAwareTenantScope);
-        }
+        static::addGlobalScope(new SystemAwareTenantScope);
     }
 
     protected static function booted()

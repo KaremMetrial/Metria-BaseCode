@@ -13,18 +13,24 @@ class SystemAwareTenantScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $tenantId = Auth::check() ? Auth::user()->tenant_id : null;
+        if (! config('tenancy.enabled', true)) {
+            return;
+        }
+
+        $tenantId = app(\App\Core\Tenancy\TenantManager::class)->id()
+            ?? (Auth::check() ? Auth::user()->tenant_id : null);
 
         if ($tenantId === null) {
             return;
         }
 
-        $builder->where(function (Builder $query) use ($tenantId) {
+        $builder->where(function (Builder $query) use ($tenantId, $model) {
+            $table = $model->getTable();
             // Belonging strictly to the current tenant
-            $query->where('roles.tenant_id', $tenantId)
+            $query->where($table . '.tenant_id', $tenantId)
                   // OR belonging to the system (tenant_id = null)
-                  ->orWhere(function (Builder $subQuery) {
-                      $subQuery->whereNull('roles.tenant_id')
+                  ->orWhere(function (Builder $subQuery) use ($table) {
+                      $subQuery->whereNull($table . '.tenant_id')
                                ->whereHas('metadata', function (Builder $metadataQuery) {
                                    $metadataQuery->where('is_system', true);
                                });
