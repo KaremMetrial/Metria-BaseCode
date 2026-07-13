@@ -48,7 +48,7 @@
             "@php artisan key:generate --ansi"
         ],
         "lint": "pint --test",
-        "analyse": "phpstan analyse --memory-limit=1G",
+        "analyse": "phpstan analyse app --memory-limit=1G",
         "test": "@php artisan test"
     },
     "extra": {
