@@ -73,7 +73,6 @@ class TenantIsolationTest extends TestCase
         $tenantB = $this->setRandomTenant();
         $roleB = $this->createRole($tenantB, ['name' => 'Tenant B Role']);
 
-        $this->setTenant($tenantA);
         $this->actingAs($superAdmin);
 
         // Super Admin in Tenant A tries to hit API to view Tenant B's role

@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use App\Domain\RBAC\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
@@ -88,8 +88,20 @@ class RolesAndPermissionsSeeder extends Seeder
             ],
         ];
 
-        foreach ($roles as $role => $rolePermissions) {
-            Role::findOrCreate($role, 'web')->syncPermissions($rolePermissions);
+        foreach ($roles as $roleName => $rolePermissions) {
+            $role = Role::findOrCreate($roleName, 'web');
+            $role->syncPermissions($rolePermissions);
+
+            $role->metadata()->updateOrCreate(
+                ['role_id' => $role->id],
+                [
+                    'display_name' => ['en' => ucfirst(str_replace('-', ' ', $roleName))],
+                    'description' => ['en' => "System defined {$roleName} role"],
+                    'is_system' => true,
+                    'is_editable' => false,
+                    'is_assignable' => true,
+                ]
+            );
         }
     }
 }

@@ -29,8 +29,6 @@ class ResolveTenant
             ?? $request->user()?->tenant_id;
 
         $user = $request->user();
-        dump('ResolveTenant user:', $user?->id, $user?->tenant_id);
-        dump('ResolveTenant initial tenantId:', $tenantId);
         
         if ($user && $tenantId !== null) {
             $userTenantId = $user->getAttributes()['tenant_id'] ?? null;
@@ -39,11 +37,9 @@ class ResolveTenant
             }
         }
 
-        dump('ResolveTenant final tenantId:', $tenantId);
         $this->manager->set($tenantId);
 
         if ($tenantId !== null && function_exists('setPermissionsTeamId')) {
-            dump('ResolveTenant setPermissionsTeamId called with:', $tenantId);
             setPermissionsTeamId($tenantId);
         }
 

@@ -53,6 +53,7 @@ class MediaUploadTest extends TestCase
             'tenant_id' => $tenantId,
         ]);
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        setPermissionsTeamId($tenantId);
         $user->assignRole('customer');
 
         return $user;

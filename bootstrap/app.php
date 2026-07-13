@@ -11,7 +11,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
-
+use Illuminate\Auth\Middleware\Authenticate;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Auth\Middleware\Authorize;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         api: __DIR__.'/../routes/api.php',
@@ -30,6 +33,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'idempotent' => IdempotencyMiddleware::class,
             'tenant' => ResolveTenant::class,
+        ]);
+
+        $middleware->priority([
+            ForceJsonResponse::class,
+            SetLocale::class,
+            Authenticate::class,
+            EnsureFrontendRequestsAreStateful::class,
+            ResolveTenant::class,
+            SubstituteBindings::class,
+            Authorize::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
