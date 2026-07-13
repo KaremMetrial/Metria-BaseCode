@@ -55,9 +55,6 @@ class UserAssignmentApiTest extends TestCase
             'roles' => ['DoesNotExist']
         ]);
 
-        // Validation rule should catch it, or action should throw.
-        // The API returns 422 if it's validated, or 404 if it tries to find the role.
-        // Assuming validation `exists:roles,name` is used.
-        $response->assertJsonPath('error.errors.roles\.0.0', 'The selected roles.0 is invalid.');
+        $this->assertEquals('The selected roles.0 is invalid.', $response->json('error.errors')['roles.0'][0]);
     }
 }

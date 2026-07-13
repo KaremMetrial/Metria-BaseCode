@@ -84,7 +84,7 @@ class CacheConsistencyTest extends TestCase
         // we might just have `update` action that does it. The test asserts the principle.
         // Let's revoke directly via eloquent and fire the event manually to simulate the Domain Action.
         $role->revokePermissionTo($permToRevoke);
-        event(new \App\Domain\RBAC\Events\RolePermissionsUpdated($role));
+        event(new \App\Domain\RBAC\Events\RolePermissionsUpdated($role, $role->permissions->pluck('name')->toArray()));
 
         $this->actingAs($user);
         $response2 = $this->getJson("/api/v1/rbac/users/{$user->id}/effective-permissions");
