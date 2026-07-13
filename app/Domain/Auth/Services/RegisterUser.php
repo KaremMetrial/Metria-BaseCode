@@ -9,6 +9,7 @@ use App\Domain\Auth\Events\UserRegistered;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Services\AuditLogger;
 use App\Domain\Media\Services\MediaUploadService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -38,7 +39,7 @@ class RegisterUser
 
             $user->assignRole('customer');
 
-            if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
+            if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
                 $this->mediaUpload->storeUploadedFile(
                     $data['avatar'],
                     $user,

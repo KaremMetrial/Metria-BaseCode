@@ -23,11 +23,12 @@ class MediaProcessingService
         $blob = $media->blob;
         if (! $blob) {
             $this->stateMachine->transition($media, MediaStatus::Failed);
+
             return;
         }
 
         $disk = Storage::disk($blob->disk);
-        
+
         $isLocal = false;
         try {
             $filePath = $disk->path($blob->path);
@@ -35,7 +36,7 @@ class MediaProcessingService
         } catch (\Throwable) {
             $tempPath = tempnam(sys_get_temp_dir(), 'media_process_');
             if ($tempPath === false) {
-                throw new \RuntimeException("Failed to create temporary file.");
+                throw new \RuntimeException('Failed to create temporary file.');
             }
             $source = $disk->readStream($blob->path);
             if (! $source) {
@@ -74,7 +75,7 @@ class MediaProcessingService
 
             // Transition status to Active
             $this->stateMachine->transition($media, MediaStatus::Active);
-            
+
             $media->update([
                 'activated_at' => now(),
                 'processing_finished_at' => now(),
@@ -126,18 +127,18 @@ class MediaProcessingService
                 'width' => $width,
                 'height' => $height,
                 'exif_stripped' => true,
-            ])
+            ]),
         ]);
 
         // 2. Generate Variants (Thumbnail, Medium, Webp)
         $variants = config('media.image_variants', []);
-        
+
         foreach ($variants as $name => $specs) {
             // Safely build the variant path by replacing only the final extension,
             // preventing corruption of paths that contain multiple dots.
-            $blobPath   = $media->blob->path;
-            $ext        = pathinfo($blobPath, PATHINFO_EXTENSION);
-            $base       = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
+            $blobPath = $media->blob->path;
+            $ext = pathinfo($blobPath, PATHINFO_EXTENSION);
+            $base = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
             $variantPath = "{$base}_{$name}.{$ext}";
 
             // Upload the EXIF-stripped/modified local file stream to the variant path
@@ -177,14 +178,14 @@ class MediaProcessingService
 
         // Extract basic video metadata (FPS, Duration, Resolution) using ffprobe.
         // Fallback to null if ffprobe is not installed on the system.
-        exec("ffprobe -v quiet -print_format json -show_format -show_streams " . escapeshellarg($filePath), $output, $resultCode);
-        if ($resultCode === 0 && !empty($output)) {
+        exec('ffprobe -v quiet -print_format json -show_format -show_streams '.escapeshellarg($filePath), $output, $resultCode);
+        if ($resultCode === 0 && ! empty($output)) {
             $json = json_decode(implode('', $output), true);
             if ($json) {
                 $duration = isset($json['format']['duration']) ? (float) $json['format']['duration'] : null;
                 $videoStream = collect($json['streams'] ?? [])->firstWhere('codec_type', 'video');
                 if ($videoStream) {
-                    $width  = $videoStream['width'] ?? null;
+                    $width = $videoStream['width'] ?? null;
                     $height = $videoStream['height'] ?? null;
                     if (isset($videoStream['r_frame_rate'])) {
                         $parts = explode('/', $videoStream['r_frame_rate']);
@@ -202,13 +203,13 @@ class MediaProcessingService
                 'fps' => $fps,
                 'width' => $width,
                 'height' => $height,
-            ])
+            ]),
         ]);
 
         // Generate alternate quality variant (e.g. 720p resolution)
-        $blobPath    = $media->blob->path;
-        $ext         = pathinfo($blobPath, PATHINFO_EXTENSION);
-        $base        = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
+        $blobPath = $media->blob->path;
+        $ext = pathinfo($blobPath, PATHINFO_EXTENSION);
+        $base = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
         $variantPath = "{$base}_720p.{$ext}";
         $disk->copy($media->blob->path, $variantPath);
 

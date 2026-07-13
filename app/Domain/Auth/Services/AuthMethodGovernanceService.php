@@ -11,8 +11,7 @@ class AuthMethodGovernanceService
 {
     public function __construct(
         private readonly SettingsService $settings
-    ) {
-    }
+    ) {}
 
     public function isMethodEnabled(string $method): bool
     {

@@ -32,8 +32,7 @@ class AuthController extends ApiController
 {
     public function __construct(
         private readonly AuthMethodGovernanceService $governance
-    ) {
-    }
+    ) {}
 
     public function register(RegisterRequest $request, RegisterUser $register, IssueApiToken $issueToken): JsonResponse
     {
@@ -58,7 +57,7 @@ class AuthController extends ApiController
         $this->recordSession($user, $request);
 
         return $this->respondCreated([
-            'user'  => (new UserResource($user->load('roles')))->resolve(),
+            'user' => (new UserResource($user->load('roles')))->resolve(),
             'token' => $token,
         ]);
     }
@@ -73,7 +72,7 @@ class AuthController extends ApiController
         // Tenant resolution happens in ResolveTenant middleware from the authenticated
         // user's own tenant_id — do NOT trust a client-supplied header here.
         $user = $strategy->authenticate([
-            'email'    => $request->string('email')->value(),
+            'email' => $request->string('email')->value(),
             'password' => $request->string('password')->value(),
         ]);
 

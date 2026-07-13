@@ -8,8 +8,8 @@ use App\Domain\Media\Contracts\ContentModerator;
 use App\Domain\Media\Contracts\VirusScanner;
 use App\Domain\Media\Enums\MediaStatus;
 use App\Domain\Media\Enums\MediaType;
-use App\Domain\Media\Events\MediaVerified;
 use App\Domain\Media\Events\MediaQuarantined;
+use App\Domain\Media\Events\MediaVerified;
 use App\Domain\Media\Jobs\ProcessMediaVariants;
 use App\Domain\Media\Models\Media;
 use Illuminate\Support\Facades\Storage;
@@ -27,11 +27,12 @@ class MediaVerificationService
         $blob = $media->blob;
         if (! $blob) {
             $this->stateMachine->transition($media, MediaStatus::Failed);
+
             return;
         }
 
         $disk = Storage::disk($blob->disk);
-        
+
         $isLocal = false;
         try {
             $filePath = $disk->path($blob->path);
@@ -39,7 +40,7 @@ class MediaVerificationService
         } catch (\Throwable) {
             $tempPath = tempnam(sys_get_temp_dir(), 'media_verify_');
             if ($tempPath === false) {
-                throw new \RuntimeException("Failed to create temporary file.");
+                throw new \RuntimeException('Failed to create temporary file.');
             }
             $source = $disk->readStream($blob->path);
             if (! $source) {
@@ -60,7 +61,7 @@ class MediaVerificationService
             // 1. Virus Scanning
             if (config('media.virus_scan_enabled', true)) {
                 $scanResult = $this->virusScanner->scan($filePath);
-                
+
                 $blob->virus_status = $scanResult->status;
                 $blob->virus_scan_details = [
                     'engine' => $scanResult->engine,
@@ -78,6 +79,7 @@ class MediaVerificationService
                         'quarantined_at' => now(),
                     ]);
                     event(new MediaQuarantined($media, 'virus_detected'));
+
                     return;
                 }
             }
@@ -85,7 +87,7 @@ class MediaVerificationService
             // 2. Content Moderation
             if (config('media.moderation_enabled', true) && in_array($media->media_type, [MediaType::Image, MediaType::Video], true)) {
                 $modResult = $this->moderator->moderate($filePath);
-                
+
                 $media->moderation_status = $modResult->approved ? 'approved' : 'flagged';
                 $media->moderation_details = [
                     'provider' => $modResult->provider,
@@ -103,6 +105,7 @@ class MediaVerificationService
                         'quarantined_at' => now(),
                     ]);
                     event(new MediaQuarantined($media, 'nsfw_detected'));
+
                     return;
                 }
             }
@@ -118,7 +121,7 @@ class MediaVerificationService
             // Trigger asynchronous variant/optimization pipeline job
             ProcessMediaVariants::dispatch($media->id);
         } finally {
-            if (!$isLocal && file_exists($filePath)) {
+            if (! $isLocal && file_exists($filePath)) {
                 @unlink($filePath);
             }
         }

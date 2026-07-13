@@ -12,7 +12,7 @@ class CheckAccountStatusPipe
     /**
      * Handle an incoming authentication context and verify account status.
      *
-     * @param Closure(AuthContext): mixed $next
+     * @param  Closure(AuthContext): mixed  $next
      */
     public function handle(AuthContext $context, Closure $next): mixed
     {

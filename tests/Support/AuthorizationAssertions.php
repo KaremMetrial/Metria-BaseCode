@@ -15,14 +15,14 @@ trait AuthorizationAssertions
     protected function assertEffectivePermissionsMatch(User $user, array $expectedPermissions): void
     {
         $actualPermissions = $user->getAllPermissions()->pluck('name')->toArray();
-        
+
         sort($expectedPermissions);
         sort($actualPermissions);
 
         Assert::assertEquals(
             $expectedPermissions,
             $actualPermissions,
-            "Effective permissions do not match. Expected: [" . implode(', ', $expectedPermissions) . "], Actual: [" . implode(', ', $actualPermissions) . "]"
+            'Effective permissions do not match. Expected: ['.implode(', ', $expectedPermissions).'], Actual: ['.implode(', ', $actualPermissions).']'
         );
     }
 }

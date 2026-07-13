@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Scopes;
 
+use App\Core\Tenancy\TenantManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -17,7 +18,7 @@ class SystemAwareTenantScope implements Scope
             return;
         }
 
-        $tenantId = app(\App\Core\Tenancy\TenantManager::class)->id()
+        $tenantId = app(TenantManager::class)->id()
             ?? (Auth::check() ? Auth::user()->tenant_id : null);
 
         if ($tenantId === null) {
@@ -27,14 +28,14 @@ class SystemAwareTenantScope implements Scope
         $builder->where(function (Builder $query) use ($tenantId, $model) {
             $table = $model->getTable();
             // Belonging strictly to the current tenant
-            $query->where($table . '.tenant_id', $tenantId)
+            $query->where($table.'.tenant_id', $tenantId)
                   // OR belonging to the system (tenant_id = null)
-                  ->orWhere(function (Builder $subQuery) use ($table) {
-                      $subQuery->whereNull($table . '.tenant_id')
-                               ->whereHas('metadata', function (Builder $metadataQuery) {
-                                   $metadataQuery->where('is_system', true);
-                               });
-                  });
+                ->orWhere(function (Builder $subQuery) use ($table) {
+                    $subQuery->whereNull($table.'.tenant_id')
+                        ->whereHas('metadata', function (Builder $metadataQuery) {
+                            $metadataQuery->where('is_system', true);
+                        });
+                });
         });
     }
 }

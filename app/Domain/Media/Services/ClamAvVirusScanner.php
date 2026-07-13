@@ -17,7 +17,7 @@ class ClamAvVirusScanner implements VirusScanner
         usleep(10000); // 10ms delay
 
         $filename = basename($filePath);
-        
+
         // If file contains 'infected' or eicar signature, simulate malware detection
         if (str_contains(strtolower($filename), 'infected') || str_contains(strtolower($filename), 'eicar')) {
             return new VirusScanResult(

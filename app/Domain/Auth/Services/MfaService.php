@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
+use App\Core\Exceptions\DomainException;
 use App\Domain\Auth\Events\MfaDisabled;
 use App\Domain\Auth\Events\MfaEnabled;
 use App\Domain\Auth\Events\MfaVerified;
 use App\Domain\Auth\Models\User;
-use App\Core\Exceptions\DomainException;
 use App\Domain\Governance\Services\AuditLogger;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -17,9 +18,7 @@ class MfaService
 {
     private const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
-    public function __construct(private readonly AuditLogger $audit)
-    {
-    }
+    public function __construct(private readonly AuditLogger $audit) {}
 
     /**
      * @return array{secret: string, qr_url: string, recovery_codes: string[]}
@@ -73,14 +72,15 @@ class MfaService
 
         $cacheKey = "mfa_used_code:{$user->id}:{$code}";
 
-        if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+        if (Cache::has($cacheKey)) {
             return false; // Replay-attack protection: same code already consumed
         }
 
         if ($this->verifyTotp($user->two_factor_secret, $code)) {
-            \Illuminate\Support\Facades\Cache::put($cacheKey, true, 60);
+            Cache::put($cacheKey, true, 60);
             $this->audit->log('auth.mfa_verified', $user);
             event(new MfaVerified($user));
+
             return true;
         }
 
@@ -88,6 +88,7 @@ class MfaService
         if ($this->consumeRecoveryCode($user, $code)) {
             $this->audit->log('auth.mfa_recovery_used', $user);
             event(new MfaVerified($user));
+
             return true;
         }
 
@@ -116,6 +117,7 @@ class MfaService
         for ($i = 0; $i < $length; $i++) {
             $secret .= $alphabet[random_int(0, 31)];
         }
+
         return $secret;
     }
 
@@ -125,6 +127,7 @@ class MfaService
         for ($i = 0; $i < $count; $i++) {
             $codes[] = Str::upper(Str::random(5)).'-'.Str::upper(Str::random(5));
         }
+
         return $codes;
     }
 
@@ -140,9 +143,11 @@ class MfaService
                 unset($hashedCodes[$index]);
                 $user->two_factor_recovery_codes = json_encode(array_values($hashedCodes));
                 $user->save();
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -161,11 +166,11 @@ class MfaService
             $timeSlice = $currentTimeSlice + $offset;
             $binaryTimeSlice = pack('N', 0).pack('N', $timeSlice);
             $hmac = hash_hmac('sha1', $binaryTimeSlice, $decoded, true);
-            $offsetIndex = ord($hmac[19]) & 0xf;
-            $value = ((ord($hmac[$offsetIndex]) & 0x7f) << 24)
-                | ((ord($hmac[$offsetIndex + 1]) & 0xff) << 16)
-                | ((ord($hmac[$offsetIndex + 2]) & 0xff) << 8)
-                | (ord($hmac[$offsetIndex + 3]) & 0xff);
+            $offsetIndex = ord($hmac[19]) & 0xF;
+            $value = ((ord($hmac[$offsetIndex]) & 0x7F) << 24)
+                | ((ord($hmac[$offsetIndex + 1]) & 0xFF) << 16)
+                | ((ord($hmac[$offsetIndex + 2]) & 0xFF) << 8)
+                | (ord($hmac[$offsetIndex + 3]) & 0xFF);
             $otp = str_pad((string) ($value % 1000000), 6, '0', STR_PAD_LEFT);
 
             if (hash_equals($otp, $code)) {
@@ -193,6 +198,7 @@ class MfaService
         for ($i = 0, $len = strlen($bits); $i + 8 <= $len; $i += 8) {
             $bytes .= chr((int) bindec(substr($bits, $i, 8)));
         }
+
         return $bytes;
     }
 }

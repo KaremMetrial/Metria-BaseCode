@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Services;
 
+use App\Core\Tenancy\TenantManager;
 use App\Domain\Governance\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 
@@ -19,7 +20,7 @@ class SettingsService
 
     protected function cacheKey(string $key): string
     {
-        $tenantId = app(\App\Core\Tenancy\TenantManager::class)->id() ?: 'global';
+        $tenantId = app(TenantManager::class)->id() ?: 'global';
 
         return self::CACHE_PREFIX."{$tenantId}:{$key}";
     }

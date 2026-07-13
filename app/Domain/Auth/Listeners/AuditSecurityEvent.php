@@ -8,9 +8,7 @@ use App\Domain\Governance\Services\AuditLogger;
 
 class AuditSecurityEvent
 {
-    public function __construct(private readonly AuditLogger $audit)
-    {
-    }
+    public function __construct(private readonly AuditLogger $audit) {}
 
     public function handle(object $event): void
     {

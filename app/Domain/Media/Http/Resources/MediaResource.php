@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Media\Http\Resources;
 
+use App\Domain\Media\Enums\MediaStatus;
 use App\Domain\Media\Models\Media;
 use App\Domain\Media\Services\MediaDownloadService;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class MediaResource extends JsonResource
         $downloadService = app(MediaDownloadService::class);
 
         $downloadUrl = '';
-        if ($this->resource->status === \App\Domain\Media\Enums\MediaStatus::Active && $this->resource->blob !== null) {
+        if ($this->resource->status === MediaStatus::Active && $this->resource->blob !== null) {
             try {
                 if ($this->resource->is_public) {
                     $downloadUrl = Storage::disk($this->resource->blob->disk)->url($this->resource->blob->path);

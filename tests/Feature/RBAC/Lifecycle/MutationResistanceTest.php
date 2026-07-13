@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Tests\Feature\RBAC\Lifecycle;
 
 use App\Domain\RBAC\Support\PermissionRegistry;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;
 use Tests\Support\CreatesTenant;
 use Tests\Support\CreatesUser;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MutationResistanceTest extends TestCase
 {
+    use CreatesPermission, CreatesRole, CreatesTenant, CreatesUser;
     use RefreshDatabase;
-    use CreatesTenant, CreatesRole, CreatesPermission, CreatesUser;
 
     public function test_sync_command_repairs_deleted_registered_permissions(): void
     {

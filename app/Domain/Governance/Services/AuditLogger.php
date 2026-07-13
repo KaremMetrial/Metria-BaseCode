@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Services;
 
+use App\Core\Tenancy\TenantManager;
 use App\Domain\Governance\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,7 +31,7 @@ class AuditLogger
             return null;
         }
 
-        $resolvedTenantId = $tenantId ?? $auditable?->tenant_id ?? app(\App\Core\Tenancy\TenantManager::class)->id();
+        $resolvedTenantId = $tenantId ?? $auditable?->tenant_id ?? app(TenantManager::class)->id();
 
         // Resolve actor: explicit > authenticated user > null (not 'unknown', so
         // the column stays null and is distinguishable from a real user ID of 0).
@@ -40,16 +41,16 @@ class AuditLogger
         $req = app()->runningInConsole() ? null : request();
 
         return AuditLog::query()->create([
-            'tenant_id'      => $resolvedTenantId,
-            'user_id'        => $resolvedActor,
-            'action'         => $action,
+            'tenant_id' => $resolvedTenantId,
+            'user_id' => $resolvedActor,
+            'action' => $action,
             'auditable_type' => $auditable?->getMorphClass(),
-            'auditable_id'   => $auditable?->getKey(),
-            'old_values'     => $this->mask($oldValues),
-            'new_values'     => $this->mask($newValues),
-            'ip_address'     => $req?->ip(),
-            'user_agent'     => mb_substr((string) $req?->userAgent(), 0, 255),
-            'context'        => $context,
+            'auditable_id' => $auditable?->getKey(),
+            'old_values' => $this->mask($oldValues),
+            'new_values' => $this->mask($newValues),
+            'ip_address' => $req?->ip(),
+            'user_agent' => mb_substr((string) $req?->userAgent(), 0, 255),
+            'context' => $context,
         ]);
     }
 

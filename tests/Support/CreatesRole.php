@@ -15,16 +15,16 @@ trait CreatesRole
     protected function createRole(?string $tenantId = null, array $attributes = [], array $metadata = []): Role
     {
         /** @var Role $role */
-        $attributes['name'] = $attributes['name'] ?? 'role_' . Str::random(8);
+        $attributes['name'] = $attributes['name'] ?? 'role_'.Str::random(8);
         $attributes['guard_name'] = $attributes['guard_name'] ?? 'web';
-        
+
         $role = Role::firstOrCreate([
             'name' => $attributes['name'],
             'guard_name' => $attributes['guard_name'],
             'tenant_id' => $tenantId,
         ]);
 
-        if (!$role->metadata) {
+        if (! $role->metadata) {
             $role->metadata()->create(array_merge([
                 'display_name' => ['en' => 'Mock Role', 'ar' => 'دور وهمي'],
                 'description' => ['en' => 'A mock role for testing', 'ar' => 'دور وهمي للاختبار'],

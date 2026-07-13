@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
-use App\Core\Exceptions\ApiException;
 use App\Core\Exceptions\DomainException;
 use App\Domain\Auth\Events\SocialIdentityLinked;
 use App\Domain\Auth\Events\SocialIdentityUnlinked;
@@ -20,8 +19,7 @@ class SocialIdentityService
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly AuthMethodGovernanceService $governance
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{user: User, token: string, is_new: bool}
@@ -66,7 +64,7 @@ class SocialIdentityService
                     $user = User::query()->create([
                         'tenant_id' => $tenantId,
                         'name' => $socialUser['name'] ?? 'User',
-                        'email' => $email ?? "{$provider}_".Str::random(10)."@example.com",
+                        'email' => $email ?? "{$provider}_".Str::random(10).'@example.com',
                         'password' => null,
                         'email_verified_at' => now(),
                     ]);

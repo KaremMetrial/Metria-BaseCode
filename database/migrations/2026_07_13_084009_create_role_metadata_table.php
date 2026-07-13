@@ -14,21 +14,21 @@ return new class extends Migration
         Schema::create('role_metadata', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('role_id')->constrained('roles')->cascadeOnDelete();
-            
+
             $table->string('display_name')->nullable();
             $table->text('description')->nullable();
-            
+
             // Enterprise controls
             $table->boolean('is_system')->default(false)->comment('If true, role cannot be deleted');
             $table->boolean('is_editable')->default(true)->comment('If false, permissions cannot be changed');
             $table->boolean('is_assignable')->default(true)->comment('If false, cannot be assigned to new users');
-            
+
             // Audit
             $table->foreignUuid('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignUuid('updated_by')->nullable()->constrained('users')->nullOnDelete();
-            
+
             $table->timestamps();
-            
+
             $table->unique('role_id');
         });
     }

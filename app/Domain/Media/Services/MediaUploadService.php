@@ -8,11 +8,12 @@ use App\Core\Exceptions\DomainException;
 use App\Domain\Auth\Models\User;
 use App\Domain\Media\Enums\MediaStatus;
 use App\Domain\Media\Enums\MediaType;
-use App\Domain\Media\Events\MediaUploadInitiated;
 use App\Domain\Media\Events\MediaUploaded;
+use App\Domain\Media\Events\MediaUploadInitiated;
 use App\Domain\Media\Jobs\VerifyMediaUpload;
 use App\Domain\Media\Models\Media;
 use App\Domain\Media\Models\MediaBlob;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -53,11 +54,11 @@ class MediaUploadService
         $sanitizedName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($filename));
         $extension = pathinfo($sanitizedName, PATHINFO_EXTENSION);
         $diskName = $isPublic ? config('media.default_disk', 'public') : config('media.private_disk', 'local');
-        
+
         // Storage path layout: tenants/{tenant_id}/{media_type}/{uuid}.{ext}
         $storagePath = sprintf('tenants/%s/%s/%s.%s', $tenantId ?? 'global', $mediaType->value, $mediaId, $extension ?: 'bin');
 
-        return DB::transaction(function () use ($user, $tenantId, $mediaId, $mediaType, $purpose, $isPublic, $sanitizedName, $mimeType, $size, $diskName, $storagePath, $options) {
+        return DB::transaction(function () use ($user, $tenantId, $mediaId, $mediaType, $purpose, $isPublic, $sanitizedName, $size, $diskName, $storagePath, $options) {
             $media = Media::query()->create([
                 'id' => $mediaId,
                 'tenant_id' => $tenantId,
@@ -75,7 +76,7 @@ class MediaUploadService
 
             // Generate direct upload presigned URL (S3/R2 mock simulation or real driver url)
             $disk = Storage::disk($diskName);
-            
+
             // Check if disk adapter supports temporary upload URLs (like AWS S3), otherwise fallback to local upload url
             $presignedUrl = '';
             try {
@@ -98,7 +99,7 @@ class MediaUploadService
                     'urls' => [
                         $presignedUrl.'?part=1',
                         $presignedUrl.'?part=2',
-                    ]
+                    ],
                 ];
             }
 
@@ -157,7 +158,7 @@ class MediaUploadService
 
                 // Check if tenant-scoped deduplication is possible
                 $tenantId = $media->tenant_id;
-                
+
                 /** @var MediaBlob|null $existingBlob */
                 $existingBlob = MediaBlob::query()
                     ->where('tenant_id', $tenantId)
@@ -201,7 +202,7 @@ class MediaUploadService
 
                 // Transition to verifying and queue asynchronous scan pipeline
                 $this->stateMachine->transition($media, MediaStatus::Verifying);
-                
+
                 event(new MediaUploaded($media));
 
                 VerifyMediaUpload::dispatch($media->id);
@@ -219,7 +220,7 @@ class MediaUploadService
     }
 
     public function storeUploadedFile(
-        \Illuminate\Http\UploadedFile $file,
+        UploadedFile $file,
         ?User $user,
         ?string $tenantId = null,
         string $purpose = 'attachment',
@@ -308,6 +309,7 @@ class MediaUploadService
         if (in_array($mimeType, ['application/pdf', 'application/msword', 'text/plain'], true)) {
             return MediaType::Document;
         }
+
         return MediaType::Archive;
     }
 }

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('storage_provider', 50)->nullable();
             $table->boolean('is_generated')->default(true);
             $table->integer('processing_time_ms')->nullable();
-            
+
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();
             $table->unsignedBigInteger('size');

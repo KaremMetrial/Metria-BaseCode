@@ -18,12 +18,14 @@ class SettingsController extends ApiController
     public function index(): JsonResponse
     {
         Gate::authorize('viewAny', Setting::class);
+
         return $this->respond($this->settings->all());
     }
 
     public function show(string $key): JsonResponse
     {
         Gate::authorize('viewAny', Setting::class);
+
         return $this->respond(['key' => $key, 'value' => $this->settings->get($key)]);
     }
 

@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature\RBAC\Api;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;
 use Tests\Support\CreatesTenant;
 use Tests\Support\CreatesUser;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class RoleApiTest extends TestCase
 {
+    use CreatesPermission, CreatesRole, CreatesTenant, CreatesUser;
     use RefreshDatabase;
-    use CreatesTenant, CreatesRole, CreatesPermission, CreatesUser;
 
     public function test_it_creates_role_with_translations(): void
     {
         $tenant = $this->setRandomTenant();
         $user = $this->createUser($tenant);
-        
+
         $managePerm = $this->createPermission(['name' => 'rbac.roles.manage']);
         $user->givePermissionTo($managePerm);
 
@@ -46,7 +46,7 @@ class RoleApiTest extends TestCase
     {
         $tenant = $this->setRandomTenant();
         $user = $this->createUser($tenant);
-        
+
         $managePerm = $this->createPermission(['name' => 'rbac.roles.manage']);
         $user->givePermissionTo($managePerm);
 

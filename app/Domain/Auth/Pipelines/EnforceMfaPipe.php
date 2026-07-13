@@ -11,7 +11,7 @@ class EnforceMfaPipe
     /**
      * Handle an incoming authentication context and enforce MFA requirements.
      *
-     * @param Closure(AuthContext): mixed $next
+     * @param  Closure(AuthContext): mixed  $next
      */
     public function handle(AuthContext $context, Closure $next): mixed
     {

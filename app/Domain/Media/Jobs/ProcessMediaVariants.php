@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Media\Jobs;
 
+use App\Domain\Media\Enums\MediaStatus;
 use App\Domain\Media\Models\Media;
 use App\Domain\Media\Services\MediaProcessingService;
 use Illuminate\Bus\Queueable;
@@ -33,6 +34,7 @@ class ProcessMediaVariants implements ShouldQueue
 
         if (! $media) {
             Log::warning("Media record [{$this->mediaId}] not found for processing. Aborting.");
+
             return;
         }
 
@@ -40,14 +42,14 @@ class ProcessMediaVariants implements ShouldQueue
             Log::info("Starting optimization/variant pipeline for media [{$this->mediaId}].");
             $processor->process($media);
         } catch (\Throwable $e) {
-            Log::error("Failed variant generation for media [{$this->mediaId}]: " . $e->getMessage());
+            Log::error("Failed variant generation for media [{$this->mediaId}]: ".$e->getMessage());
 
             $media->increment('retry_count');
 
             if ($media->retry_count >= $this->tries) {
                 $media->update([
-                    'status' => \App\Domain\Media\Enums\MediaStatus::Failed,
-                    'processing_error' => 'Processing failed after max retries: ' . $e->getMessage(),
+                    'status' => MediaStatus::Failed,
+                    'processing_error' => 'Processing failed after max retries: '.$e->getMessage(),
                 ]);
             }
 

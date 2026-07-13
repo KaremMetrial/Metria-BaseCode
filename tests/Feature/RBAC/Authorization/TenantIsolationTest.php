@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace Tests\Feature\RBAC\Authorization;
 
 use App\Domain\RBAC\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;
 use Tests\Support\CreatesTenant;
 use Tests\Support\CreatesUser;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class TenantIsolationTest extends TestCase
 {
+    use CreatesPermission, CreatesRole, CreatesTenant, CreatesUser;
     use RefreshDatabase;
-    use CreatesTenant, CreatesRole, CreatesPermission, CreatesUser;
 
     protected function setUp(): void
     {
@@ -36,7 +35,7 @@ class TenantIsolationTest extends TestCase
         $this->setTenant($tenantA);
 
         $roles = Role::whereNotNull('tenant_id')->get();
-        
+
         $this->assertCount(1, $roles);
         $this->assertEquals('Role A', $roles->first()->name);
     }
@@ -44,18 +43,18 @@ class TenantIsolationTest extends TestCase
     public function test_tenant_can_see_global_system_roles(): void
     {
         $tenantA = $this->setRandomTenant();
-        
+
         // System roles have null tenant_id
         $this->createSystemRole('System Admin');
-        
+
         $this->createRole($tenantA, ['name' => 'Custom Role']);
 
         $roles = Role::all();
-        
+
         // It will contain our created role, our custom system role, plus seeded system roles
         $this->assertTrue($roles->contains('name', 'System Admin'));
         $this->assertTrue($roles->contains('name', 'Custom Role'));
-        
+
         // Tenant A should only have 1 scoped role
         $this->assertEquals(1, $roles->whereNotNull('tenant_id')->count());
     }
@@ -64,7 +63,7 @@ class TenantIsolationTest extends TestCase
     {
         $tenantA = $this->setRandomTenant();
         $superAdmin = $this->createUser($tenantA);
-        
+
         // Temporarily disable scope to assign system role
         Role::withoutGlobalScopes()->get();
         $superRole = $this->createSystemRole('super-admin');
@@ -77,7 +76,7 @@ class TenantIsolationTest extends TestCase
 
         // Super Admin in Tenant A tries to hit API to view Tenant B's role
         $response = $this->getJson("/api/v1/rbac/roles/{$roleB->id}");
-        
+
         // Should be 404, not 403. The record is completely invisible to Tenant A's scope.
         $response->assertNotFound();
     }

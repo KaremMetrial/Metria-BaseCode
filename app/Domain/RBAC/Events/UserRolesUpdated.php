@@ -10,7 +10,7 @@ use App\Domain\Auth\Models\User;
 class UserRolesUpdated extends DomainEvent
 {
     /**
-     * @param array<int, string> $roles
+     * @param  array<int, string>  $roles
      */
     public function __construct(public readonly User $user, public readonly array $roles)
     {

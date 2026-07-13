@@ -9,6 +9,8 @@ use App\Domain\RBAC\Actions\CreateRoleAction;
 use App\Domain\RBAC\Actions\DeleteRoleAction;
 use App\Domain\RBAC\Actions\UpdateRoleAction;
 use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
+use App\Domain\RBAC\DTOs\CreateRoleDTO;
+use App\Domain\RBAC\DTOs\UpdateRoleDTO;
 use App\Domain\RBAC\Http\Requests\StoreRoleRequest;
 use App\Domain\RBAC\Http\Requests\UpdateRoleRequest;
 use App\Domain\RBAC\Http\Resources\RoleResource;
@@ -37,7 +39,7 @@ class RoleController extends ApiController
     public function store(StoreRoleRequest $request): JsonResponse
     {
         $this->authorize('create', Role::class);
-        $dto = \App\Domain\RBAC\DTOs\CreateRoleDTO::fromArray($request->validated());
+        $dto = CreateRoleDTO::fromArray($request->validated());
         $role = $this->createAction->execute($dto, (string) $request->user()?->id);
 
         return $this->respond(new RoleResource($role), __('rbac.role_created'), 201);
@@ -53,7 +55,7 @@ class RoleController extends ApiController
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
     {
         $this->authorize('update', $role);
-        $dto = \App\Domain\RBAC\DTOs\UpdateRoleDTO::fromArray($request->validated());
+        $dto = UpdateRoleDTO::fromArray($request->validated());
         $updatedRole = $this->updateAction->execute($role, $dto, (string) $request->user()?->id);
 
         return $this->respond(new RoleResource($updatedRole), __('rbac.role_updated'));

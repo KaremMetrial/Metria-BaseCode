@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
+use App\Core\Exceptions\DomainException;
 use App\Domain\Auth\Events\AllSessionsRevoked;
 use App\Domain\Auth\Events\PasswordResetRequested;
 use App\Domain\Auth\Events\PasswordResetSuccessfully;
 use App\Domain\Auth\Models\User;
-use App\Core\Exceptions\DomainException;
 use App\Domain\Governance\Services\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,8 +18,7 @@ class PasswordResetService
 {
     public function __construct(
         private readonly AuditLogger $audit
-    ) {
-    }
+    ) {}
 
     public function requestReset(string $email): void
     {

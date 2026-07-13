@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace Tests\Feature\RBAC\Infrastructure;
 
 use App\Domain\RBAC\Support\PermissionRegistry;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class RegistryCommandTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_sync_command_removes_unregistered_permissions(): void
     {
         Permission::create(['name' => 'legacy.permission', 'guard_name' => 'web']);
-        
+
         $this->assertNotNull(Permission::where('name', 'legacy.permission')->first());
 
         // Assuming 'legacy.permission' is NOT in PermissionRegistry

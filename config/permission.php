@@ -1,8 +1,8 @@
 <?php
 
+use App\Domain\RBAC\Models\Role;
 use Spatie\Permission\DefaultTeamResolver;
 use Spatie\Permission\Models\Permission;
-use App\Domain\RBAC\Models\Role;
 
 return [
 

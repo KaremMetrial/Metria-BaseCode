@@ -7,7 +7,7 @@ namespace App\Domain\RBAC\Repositories;
 use App\Core\Abstracts\BaseRepository;
 use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
 use App\Domain\RBAC\Models\Role;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class RoleRepository extends BaseRepository implements RoleRepositoryInterface
 {
@@ -49,7 +49,7 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
         return $role->load('metadata');
     }
 
-    public function updateWithMetadata(Role|\Illuminate\Database\Eloquent\Model $role, array $attributes, array $metadata = [], ?string $tenantId = null): Role
+    public function updateWithMetadata(Role|Model $role, array $attributes, array $metadata = [], ?string $tenantId = null): Role
     {
         if (! empty($attributes)) {
             parent::update($role, $attributes, $tenantId);
@@ -62,7 +62,7 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
         return $role->refresh()->load('metadata');
     }
 
-    public function delete(Role|\Illuminate\Database\Eloquent\Model $role, ?string $tenantId = null): bool
+    public function delete(Role|Model $role, ?string $tenantId = null): bool
     {
         return parent::delete($role, $tenantId);
     }

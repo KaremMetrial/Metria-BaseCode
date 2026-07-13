@@ -8,13 +8,16 @@ use App\Domain\Auth\Models\User;
 use App\Domain\Media\Enums\MediaStatus;
 use App\Domain\Media\Enums\MediaType;
 use App\Domain\Media\Enums\MediaVariantType;
+use App\Domain\Media\Http\Resources\MediaResource;
 use App\Domain\Media\Models\Media;
 use App\Domain\Media\Models\MediaBlob;
 use App\Domain\Media\Models\MediaVariant;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
@@ -52,7 +55,7 @@ class MediaUploadTest extends TestCase
         $user = User::factory()->create([
             'tenant_id' => $tenantId,
         ]);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
         setPermissionsTeamId($tenantId);
         $user->assignRole('customer');
 
@@ -79,7 +82,7 @@ class MediaUploadTest extends TestCase
                     'upload_url',
                     'multipart',
                     'path',
-                ]
+                ],
             ]);
 
         $mediaId = $response->json('data.media_id');
@@ -390,7 +393,7 @@ class MediaUploadTest extends TestCase
     {
         $user = $this->createTenantUser('org-1');
         $otherUser = $this->createTenantUser('org-1');
-        
+
         // 1. Upload a private file
         Sanctum::actingAs($user);
         $presign = $this->postJson('/api/v1/media/presign', [
@@ -409,8 +412,8 @@ class MediaUploadTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
-                    'download_url'
-                ]
+                    'download_url',
+                ],
             ]);
 
         // Check audit fields updated (1 from confirmation response serialization + 1 from download route request)
@@ -437,7 +440,7 @@ class MediaUploadTest extends TestCase
     {
         $user = $this->createTenantUser('org-1');
         $media = Media::create([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'id' => (string) Str::uuid(),
             'tenant_id' => 'org-1',
             'media_type' => MediaType::Image,
             'purpose' => 'avatar',
@@ -449,7 +452,7 @@ class MediaUploadTest extends TestCase
             'created_by' => $user->id,
         ]);
 
-        $resource = new \App\Domain\Media\Http\Resources\MediaResource($media);
+        $resource = new MediaResource($media);
         $array = $resource->toArray(request());
 
         $this->assertEquals($media->id, $array['id']);

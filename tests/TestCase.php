@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Spatie\Permission\PermissionRegistrar;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -14,7 +15,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->app->make(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     /**
@@ -24,7 +25,7 @@ abstract class TestCase extends BaseTestCase
     protected function generateTotp(string $secret): string
     {
         $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        $secret    = strtoupper($secret);
+        $secret = strtoupper($secret);
 
         // Base32 decode
         $bits = '';
@@ -40,16 +41,15 @@ abstract class TestCase extends BaseTestCase
             $key .= chr((int) bindec(substr($bits, $i, 8)));
         }
 
-        $timeSlice      = (int) floor(time() / 30);
-        $binaryTime     = pack('N', 0) . pack('N', $timeSlice);
-        $hmac           = hash_hmac('sha1', $binaryTime, $key, true);
-        $offset         = ord($hmac[19]) & 0xf;
-        $value          = ((ord($hmac[$offset]) & 0x7f) << 24)
-            | ((ord($hmac[$offset + 1]) & 0xff) << 16)
-            | ((ord($hmac[$offset + 2]) & 0xff) << 8)
-            | (ord($hmac[$offset + 3]) & 0xff);
+        $timeSlice = (int) floor(time() / 30);
+        $binaryTime = pack('N', 0).pack('N', $timeSlice);
+        $hmac = hash_hmac('sha1', $binaryTime, $key, true);
+        $offset = ord($hmac[19]) & 0xF;
+        $value = ((ord($hmac[$offset]) & 0x7F) << 24)
+            | ((ord($hmac[$offset + 1]) & 0xFF) << 16)
+            | ((ord($hmac[$offset + 2]) & 0xFF) << 8)
+            | (ord($hmac[$offset + 3]) & 0xFF);
 
         return str_pad((string) ($value % 1_000_000), 6, '0', STR_PAD_LEFT);
     }
 }
-

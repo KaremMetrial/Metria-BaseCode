@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\RBAC\Actions;
 
 use App\Core\Events\EventBus;
+use App\Core\Tenancy\TenantManager;
 use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
 use App\Domain\RBAC\DTOs\CreateRoleDTO;
 use App\Domain\RBAC\Events\RoleCreated;
@@ -36,7 +37,7 @@ class CreateRoleAction
                 'created_by' => $userId,
             ];
 
-            $tenantId = app(\App\Core\Tenancy\TenantManager::class)->id();
+            $tenantId = app(TenantManager::class)->id();
             $role = $this->roleRepository->createWithMetadata($roleData, $metadata, (string) $tenantId);
 
             $this->eventBus->publish(new RoleCreated($role));

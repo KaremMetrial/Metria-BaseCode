@@ -46,14 +46,14 @@ class PaymentService
 
         return DB::transaction(function () use ($user, $money, $driver, $options, $description) {
             $payment = Payment::create([
-                'user_id'     => $user->id,
-                'gateway'     => $driver->name(),
-                'amount'      => $money->amount,
+                'user_id' => $user->id,
+                'gateway' => $driver->name(),
+                'amount' => $money->amount,
                 'refunded_amount' => 0,
-                'currency'    => $money->currency,
-                'status'      => PaymentStatus::Pending,
+                'currency' => $money->currency,
+                'status' => PaymentStatus::Pending,
                 'description' => $description,
-                'metadata'    => $options['metadata'] ?? [],
+                'metadata' => $options['metadata'] ?? [],
             ]);
 
             try {
@@ -61,7 +61,7 @@ class PaymentService
             } catch (\Throwable $e) {
                 // Mark as Failed immediately so the row is not silently orphaned.
                 $payment->update([
-                    'status'   => PaymentStatus::Failed,
+                    'status' => PaymentStatus::Failed,
                     'metadata' => array_merge($payment->metadata ?? [], [
                         'gateway_error' => $e->getMessage(),
                     ]),
@@ -71,8 +71,8 @@ class PaymentService
 
             $payment->update([
                 'gateway_reference' => $result->gatewayReference,
-                'status'            => $result->status,
-                'metadata'          => array_merge($payment->metadata ?? [], array_filter([
+                'status' => $result->status,
+                'metadata' => array_merge($payment->metadata ?? [], array_filter([
                     'reference_code' => $result->referenceCode,
                 ])),
             ]);
@@ -142,9 +142,9 @@ class PaymentService
         if (config('governance.approvals.enabled', true)) {
             return $this->approvals->request('payments.refund', [
                 'payment_id' => $payment->id,
-                'tenant_id'  => $payment->tenant_id,  // locked to prevent cross-tenant attacks
-                'amount'     => $amount?->amount,
-                'reason'     => $reason,
+                'tenant_id' => $payment->tenant_id,  // locked to prevent cross-tenant attacks
+                'amount' => $amount?->amount,
+                'reason' => $reason,
             ], $requestedBy);
         }
 
@@ -167,7 +167,7 @@ class PaymentService
             $driver = $this->gateways->driver($payment->gateway);
             $driver->refund($payment, $amount);
 
-            $refunded        = ($amount ?? $payment->remainingRefundable())->amount;
+            $refunded = ($amount ?? $payment->remainingRefundable())->amount;
             $newRefundedAmount = $payment->refunded_amount + $refunded;
 
             $status = $newRefundedAmount >= $payment->amount
@@ -176,7 +176,7 @@ class PaymentService
 
             $payment->update([
                 'refunded_amount' => $newRefundedAmount,
-                'status'          => $status,
+                'status' => $status,
             ]);
 
             $this->events->publish(new PaymentRefunded($payment, $refunded));

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core;
 
-use App\Domain\Integration\Support\CircuitBreaker;
 use App\Core\Exceptions\IntegrationException;
-use Illuminate\Support\Facades\Cache;
+use App\Domain\Integration\Support\CircuitBreaker;
 use Tests\TestCase;
 
 class CircuitBreakerTest extends TestCase
@@ -65,7 +64,8 @@ class CircuitBreakerTest extends TestCase
             $breaker->call($service, function () {
                 throw new \Exception('Failed');
             });
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         // Success should reset failures
         $result = $breaker->call($service, function () {
@@ -78,7 +78,8 @@ class CircuitBreakerTest extends TestCase
             $breaker->call($service, function () {
                 throw new \Exception('Failed again');
             });
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         $this->assertFalse($breaker->isOpen($service));
     }

@@ -4,19 +4,30 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Security;
 
+use App\Core\Support\Money;
+use App\Core\Tenancy\TenantManager;
+use App\Domain\Auth\Http\Requests\ConfirmMfaRequest;
+use App\Domain\Auth\Http\Requests\DisableMfaRequest;
+use App\Domain\Auth\Http\Requests\UpdateFcmTokenRequest;
 use App\Domain\Auth\Models\User;
 use App\Domain\Currency\Models\Currency;
-use App\Domain\Governance\Models\ApprovalRequest;
-use App\Domain\Governance\Models\AuditLog;
+use App\Domain\Governance\Enums\ApprovalStatus;
+use App\Domain\Governance\Http\Requests\UpdateSettingRequest;
 use App\Domain\Governance\Models\FeatureFlag;
 use App\Domain\Governance\Models\Setting;
+use App\Domain\Governance\Services\ApprovalService;
 use App\Domain\Integration\Models\OAuthProvider;
+use App\Domain\Media\Models\Media;
+use App\Domain\Payment\Models\Payment;
 use App\Domain\Territory\Models\Country;
-use App\Domain\Territory\Models\Zone;
+use App\Domain\Wallet\Models\Wallet;
+use App\Domain\Wallet\Services\WalletService;
+use App\Domain\Webhook\Models\WebhookEndpoint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class EnterpriseRbacPolicyTest extends TestCase
@@ -64,10 +75,10 @@ class EnterpriseRbacPolicyTest extends TestCase
         $this->assertTrue(Gate::forUser($superAdmin)->allows('create', Country::class));
         $this->assertTrue(Gate::forUser($superAdmin)->allows('viewAny', Currency::class));
         $this->assertTrue(Gate::forUser($superAdmin)->allows('delete', Currency::class));
-        $this->assertTrue(Gate::forUser($superAdmin)->allows('create', \App\Domain\Media\Models\Media::class));
-        $this->assertTrue(Gate::forUser($superAdmin)->allows('refund', \App\Domain\Payment\Models\Payment::class));
-        $this->assertTrue(Gate::forUser($superAdmin)->allows('manage', \App\Domain\Wallet\Models\Wallet::class));
-        $this->assertTrue(Gate::forUser($superAdmin)->allows('create', \App\Domain\Webhook\Models\WebhookEndpoint::class));
+        $this->assertTrue(Gate::forUser($superAdmin)->allows('create', Media::class));
+        $this->assertTrue(Gate::forUser($superAdmin)->allows('refund', Payment::class));
+        $this->assertTrue(Gate::forUser($superAdmin)->allows('manage', Wallet::class));
+        $this->assertTrue(Gate::forUser($superAdmin)->allows('create', WebhookEndpoint::class));
     }
 
     public function test_unprivileged_user_is_denied_management_abilities(): void
@@ -80,10 +91,10 @@ class EnterpriseRbacPolicyTest extends TestCase
         $this->assertFalse(Gate::forUser($user)->allows('update', Setting::class));
         $this->assertFalse(Gate::forUser($user)->allows('create', Country::class));
         $this->assertFalse(Gate::forUser($user)->allows('create', Currency::class));
-        $this->assertFalse(Gate::forUser($user)->allows('create', \App\Domain\Media\Models\Media::class));
-        $this->assertFalse(Gate::forUser($user)->allows('refund', \App\Domain\Payment\Models\Payment::class));
-        $this->assertFalse(Gate::forUser($user)->allows('manage', \App\Domain\Wallet\Models\Wallet::class));
-        $this->assertFalse(Gate::forUser($user)->allows('create', \App\Domain\Webhook\Models\WebhookEndpoint::class));
+        $this->assertFalse(Gate::forUser($user)->allows('create', Media::class));
+        $this->assertFalse(Gate::forUser($user)->allows('refund', Payment::class));
+        $this->assertFalse(Gate::forUser($user)->allows('manage', Wallet::class));
+        $this->assertFalse(Gate::forUser($user)->allows('create', WebhookEndpoint::class));
     }
 
     public function test_modular_permission_grants_specific_abilities_without_super_admin(): void
@@ -117,35 +128,35 @@ class EnterpriseRbacPolicyTest extends TestCase
     {
         $mediaUploader = User::factory()->create();
         $mediaUploader->givePermissionTo('media.upload');
-        $this->assertTrue(Gate::forUser($mediaUploader)->allows('create', \App\Domain\Media\Models\Media::class));
-        $this->assertFalse(Gate::forUser($mediaUploader)->allows('refund', \App\Domain\Payment\Models\Payment::class));
+        $this->assertTrue(Gate::forUser($mediaUploader)->allows('create', Media::class));
+        $this->assertFalse(Gate::forUser($mediaUploader)->allows('refund', Payment::class));
 
         $financeUser = User::factory()->create();
         $financeUser->givePermissionTo(['payments.refund', 'wallets.manage']);
-        $this->assertTrue(Gate::forUser($financeUser)->allows('refund', \App\Domain\Payment\Models\Payment::class));
-        $this->assertTrue(Gate::forUser($financeUser)->allows('manage', \App\Domain\Wallet\Models\Wallet::class));
-        $this->assertFalse(Gate::forUser($financeUser)->allows('create', \App\Domain\Webhook\Models\WebhookEndpoint::class));
+        $this->assertTrue(Gate::forUser($financeUser)->allows('refund', Payment::class));
+        $this->assertTrue(Gate::forUser($financeUser)->allows('manage', Wallet::class));
+        $this->assertFalse(Gate::forUser($financeUser)->allows('create', WebhookEndpoint::class));
 
         $webhookManager = User::factory()->create();
         $webhookManager->givePermissionTo('webhooks.manage');
-        $this->assertTrue(Gate::forUser($webhookManager)->allows('create', \App\Domain\Webhook\Models\WebhookEndpoint::class));
-        $this->assertTrue(Gate::forUser($webhookManager)->allows('update', \App\Domain\Webhook\Models\WebhookEndpoint::class));
-        $this->assertFalse(Gate::forUser($webhookManager)->allows('wallets.manage', \App\Domain\Wallet\Models\Wallet::class));
+        $this->assertTrue(Gate::forUser($webhookManager)->allows('create', WebhookEndpoint::class));
+        $this->assertTrue(Gate::forUser($webhookManager)->allows('update', WebhookEndpoint::class));
+        $this->assertFalse(Gate::forUser($webhookManager)->allows('wallets.manage', Wallet::class));
     }
 
     public function test_form_request_authorization_boundaries(): void
     {
-        $confirmMfaRequest = new \App\Domain\Auth\Http\Requests\ConfirmMfaRequest();
+        $confirmMfaRequest = new ConfirmMfaRequest;
         $this->assertFalse($confirmMfaRequest->authorize());
 
-        $disableMfaRequest = new \App\Domain\Auth\Http\Requests\DisableMfaRequest();
+        $disableMfaRequest = new DisableMfaRequest;
         $this->assertFalse($disableMfaRequest->authorize());
 
-        $updateFcmRequest = new \App\Domain\Auth\Http\Requests\UpdateFcmTokenRequest();
+        $updateFcmRequest = new UpdateFcmTokenRequest;
         $this->assertFalse($updateFcmRequest->authorize());
 
         $user = User::factory()->create();
-        $updateSettingRequest = new \App\Domain\Governance\Http\Requests\UpdateSettingRequest();
+        $updateSettingRequest = new UpdateSettingRequest;
         $updateSettingRequest->setUserResolver(fn () => $user);
         $this->assertFalse($updateSettingRequest->authorize());
 
@@ -160,7 +171,7 @@ class EnterpriseRbacPolicyTest extends TestCase
         $customer = User::factory()->create();
         $customer->givePermissionTo('payments.create');
 
-        $this->assertTrue(Gate::forUser($customer)->allows('viewAny', \App\Domain\Payment\Models\Payment::class));
+        $this->assertTrue(Gate::forUser($customer)->allows('viewAny', Payment::class));
     }
 
     public function test_cross_tenant_wallet_approval_and_payment_operations(): void
@@ -169,7 +180,7 @@ class EnterpriseRbacPolicyTest extends TestCase
         config(['tenancy.enabled' => true]);
 
         // Insert Tenant records to satisfy foreign key constraints
-        \Illuminate\Support\Facades\DB::table('tenants')->insert([
+        DB::table('tenants')->insert([
             ['id' => 'tenant-1', 'name' => 'Tenant 1', 'slug' => 'tenant-1', 'active' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 'tenant-2', 'name' => 'Tenant 2', 'slug' => 'tenant-2', 'active' => 1, 'created_at' => now(), 'updated_at' => now()],
         ]);
@@ -179,7 +190,7 @@ class EnterpriseRbacPolicyTest extends TestCase
         $tenant2User = User::factory()->create(['tenant_id' => 'tenant-2']);
 
         // Create wallets
-        $walletService = app(\App\Domain\Wallet\Services\WalletService::class);
+        $walletService = app(WalletService::class);
         $w1 = $walletService->firstOrCreateFor($tenant1User, 'USD');
         $w2 = $walletService->firstOrCreateFor($tenant2User, 'USD');
 
@@ -187,15 +198,15 @@ class EnterpriseRbacPolicyTest extends TestCase
         $this->assertEquals('tenant-2', $w2->tenant_id);
 
         // Credit w1
-        $walletService->credit($w1, \App\Core\Support\Money::of(1000, 'USD'));
+        $walletService->credit($w1, Money::of(1000, 'USD'));
 
         // Settle from tenant-1 to tenant-2 wallet under tenant-1 context
-        app(\App\Core\Tenancy\TenantManager::class)->set('tenant-1');
-        
-        $walletService->hold($w1, \App\Core\Support\Money::of(500, 'USD'));
+        app(TenantManager::class)->set('tenant-1');
+
+        $walletService->hold($w1, Money::of(500, 'USD'));
 
         // Settle hold from w1 to w2 should not fail due to tenant scopes
-        $walletService->settleHold($w1, $w2, \App\Core\Support\Money::of(500, 'USD'), 'Cross-tenant settlement');
+        $walletService->settleHold($w1, $w2, Money::of(500, 'USD'), 'Cross-tenant settlement');
 
         $this->assertEquals(500, $w1->fresh()->balance);
         $this->assertEquals(500, $w2->fresh()->balance);
@@ -204,16 +215,16 @@ class EnterpriseRbacPolicyTest extends TestCase
         $admin = User::factory()->create(['tenant_id' => 'tenant-2']);
         $admin->givePermissionTo('admin.super');
 
-        $approvalService = app(\App\Domain\Governance\Services\ApprovalService::class);
+        $approvalService = app(ApprovalService::class);
         $approvalRequest = $approvalService->request('payments.refund', [
-            'payment_id' => (string) \Illuminate\Support\Str::uuid(),
+            'payment_id' => (string) Str::uuid(),
             'amount' => 100,
         ], $tenant1User);
 
         // Admin (in tenant-2 context) approves request (in tenant-1)
-        app(\App\Core\Tenancy\TenantManager::class)->set('tenant-2');
+        app(TenantManager::class)->set('tenant-2');
         $updatedRequest = $approvalService->approve($approvalRequest, $admin);
 
-        $this->assertEquals(\App\Domain\Governance\Enums\ApprovalStatus::Failed, $updatedRequest->status);
+        $this->assertEquals(ApprovalStatus::Failed, $updatedRequest->status);
     }
 }

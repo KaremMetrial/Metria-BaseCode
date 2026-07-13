@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace Tests\Feature\RBAC\Security;
 
 use App\Domain\RBAC\Models\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;
 use Tests\Support\CreatesTenant;
 use Tests\Support\CreatesUser;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SecurityRegressionTest extends TestCase
 {
+    use CreatesPermission, CreatesRole, CreatesTenant, CreatesUser;
     use RefreshDatabase;
-    use CreatesTenant, CreatesRole, CreatesPermission, CreatesUser;
 
     public function test_mass_assignment_of_system_and_tenant_flags_fails(): void
     {
         $tenant = $this->setRandomTenant();
         $admin = $this->createUser($tenant);
         $admin->givePermissionTo($this->createPermission(['name' => 'rbac.roles.manage']));
-        
+
         $this->actingAs($admin);
 
         $response = $this->postJson('/api/v1/rbac/roles', [
@@ -35,7 +35,7 @@ class SecurityRegressionTest extends TestCase
         $response->assertCreated();
 
         $role = Role::where('name', 'Hacker Role')->first();
-        
+
         // Assert mass assignment failed to make it a global system role
         // A tenant should NEVER be able to create a global system role (tenant_id = null) via API.
         // The DTO and Action should automatically scope it to their tenant or reject it.
@@ -48,7 +48,7 @@ class SecurityRegressionTest extends TestCase
         $tenant = $this->setRandomTenant();
         $admin = $this->createUser($tenant);
         $admin->givePermissionTo($this->createPermission(['name' => 'rbac.roles.manage']));
-        
+
         $this->actingAs($admin);
 
         $response = $this->postJson('/api/v1/rbac/roles', [

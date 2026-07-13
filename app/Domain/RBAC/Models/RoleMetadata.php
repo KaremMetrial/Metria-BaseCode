@@ -11,8 +11,8 @@ use Spatie\Translatable\HasTranslations;
 
 class RoleMetadata extends Model
 {
-    use HasUuid;
     use HasTranslations;
+    use HasUuid;
 
     protected $table = 'role_metadata';
 

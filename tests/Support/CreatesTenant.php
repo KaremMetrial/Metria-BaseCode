@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use App\Core\Tenancy\TenantManager;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 trait CreatesTenant
@@ -23,18 +24,18 @@ trait CreatesTenant
     protected function setRandomTenant(): string
     {
         $tenantId = (string) Str::uuid();
-        
+
         // Ensure the tenant exists in the database to satisfy FK constraints
-        \Illuminate\Support\Facades\DB::table('tenants')->insert([
+        DB::table('tenants')->insert([
             'id' => $tenantId,
-            'name' => 'Test Tenant ' . Str::random(5),
+            'name' => 'Test Tenant '.Str::random(5),
             'slug' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         $this->setTenant($tenantId);
-        
+
         return $tenantId;
     }
 }

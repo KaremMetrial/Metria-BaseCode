@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core\Http\Middleware;
 
 use App\Core\Models\IdempotencyKey;
+use App\Core\Tenancy\TenantManager;
 use Closure;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class IdempotencyMiddleware
             $request->method(),
             $request->path(),
             (string) $request->user()?->getAuthIdentifier(),
-            (string) app(\App\Core\Tenancy\TenantManager::class)->id(),
+            (string) app(TenantManager::class)->id(),
         ]));
 
         $existing = IdempotencyKey::query()

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature\RBAC\Authorization;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;
 use Tests\Support\CreatesTenant;
 use Tests\Support\CreatesUser;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class EffectivePermissionTest extends TestCase
 {
+    use CreatesPermission, CreatesRole, CreatesTenant, CreatesUser;
     use RefreshDatabase;
-    use CreatesTenant, CreatesRole, CreatesPermission, CreatesUser;
 
     /**
      * @dataProvider effectivePermissionMatrix
@@ -26,7 +26,7 @@ class EffectivePermissionTest extends TestCase
         array $expectedEffectivePermissions
     ): void {
         $tenant = $this->setRandomTenant();
-        
+
         $user = $this->createUser($tenant);
         $role = $this->createRole($tenant, ['name' => 'Matrix Role']);
 
@@ -35,7 +35,7 @@ class EffectivePermissionTest extends TestCase
             $perm = $this->createPermission(['name' => $permName]);
             $role->givePermissionTo($perm);
         }
-        
+
         $user->assignRole($role);
 
         // Create and assign direct permissions

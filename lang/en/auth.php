@@ -5,7 +5,7 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'login_locked' => 'Your account has been temporarily locked due to too many failed login attempts.',
-    
+
     'mfa' => [
         'required' => 'Multi-factor authentication is required to proceed.',
         'invalid_code' => 'The provided multi-factor authentication code is invalid.',

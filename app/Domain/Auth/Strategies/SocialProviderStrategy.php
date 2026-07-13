@@ -13,8 +13,7 @@ class SocialProviderStrategy implements AuthStrategyInterface
 {
     public function __construct(
         private readonly SocialIdentityService $socialService
-    ) {
-    }
+    ) {}
 
     /**
      * Generate the OAuth2 authorization URL using Laravel Socialite or fallback driver URL.
@@ -41,7 +40,7 @@ class SocialProviderStrategy implements AuthStrategyInterface
     /**
      * Authenticate or register a user via OAuth payload.
      *
-     * @param array{provider: string, user: array<string, mixed>, device_name?: string} $credentials
+     * @param  array{provider: string, user: array<string, mixed>, device_name?: string}  $credentials
      */
     public function authenticate(array $credentials, ?string $tenantId = null): User
     {

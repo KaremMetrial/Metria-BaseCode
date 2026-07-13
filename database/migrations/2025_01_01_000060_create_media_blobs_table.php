@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('size');
             $table->string('virus_status', 20)->default('pending');
             $table->json('virus_scan_details')->nullable();
-            
+
             // Enterprise cloud storage columns
             $table->string('storage_provider', 50)->nullable();
             $table->string('bucket', 100)->nullable();

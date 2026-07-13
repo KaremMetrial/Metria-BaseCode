@@ -13,6 +13,7 @@ use App\Domain\Payment\Enums\PaymentStatus;
 use App\Domain\Payment\Models\Payment;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -201,7 +202,7 @@ class PaymobGateway implements PaymentGateway
 
     private function authToken(): string
     {
-        return \Illuminate\Support\Facades\Cache::remember('paymob_auth_token', 3300, function () {
+        return Cache::remember('paymob_auth_token', 3300, function () {
             $response = $this->http()->post('/auth/tokens', [
                 'api_key' => (string) ($this->config['api_key'] ?? ''),
             ]);

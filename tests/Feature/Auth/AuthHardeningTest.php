@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Auth;
 
 use App\Domain\Auth\Models\User;
+use App\Domain\Auth\Services\MfaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -130,7 +131,7 @@ class AuthHardeningTest extends TestCase
             'two_factor_confirmed_at' => now(),
         ]);
 
-        $mfaService = app(\App\Domain\Auth\Services\MfaService::class);
+        $mfaService = app(MfaService::class);
         $code = $this->generateTotp($secret);
 
         // First verification should succeed
@@ -148,7 +149,9 @@ class AuthHardeningTest extends TestCase
         for ($i = 0, $len = strlen($secret); $i < $len; $i++) {
             $char = $secret[$i];
             $val = strpos($alphabet, $char);
-            if ($val === false) continue;
+            if ($val === false) {
+                continue;
+            }
             $bits .= str_pad(decbin($val), 5, '0', STR_PAD_LEFT);
         }
         $decoded = '';
@@ -159,11 +162,12 @@ class AuthHardeningTest extends TestCase
         $timeSlice = (int) floor(time() / 30);
         $binaryTimeSlice = pack('N', 0).pack('N', $timeSlice);
         $hmac = hash_hmac('sha1', $binaryTimeSlice, $decoded, true);
-        $offsetIndex = ord($hmac[19]) & 0xf;
-        $value = ((ord($hmac[$offsetIndex]) & 0x7f) << 24)
-            | ((ord($hmac[$offsetIndex + 1]) & 0xff) << 16)
-            | ((ord($hmac[$offsetIndex + 2]) & 0xff) << 8)
-            | (ord($hmac[$offsetIndex + 3]) & 0xff);
+        $offsetIndex = ord($hmac[19]) & 0xF;
+        $value = ((ord($hmac[$offsetIndex]) & 0x7F) << 24)
+            | ((ord($hmac[$offsetIndex + 1]) & 0xFF) << 16)
+            | ((ord($hmac[$offsetIndex + 2]) & 0xFF) << 8)
+            | (ord($hmac[$offsetIndex + 3]) & 0xFF);
+
         return str_pad((string) ($value % 1000000), 6, '0', STR_PAD_LEFT);
     }
 }

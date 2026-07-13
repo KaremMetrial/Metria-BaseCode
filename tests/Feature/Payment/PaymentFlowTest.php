@@ -7,6 +7,8 @@ namespace Tests\Feature\Payment;
 use App\Domain\Auth\Models\User;
 use App\Domain\Payment\Enums\PaymentStatus;
 use App\Domain\Payment\Models\Payment;
+use App\Domain\Payment\Services\PaymentService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -18,7 +20,7 @@ class PaymentFlowTest extends TestCase
 
     private function createPaymentUser(): User
     {
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
         $user = User::factory()->create();
         $user->assignRole('customer');
 
@@ -146,7 +148,7 @@ class PaymentFlowTest extends TestCase
             ]),
         ]);
 
-        $paymentService = app(\App\Domain\Payment\Services\PaymentService::class);
+        $paymentService = app(PaymentService::class);
 
         // 1. First refund of 4000 (40 EGP)
         $payment = $paymentService->executeRefund($payment, 4000);

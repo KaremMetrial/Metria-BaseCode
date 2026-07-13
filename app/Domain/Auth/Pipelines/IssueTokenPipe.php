@@ -21,7 +21,7 @@ class IssueTokenPipe
     /**
      * Handle an incoming authentication context and issue API tokens and sessions.
      *
-     * @param Closure(AuthContext): mixed $next
+     * @param  Closure(AuthContext): mixed  $next
      */
     public function handle(AuthContext $context, Closure $next): mixed
     {

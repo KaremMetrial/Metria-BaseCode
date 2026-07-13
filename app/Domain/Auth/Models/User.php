@@ -7,11 +7,13 @@ namespace App\Domain\Auth\Models;
 use App\Core\Tenancy\BelongsToTenant;
 use App\Core\Traits\HasUuid;
 use App\Domain\Governance\Traits\Auditable;
+use App\Domain\Media\Models\Media;
 use App\Domain\Wallet\Models\Wallet;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -97,9 +99,9 @@ class User extends Authenticatable
         );
     }
 
-    public function avatar(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    public function avatar(): MorphOne
     {
-        return $this->morphOne(\App\Domain\Media\Models\Media::class, 'mediable')
+        return $this->morphOne(Media::class, 'mediable')
             ->where('purpose', 'avatar');
     }
 

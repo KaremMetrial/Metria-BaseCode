@@ -22,7 +22,7 @@ class WebhookDispatcher
             ->where('active', true)
             ->where(function ($query) use ($event) {
                 $query->whereJsonContains('events', '*')
-                      ->orWhereJsonContains('events', $event);
+                    ->orWhereJsonContains('events', $event);
             })
             ->each(function (WebhookEndpoint $endpoint) use ($event, $payload) {
                 $delivery = WebhookDelivery::create([

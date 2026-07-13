@@ -13,13 +13,12 @@ class OtpAuthStrategy implements AuthStrategyInterface
 {
     public function __construct(
         private readonly VerifyOtp $verifyOtp
-    ) {
-    }
+    ) {}
 
     /**
      * Authenticate or resolve a user via OTP verification.
      *
-     * @param array{identifier: string, code: string, guard?: string} $credentials
+     * @param  array{identifier: string, code: string, guard?: string}  $credentials
      */
     public function authenticate(array $credentials, ?string $tenantId = null): User
     {

@@ -38,7 +38,7 @@ class WalletService
                 'tenant_id' => $user->getAttributes()['tenant_id'] ?? null,
                 'currency' => strtoupper($currency ?? config('payments.currency', 'EGP')),
                 'balance' => 0,
-                'held' => 0
+                'held' => 0,
             ],
         );
     }
@@ -124,9 +124,9 @@ class WalletService
             // Do NOT call captureHold/credit here — they would re-lock the same rows.
             if (strcmp((string) $from->getKey(), (string) $to->getKey()) < 0) {
                 $lockedFrom = $this->locked($from);
-                $lockedTo   = $this->locked($to);
+                $lockedTo = $this->locked($to);
             } else {
-                $lockedTo   = $this->locked($to);
+                $lockedTo = $this->locked($to);
                 $lockedFrom = $this->locked($from);
             }
 
@@ -146,7 +146,7 @@ class WalletService
 
     private function _applyCapture(Wallet $wallet, Money $amount, ?string $description, ?Model $reference): WalletTransaction
     {
-        $wallet->held    -= $amount->amount;
+        $wallet->held -= $amount->amount;
         $wallet->balance -= $amount->amount;
         $wallet->save();
 

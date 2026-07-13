@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Domain\Media\Models;
 
-use App\Domain\Media\Enums\MediaVariantType;
 use App\Core\Traits\HasUuid;
+use App\Domain\Media\Enums\MediaVariantType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MediaVariant extends Model
 {
     use HasUuid;
+
     protected $table = 'media_variants';
 
     protected $fillable = [

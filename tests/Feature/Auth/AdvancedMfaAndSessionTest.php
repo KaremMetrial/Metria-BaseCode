@@ -59,9 +59,9 @@ class AdvancedMfaAndSessionTest extends TestCase
         $user->save();
 
         $response = $this->postJson('/api/v1/auth/mfa/verify', [
-            'email'    => $user->email,
+            'email' => $user->email,
             'password' => 'Secret123!',
-            'code'     => $this->generateTotp($secret),
+            'code' => $this->generateTotp($secret),
         ]);
 
         $response->assertOk()

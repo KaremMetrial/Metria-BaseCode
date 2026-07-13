@@ -10,7 +10,7 @@ use App\Domain\RBAC\Models\Role;
 class RolePermissionsUpdated extends DomainEvent
 {
     /**
-     * @param array<int, string> $permissions
+     * @param  array<int, string>  $permissions
      */
     public function __construct(public readonly Role $role, public readonly array $permissions)
     {

@@ -15,13 +15,12 @@ class PasswordAuthStrategy implements AuthStrategyInterface
 {
     public function __construct(
         private readonly AuditLogger $audit
-    ) {
-    }
+    ) {}
 
     /**
      * Authenticate a user by checking email and password credentials.
      *
-     * @param array{email: string, password: string} $credentials
+     * @param  array{email: string, password: string}  $credentials
      */
     public function authenticate(array $credentials, ?string $tenantId = null): User
     {

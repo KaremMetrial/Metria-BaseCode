@@ -17,7 +17,7 @@ interface PermissionRepositoryInterface
     public function findByName(string $name): Permission;
 
     /**
-     * @param array<int, string> $names
+     * @param  array<int, string>  $names
      * @return Collection<int, Permission>
      */
     public function findByNames(array $names): Collection;

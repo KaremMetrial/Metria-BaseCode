@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
-use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission;
 
 trait CreatesPermission
 {
@@ -14,7 +14,7 @@ trait CreatesPermission
      */
     protected function createPermission(array $attributes = []): Permission
     {
-        $attributes['name'] = $attributes['name'] ?? 'permission.' . Str::random(8);
+        $attributes['name'] = $attributes['name'] ?? 'permission.'.Str::random(8);
         $attributes['guard_name'] = $attributes['guard_name'] ?? 'web';
 
         return Permission::firstOrCreate([

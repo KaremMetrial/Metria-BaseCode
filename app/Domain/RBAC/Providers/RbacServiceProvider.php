@@ -7,8 +7,11 @@ namespace App\Domain\RBAC\Providers;
 use App\Domain\RBAC\Console\Commands\SyncPermissionsCommand;
 use App\Domain\RBAC\Contracts\PermissionRepositoryInterface;
 use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
+use App\Domain\RBAC\Listeners\AuditRbacEvent;
+use App\Domain\RBAC\Listeners\ClearRbacCache;
 use App\Domain\RBAC\Repositories\PermissionRepository;
 use App\Domain\RBAC\Repositories\RoleRepository;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class RbacServiceProvider extends ServiceProvider
@@ -27,7 +30,7 @@ class RbacServiceProvider extends ServiceProvider
         }
 
         // Register event subscribers
-        \Illuminate\Support\Facades\Event::subscribe(\App\Domain\RBAC\Listeners\AuditRbacEvent::class);
-        \Illuminate\Support\Facades\Event::subscribe(\App\Domain\RBAC\Listeners\ClearRbacCache::class);
+        Event::subscribe(AuditRbacEvent::class);
+        Event::subscribe(ClearRbacCache::class);
     }
 }

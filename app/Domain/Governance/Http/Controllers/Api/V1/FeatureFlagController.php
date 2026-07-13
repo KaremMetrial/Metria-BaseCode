@@ -18,6 +18,7 @@ class FeatureFlagController extends ApiController
     public function index(): JsonResponse
     {
         Gate::authorize('viewAny', FeatureFlag::class);
+
         return $this->respond(FeatureFlag::query()->orderBy('name')->get());
     }
 

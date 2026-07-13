@@ -19,13 +19,13 @@ class SyncUserRolesAction
     ) {}
 
     /**
-     * @param array<int, string> $roleNames
+     * @param  array<int, string>  $roleNames
      */
     public function execute(User $user, array $roleNames, string $mode = 'replace'): User
     {
         // Validate roles exist and are assignable
         $roles = $this->roleRepository->all()->whereIn('name', $roleNames);
-        
+
         if ($roles->count() !== count($roleNames)) {
             throw new DomainException(__('rbac.invalid_roles_provided'), 'invalid_roles_provided');
         }

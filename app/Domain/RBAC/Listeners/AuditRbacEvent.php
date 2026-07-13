@@ -51,4 +51,3 @@ class AuditRbacEvent
         $this->auditLogger->log('rbac.user_roles_updated', null, context: $event->payload());
     }
 }
-

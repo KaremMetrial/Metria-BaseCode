@@ -12,8 +12,7 @@ class DynamicSocialiteConfigService
 {
     public function __construct(
         private readonly OAuthConfigurationRepositoryInterface $repository
-    ) {
-    }
+    ) {}
 
     public function configure(string $provider, ?string $tenantId = null): void
     {
@@ -25,6 +24,7 @@ class DynamicSocialiteConfigService
                 'client_secret' => $config['client_secret'],
                 'redirect' => $config['redirect'],
             ]);
+
             return;
         }
 

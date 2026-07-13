@@ -19,7 +19,7 @@ class SyncRolePermissionsAction
     ) {}
 
     /**
-     * @param array<int, string> $permissionNames
+     * @param  array<int, string>  $permissionNames
      */
     public function execute(Role $role, array $permissionNames, string $mode = 'replace'): Role
     {

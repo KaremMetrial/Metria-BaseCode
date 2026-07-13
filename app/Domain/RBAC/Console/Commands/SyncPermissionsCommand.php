@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Permission;
 class SyncPermissionsCommand extends Command
 {
     protected $signature = 'rbac:permissions:sync {--guard= : The guard to sync permissions for}';
+
     protected $description = 'Sync permissions from the PermissionRegistry to the database';
 
     public function handle(AuthorizationCache $cache): int

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Governance;
 
+use App\Core\Tenancy\TenantManager;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -90,7 +91,7 @@ class SettingsTest extends TestCase
 
     public function test_settings_service_isolates_cache_and_db_per_tenant(): void
     {
-        $manager = app(\App\Core\Tenancy\TenantManager::class);
+        $manager = app(TenantManager::class);
 
         // Tenant A sets setting
         $manager->set('tenant-a');

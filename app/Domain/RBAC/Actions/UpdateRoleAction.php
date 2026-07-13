@@ -30,13 +30,25 @@ class UpdateRoleAction
             }
 
             $metadata = [];
-            
-            if ($dto->displayName !== null) $metadata['display_name'] = $dto->displayName;
-            if ($dto->description !== null) $metadata['description'] = $dto->description;
-            if ($dto->priority !== null) $metadata['priority'] = $dto->priority;
-            if ($dto->isSystem !== null) $metadata['is_system'] = $dto->isSystem;
-            if ($dto->isEditable !== null) $metadata['is_editable'] = $dto->isEditable;
-            if ($dto->isAssignable !== null) $metadata['is_assignable'] = $dto->isAssignable;
+
+            if ($dto->displayName !== null) {
+                $metadata['display_name'] = $dto->displayName;
+            }
+            if ($dto->description !== null) {
+                $metadata['description'] = $dto->description;
+            }
+            if ($dto->priority !== null) {
+                $metadata['priority'] = $dto->priority;
+            }
+            if ($dto->isSystem !== null) {
+                $metadata['is_system'] = $dto->isSystem;
+            }
+            if ($dto->isEditable !== null) {
+                $metadata['is_editable'] = $dto->isEditable;
+            }
+            if ($dto->isAssignable !== null) {
+                $metadata['is_assignable'] = $dto->isAssignable;
+            }
 
             if ($userId) {
                 $metadata['updated_by'] = $userId;

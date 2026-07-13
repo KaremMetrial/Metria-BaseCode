@@ -29,7 +29,7 @@ class ResolveTenant
             ?? $request->user()?->tenant_id;
 
         $user = $request->user();
-        
+
         if ($user && $tenantId !== null) {
             $userTenantId = $user->getAttributes()['tenant_id'] ?? null;
             if ($userTenantId !== null && (string) $userTenantId !== (string) $tenantId && ! $user->can('admin.super')) {

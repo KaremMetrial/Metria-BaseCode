@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature\RBAC\Api;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;
 use Tests\Support\CreatesTenant;
 use Tests\Support\CreatesUser;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class UserAssignmentApiTest extends TestCase
 {
+    use CreatesPermission, CreatesRole, CreatesTenant, CreatesUser;
     use RefreshDatabase;
-    use CreatesTenant, CreatesRole, CreatesPermission, CreatesUser;
 
     public function test_it_assigns_role_to_user_successfully(): void
     {
         $tenant = $this->setRandomTenant();
         $admin = $this->createUser($tenant);
-        
+
         $managePerm = $this->createPermission(['name' => 'rbac.roles.manage']);
         $admin->givePermissionTo($managePerm);
 
@@ -30,11 +30,11 @@ class UserAssignmentApiTest extends TestCase
         $this->actingAs($admin);
 
         $response = $this->postJson("/api/v1/rbac/users/{$targetUser->id}/roles", [
-            'roles' => [$role->name]
+            'roles' => [$role->name],
         ]);
 
         $response->assertOk();
-        
+
         // Assert user has role
         $this->assertTrue($targetUser->fresh()->hasRole('Manager'));
     }
@@ -43,7 +43,7 @@ class UserAssignmentApiTest extends TestCase
     {
         $tenant = $this->setRandomTenant();
         $admin = $this->createUser($tenant);
-        
+
         $managePerm = $this->createPermission(['name' => 'rbac.roles.manage']);
         $admin->givePermissionTo($managePerm);
 
@@ -52,7 +52,7 @@ class UserAssignmentApiTest extends TestCase
         $this->actingAs($admin);
 
         $response = $this->postJson("/api/v1/rbac/users/{$targetUser->id}/roles", [
-            'roles' => ['DoesNotExist']
+            'roles' => ['DoesNotExist'],
         ]);
 
         $this->assertEquals('The selected roles.0 is invalid.', $response->json('error.errors')['roles.0'][0]);

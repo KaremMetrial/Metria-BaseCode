@@ -13,7 +13,6 @@ use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Pipelines\AuthContext;
 use App\Domain\Auth\Pipelines\AuthPipeline;
 use App\Domain\Auth\Services\AuthMethodGovernanceService;
-use App\Domain\Auth\Services\LoginWithOtp;
 use App\Domain\Auth\Services\RegisterWithOtp;
 use App\Domain\Auth\Services\SendOtp;
 use App\Domain\Auth\Strategies\OtpAuthStrategy;
@@ -24,8 +23,7 @@ class OtpAuthController extends ApiController
 {
     public function __construct(
         private readonly AuthMethodGovernanceService $governance
-    ) {
-    }
+    ) {}
 
     public function send(SendOtpRequest $request, SendOtp $sendOtp): JsonResponse
     {

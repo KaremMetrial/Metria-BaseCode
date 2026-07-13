@@ -5,19 +5,24 @@ declare(strict_types=1);
 use App\Domain\Auth\Http\Controllers\Api\V1\AuthController;
 use App\Domain\Auth\Http\Controllers\Api\V1\OtpAuthController;
 use App\Domain\Auth\Http\Controllers\Api\V1\SocialAuthController;
-use App\Domain\Integration\Http\Controllers\Api\V1\OAuthProviderController;
 use App\Domain\Governance\Http\Controllers\Api\V1\ApprovalController;
 use App\Domain\Governance\Http\Controllers\Api\V1\AuditLogController;
 use App\Domain\Governance\Http\Controllers\Api\V1\FeatureFlagController;
 use App\Domain\Governance\Http\Controllers\Api\V1\SettingsController;
+use App\Domain\Integration\Http\Controllers\Api\V1\OAuthProviderController;
+use App\Domain\Media\Http\Controllers\Api\V1\MediaController;
 use App\Domain\Payment\Http\Controllers\Api\V1\PaymentController;
 use App\Domain\Payment\Http\Controllers\Api\V1\PaymentWebhookController;
+use App\Domain\RBAC\Http\Controllers\Api\V1\EffectivePermissionController;
+use App\Domain\RBAC\Http\Controllers\Api\V1\PermissionController;
+use App\Domain\RBAC\Http\Controllers\Api\V1\RoleController;
+use App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController;
+use App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController;
 use App\Domain\System\Http\Controllers\Api\V1\EnumController;
 use App\Domain\System\Http\Controllers\Api\V1\HealthController;
 use App\Domain\Territory\Http\Controllers\Api\V1\TerritoryController;
 use App\Domain\Wallet\Http\Controllers\Api\V1\WalletController;
 use App\Domain\Webhook\Http\Controllers\Api\V1\WebhookEndpointController;
-use App\Domain\Media\Http\Controllers\Api\V1\MediaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -167,25 +172,25 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
 
     // RBAC Engine
     Route::prefix('rbac')->name('rbac.')->group(function () {
-        Route::get('/permissions', [\App\Domain\RBAC\Http\Controllers\Api\V1\PermissionController::class, 'index'])->name('permissions.index');
-        
-        Route::apiResource('roles', \App\Domain\RBAC\Http\Controllers\Api\V1\RoleController::class);
-        
+        Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+
+        Route::apiResource('roles', RoleController::class);
+
         Route::prefix('roles/{role}/permissions')->name('roles.permissions.')->group(function () {
-            Route::get('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'index'])->name('index');
-            Route::post('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'store'])->name('store');
-            Route::put('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'update'])->name('update');
-            Route::delete('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController::class, 'destroy'])->name('destroy');
+            Route::get('/', [RolePermissionController::class, 'index'])->name('index');
+            Route::post('/', [RolePermissionController::class, 'store'])->name('store');
+            Route::put('/', [RolePermissionController::class, 'update'])->name('update');
+            Route::delete('/', [RolePermissionController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('users/{user}')->name('users.')->group(function () {
-            Route::get('/effective-permissions', [\App\Domain\RBAC\Http\Controllers\Api\V1\EffectivePermissionController::class, 'show'])->name('effective-permissions');
-            
+            Route::get('/effective-permissions', [EffectivePermissionController::class, 'show'])->name('effective-permissions');
+
             Route::prefix('roles')->name('roles.')->group(function () {
-                Route::get('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'index'])->name('index');
-                Route::post('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'store'])->name('store');
-                Route::put('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'update'])->name('update');
-                Route::delete('/', [\App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController::class, 'destroy'])->name('destroy');
+                Route::get('/', [UserRoleController::class, 'index'])->name('index');
+                Route::post('/', [UserRoleController::class, 'store'])->name('store');
+                Route::put('/', [UserRoleController::class, 'update'])->name('update');
+                Route::delete('/', [UserRoleController::class, 'destroy'])->name('destroy');
             });
         });
     });

@@ -62,8 +62,8 @@ class CircuitBreaker
 
     public function recordFailure(string $service): void
     {
-        $key    = $this->failureKey($service);
-        $ttl    = $this->cooldownSeconds * 5;
+        $key = $this->failureKey($service);
+        $ttl = $this->cooldownSeconds * 5;
         $expKey = "{$key}:expiry";
 
         // Atomically increment the counter. Cache::increment initialises to 0
@@ -80,6 +80,7 @@ class CircuitBreaker
         // If the expiry sentinel is gone, the window elapsed — reset the counter.
         if (! Cache::has($expKey)) {
             Cache::forget($key);
+
             return;
         }
 
