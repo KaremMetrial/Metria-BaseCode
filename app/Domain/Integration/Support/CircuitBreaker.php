@@ -62,17 +62,31 @@ class CircuitBreaker
 
     public function recordFailure(string $service): void
     {
-        $key = $this->failureKey($service);
-        $ttl = $this->cooldownSeconds * 5;
+        $key    = $this->failureKey($service);
+        $ttl    = $this->cooldownSeconds * 5;
+        $expKey = "{$key}:expiry";
 
-        // Initialize the counting window atomically if the key doesn't exist yet.
-        Cache::add($key, 0, $ttl);
-
+        // Atomically increment the counter. Cache::increment initialises to 0
+        // then bumps — no separate add() needed, avoiding the TOCTOU race where
+        // two workers both see failures = 1 and never open the circuit.
         $failures = (int) Cache::increment($key);
+
+        // Keep the counter alive for the full observation window.
+        // Only set the TTL on first failure to avoid resetting the window.
+        if ($failures === 1) {
+            Cache::put($expKey, true, $ttl);
+        }
+
+        // If the expiry sentinel is gone, the window elapsed — reset the counter.
+        if (! Cache::has($expKey)) {
+            Cache::forget($key);
+            return;
+        }
 
         if ($failures >= $this->threshold) {
             Cache::put($this->openKey($service), true, $this->cooldownSeconds);
             Cache::forget($key);
+            Cache::forget($expKey);
         }
     }
 

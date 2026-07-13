@@ -17,7 +17,9 @@ return [
         'image/png',
         'image/gif',
         'image/webp',
-        'image/svg+xml',
+        // 'image/svg+xml' — REMOVED: SVGs can embed <script> tags and execute arbitrary
+        //   JavaScript when served from the same origin (XSS). Re-enable only after
+        //   integrating an SVG sanitizer (e.g. enshrined/svg-sanitize).
         'video/mp4',
         'video/quicktime',
         'video/x-matroska',

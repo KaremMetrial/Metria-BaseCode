@@ -22,8 +22,10 @@ class AdvancedMfaAndSessionTest extends TestCase
         $enableRes = $this->postJson('/api/v1/auth/mfa/enable');
         $enableRes->assertOk()->assertJsonStructure(['data' => ['secret', 'qr_url', 'recovery_codes']]);
 
+        $secret = $enableRes->json('data.secret');
+
         $this->postJson('/api/v1/auth/mfa/confirm', [
-            'code' => '000000', // Test environment simulation code
+            'code' => $this->generateTotp($secret),
         ])->assertOk();
 
         $user->refresh();
@@ -50,15 +52,16 @@ class AdvancedMfaAndSessionTest extends TestCase
 
     public function test_user_can_verify_mfa_login_with_totp_code(): void
     {
+        $secret = 'JBSWY3DPEHPK3PXP';
         $user = User::factory()->create(['password' => 'Secret123!']);
-        $user->two_factor_secret = 'JBSWY3DPEHPK3PXP';
+        $user->two_factor_secret = $secret;
         $user->two_factor_confirmed_at = now();
         $user->save();
 
         $response = $this->postJson('/api/v1/auth/mfa/verify', [
-            'email' => $user->email,
+            'email'    => $user->email,
             'password' => 'Secret123!',
-            'code' => '000000', // Test environment simulation code
+            'code'     => $this->generateTotp($secret),
         ]);
 
         $response->assertOk()

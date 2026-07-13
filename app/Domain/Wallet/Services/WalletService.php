@@ -112,13 +112,7 @@ class WalletService
             $this->assertCurrency($wallet, $amount);
             $this->assertHeld($wallet, $amount);
 
-            $wallet->held -= $amount->amount;
-            $wallet->balance -= $amount->amount;
-            $wallet->save();
-
-            $this->events->publish(new WalletDebited($wallet, $amount->amount));
-
-            return $this->ledger($wallet, WalletTransactionType::CaptureHold, $amount->amount, $description, $reference);
+            return $this->_applyCapture($wallet, $amount, $description, $reference);
         });
     }
 
@@ -126,18 +120,49 @@ class WalletService
     public function settleHold(Wallet $from, Wallet $to, Money $amount, ?string $description = null, ?Model $reference = null): void
     {
         DB::transaction(function () use ($from, $to, $amount, $description, $reference) {
-            // Deterministic lock ordering to prevent deadlocks:
+            // Acquire BOTH locks once, in deterministic key order to prevent deadlocks.
+            // Do NOT call captureHold/credit here — they would re-lock the same rows.
             if (strcmp((string) $from->getKey(), (string) $to->getKey()) < 0) {
-                $this->locked($from);
-                $this->locked($to);
+                $lockedFrom = $this->locked($from);
+                $lockedTo   = $this->locked($to);
             } else {
-                $this->locked($to);
-                $this->locked($from);
+                $lockedTo   = $this->locked($to);
+                $lockedFrom = $this->locked($from);
             }
 
-            $this->captureHold($from, $amount, $description, $reference);
-            $this->credit($to, $amount, $description, $reference);
+            $this->assertCurrency($lockedFrom, $amount);
+            $this->assertHeld($lockedFrom, $amount);
+            $this->assertCurrency($lockedTo, $amount);
+
+            // Operate directly on the already-locked instances (no new lock/tx).
+            $this->_applyCapture($lockedFrom, $amount, $description, $reference);
+            $this->_applyCredit($lockedTo, $amount, $description, $reference);
         });
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers: operate on a pre-locked wallet, no new transaction/lock.
+    // -------------------------------------------------------------------------
+
+    private function _applyCapture(Wallet $wallet, Money $amount, ?string $description, ?Model $reference): WalletTransaction
+    {
+        $wallet->held    -= $amount->amount;
+        $wallet->balance -= $amount->amount;
+        $wallet->save();
+
+        $this->events->publish(new WalletDebited($wallet, $amount->amount));
+
+        return $this->ledger($wallet, WalletTransactionType::CaptureHold, $amount->amount, $description, $reference);
+    }
+
+    private function _applyCredit(Wallet $wallet, Money $amount, ?string $description, ?Model $reference): WalletTransaction
+    {
+        $wallet->balance += $amount->amount;
+        $wallet->save();
+
+        $this->events->publish(new WalletCredited($wallet, $amount->amount));
+
+        return $this->ledger($wallet, WalletTransactionType::Credit, $amount->amount, $description, $reference);
     }
 
     private function locked(Wallet $wallet): Wallet

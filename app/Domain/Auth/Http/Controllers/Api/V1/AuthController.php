@@ -39,7 +39,9 @@ class AuthController extends ApiController
     {
         $this->governance->checkMethodEnabled('password');
 
-        $tenantId = $request->header('X-Tenant-ID') ?: null;
+        // Tenant ID comes from the validated request body only — never from a raw
+        // client-controlled header, which would allow registering into any tenant.
+        $tenantId = $request->input('tenant_id') ?: null;
         $user = $register($request->validated(), $tenantId);
 
         ['token' => $token] = $issueToken($user->email, $request->string('password')->value());
@@ -56,7 +58,7 @@ class AuthController extends ApiController
         $this->recordSession($user, $request);
 
         return $this->respondCreated([
-            'user' => (new UserResource($user->load('roles')))->resolve(),
+            'user'  => (new UserResource($user->load('roles')))->resolve(),
             'token' => $token,
         ]);
     }
@@ -68,16 +70,17 @@ class AuthController extends ApiController
     ): JsonResponse {
         $this->governance->checkMethodEnabled('password');
 
-        $tenantId = $request->header('X-Tenant-ID') ?: null;
+        // Tenant resolution happens in ResolveTenant middleware from the authenticated
+        // user's own tenant_id — do NOT trust a client-supplied header here.
         $user = $strategy->authenticate([
-            'email' => $request->string('email')->value(),
+            'email'    => $request->string('email')->value(),
             'password' => $request->string('password')->value(),
-        ], $tenantId);
+        ], $user->tenant_id ?? null);
 
         $context = new AuthContext(
             $request,
             $request->string('device_name', 'api')->value(),
-            $request->header('X-Tenant-ID') ?: null,
+            $user->tenant_id ?? null,
             'web'
         );
         $context->setUser($user);

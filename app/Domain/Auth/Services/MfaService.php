@@ -72,16 +72,13 @@ class MfaService
         }
 
         $cacheKey = "mfa_used_code:{$user->id}:{$code}";
-        $isTestToken = app()->environment('testing') && $code === '000000';
 
-        if (! $isTestToken && \Illuminate\Support\Facades\Cache::has($cacheKey)) {
-            return false;
+        if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+            return false; // Replay-attack protection: same code already consumed
         }
 
         if ($this->verifyTotp($user->two_factor_secret, $code)) {
-            if (! $isTestToken) {
-                \Illuminate\Support\Facades\Cache::put($cacheKey, true, 60);
-            }
+            \Illuminate\Support\Facades\Cache::put($cacheKey, true, 60);
             $this->audit->log('auth.mfa_verified', $user);
             event(new MfaVerified($user));
             return true;
@@ -151,9 +148,6 @@ class MfaService
 
     public function verifyTotp(string $secret, string $code): bool
     {
-        if (app()->environment('testing') && $code === '000000') {
-            return true;
-        }
 
         $decoded = $this->base32Decode($secret);
         if ($decoded === '') {

@@ -20,8 +20,10 @@ class WebhookDispatcher
         WebhookEndpoint::query()
             ->withoutGlobalScopes() // outbox relay runs outside any tenant context
             ->where('active', true)
-            ->get()
-            ->filter(fn (WebhookEndpoint $endpoint) => $endpoint->listensTo($event))
+            ->where(function ($query) use ($event) {
+                $query->whereJsonContains('events', '*')
+                      ->orWhereJsonContains('events', $event);
+            })
             ->each(function (WebhookEndpoint $endpoint) use ($event, $payload) {
                 $delivery = WebhookDelivery::create([
                     'endpoint_id' => $endpoint->id,

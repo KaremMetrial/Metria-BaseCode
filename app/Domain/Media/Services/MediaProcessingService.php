@@ -133,9 +133,15 @@ class MediaProcessingService
         $variants = config('media.image_variants', []);
         
         foreach ($variants as $name => $specs) {
-            $variantPath = str_replace('.', "_{$name}.", $media->blob->path);
-            
+            // Safely build the variant path by replacing only the final extension,
+            // preventing corruption of paths that contain multiple dots.
+            $blobPath   = $media->blob->path;
+            $ext        = pathinfo($blobPath, PATHINFO_EXTENSION);
+            $base       = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
+            $variantPath = "{$base}_{$name}.{$ext}";
+
             // Upload the EXIF-stripped/modified local file stream to the variant path
+            $variantStart = microtime(true);
             $fh = fopen($filePath, 'r');
             if ($fh) {
                 $disk->put($variantPath, $fh);
@@ -144,7 +150,7 @@ class MediaProcessingService
                 throw new \RuntimeException("Failed to open local path {$filePath} for reading variant.");
             }
 
-            $processingTime = (int) ((microtime(true) - microtime(true)) * 1000);
+            $processingTime = (int) ((microtime(true) - $variantStart) * 1000);
 
             MediaVariant::query()->create([
                 'media_id' => $media->id,
@@ -164,12 +170,31 @@ class MediaProcessingService
 
     private function processVideo(Media $media, string $filePath, $disk): void
     {
-        // Extract basic video metadata (FPS, Duration, Resolution)
-        // In real S3 environments, this calls ffprobe. For high reliability, we default to fallback values.
-        $duration = 120.5; // 2 mins mock
-        $fps = 30.0;
-        $width = 1920;
-        $height = 1080;
+        $duration = null;
+        $fps = null;
+        $width = null;
+        $height = null;
+
+        // Extract basic video metadata (FPS, Duration, Resolution) using ffprobe.
+        // Fallback to null if ffprobe is not installed on the system.
+        exec("ffprobe -v quiet -print_format json -show_format -show_streams " . escapeshellarg($filePath), $output, $resultCode);
+        if ($resultCode === 0 && !empty($output)) {
+            $json = json_decode(implode('', $output), true);
+            if ($json) {
+                $duration = isset($json['format']['duration']) ? (float) $json['format']['duration'] : null;
+                $videoStream = collect($json['streams'] ?? [])->firstWhere('codec_type', 'video');
+                if ($videoStream) {
+                    $width  = $videoStream['width'] ?? null;
+                    $height = $videoStream['height'] ?? null;
+                    if (isset($videoStream['r_frame_rate'])) {
+                        $parts = explode('/', $videoStream['r_frame_rate']);
+                        if (count($parts) === 2 && (int) $parts[1] !== 0) {
+                            $fps = round((float) $parts[0] / (float) $parts[1], 2);
+                        }
+                    }
+                }
+            }
+        }
 
         $media->update([
             'custom_properties' => array_merge($media->custom_properties ?? [], [
@@ -181,7 +206,10 @@ class MediaProcessingService
         ]);
 
         // Generate alternate quality variant (e.g. 720p resolution)
-        $variantPath = str_replace('.', "_720p.", $media->blob->path);
+        $blobPath    = $media->blob->path;
+        $ext         = pathinfo($blobPath, PATHINFO_EXTENSION);
+        $base        = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
+        $variantPath = "{$base}_720p.{$ext}";
         $disk->copy($media->blob->path, $variantPath);
 
         MediaVariant::query()->create([

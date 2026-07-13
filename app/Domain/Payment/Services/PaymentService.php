@@ -44,28 +44,41 @@ class PaymentService
     {
         $driver = $this->gateways->driver($gateway);
 
-        $payment = Payment::create([
-            'user_id' => $user->id,
-            'gateway' => $driver->name(),
-            'amount' => $money->amount,
-            'refunded_amount' => 0,
-            'currency' => $money->currency,
-            'status' => PaymentStatus::Pending,
-            'description' => $description,
-            'metadata' => $options['metadata'] ?? [],
-        ]);
+        return DB::transaction(function () use ($user, $money, $driver, $options, $description) {
+            $payment = Payment::create([
+                'user_id'     => $user->id,
+                'gateway'     => $driver->name(),
+                'amount'      => $money->amount,
+                'refunded_amount' => 0,
+                'currency'    => $money->currency,
+                'status'      => PaymentStatus::Pending,
+                'description' => $description,
+                'metadata'    => $options['metadata'] ?? [],
+            ]);
 
-        $result = $driver->createPayment($payment, $options);
+            try {
+                $result = $driver->createPayment($payment, $options);
+            } catch (\Throwable $e) {
+                // Mark as Failed immediately so the row is not silently orphaned.
+                $payment->update([
+                    'status'   => PaymentStatus::Failed,
+                    'metadata' => array_merge($payment->metadata ?? [], [
+                        'gateway_error' => $e->getMessage(),
+                    ]),
+                ]);
+                throw $e;
+            }
 
-        $payment->update([
-            'gateway_reference' => $result->gatewayReference,
-            'status' => $result->status,
-            'metadata' => array_merge($payment->metadata ?? [], array_filter([
-                'reference_code' => $result->referenceCode,
-            ])),
-        ]);
+            $payment->update([
+                'gateway_reference' => $result->gatewayReference,
+                'status'            => $result->status,
+                'metadata'          => array_merge($payment->metadata ?? [], array_filter([
+                    'reference_code' => $result->referenceCode,
+                ])),
+            ]);
 
-        return ['payment' => $payment->refresh(), 'result' => $result];
+            return ['payment' => $payment->refresh(), 'result' => $result];
+        });
     }
 
     /**
@@ -129,8 +142,9 @@ class PaymentService
         if (config('governance.approvals.enabled', true)) {
             return $this->approvals->request('payments.refund', [
                 'payment_id' => $payment->id,
-                'amount' => $amount?->amount,
-                'reason' => $reason,
+                'tenant_id'  => $payment->tenant_id,  // locked to prevent cross-tenant attacks
+                'amount'     => $amount?->amount,
+                'reason'     => $reason,
             ], $requestedBy);
         }
 
@@ -140,18 +154,20 @@ class PaymentService
     /** Actually perform the refund on the gateway. Called by ApproveRefundHandler. */
     public function executeRefund(Payment $payment, ?int $amountMinor = null): Payment
     {
-        $amount = $amountMinor !== null ? Money::of($amountMinor, $payment->currency) : null;
-
-        $this->assertRefundable($payment, $amount);
-
-        $driver = $this->gateways->driver($payment->gateway);
-        $result = $driver->refund($payment, $amount);
-
-        return DB::transaction(function () use ($payment, $amount) {
+        return DB::transaction(function () use ($payment, $amountMinor) {
+            // Acquire the row lock FIRST so concurrent refund requests serialize here.
             $payment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
+
+            $amount = $amountMinor !== null ? Money::of($amountMinor, $payment->currency) : null;
+
+            // Re-validate under the lock — a concurrent request may have already
+            // changed the refunded_amount between the caller's check and this point.
             $this->assertRefundable($payment, $amount);
 
-            $refunded = ($amount ?? $payment->remainingRefundable())->amount;
+            $driver = $this->gateways->driver($payment->gateway);
+            $driver->refund($payment, $amount);
+
+            $refunded        = ($amount ?? $payment->remainingRefundable())->amount;
             $newRefundedAmount = $payment->refunded_amount + $refunded;
 
             $status = $newRefundedAmount >= $payment->amount
@@ -160,7 +176,7 @@ class PaymentService
 
             $payment->update([
                 'refunded_amount' => $newRefundedAmount,
-                'status' => $status,
+                'status'          => $status,
             ]);
 
             $this->events->publish(new PaymentRefunded($payment, $refunded));

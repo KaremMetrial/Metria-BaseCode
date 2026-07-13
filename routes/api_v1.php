@@ -35,8 +35,8 @@ Route::prefix('enums')->name('enums.')->group(function () {
     Route::get('/{key}', [EnumController::class, 'show'])->name('show');
 });
 
-// Territories & Logistics Zones
-Route::prefix('territories')->name('territories.')->group(function () {
+// Territories & Logistics Zones (Public but rate-limited)
+Route::prefix('territories')->middleware('throttle:60,1')->name('territories.')->group(function () {
     Route::get('/countries', [TerritoryController::class, 'countries'])->name('countries');
     Route::get('/countries/{country}/governorates', [TerritoryController::class, 'governorates'])->name('governorates');
     Route::get('/governorates/{governorate}/cities', [TerritoryController::class, 'cities'])->name('cities');

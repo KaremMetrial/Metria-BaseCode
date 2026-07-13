@@ -201,17 +201,19 @@ class PaymobGateway implements PaymentGateway
 
     private function authToken(): string
     {
-        $response = $this->http()->post('/auth/tokens', [
-            'api_key' => (string) ($this->config['api_key'] ?? ''),
-        ]);
-
-        if ($response->failed() || ! $response->json('token')) {
-            throw new PaymentException(__('payments.gateway_auth_failed', ['gateway' => 'paymob']), context: [
-                'gateway' => 'paymob', 'status' => $response->status(),
+        return \Illuminate\Support\Facades\Cache::remember('paymob_auth_token', 3300, function () {
+            $response = $this->http()->post('/auth/tokens', [
+                'api_key' => (string) ($this->config['api_key'] ?? ''),
             ]);
-        }
 
-        return (string) $response->json('token');
+            if ($response->failed() || ! $response->json('token')) {
+                throw new PaymentException(__('payments.gateway_auth_failed', ['gateway' => 'paymob']), context: [
+                    'gateway' => 'paymob', 'status' => $response->status(),
+                ]);
+            }
+
+            return (string) $response->json('token');
+        });
     }
 
     private function http(): PendingRequest
