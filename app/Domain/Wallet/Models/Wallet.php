@@ -19,6 +19,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * completes, then captured to the courier or released back).
  *
  * available = balance - held
+ *
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string $user_id
+ * @property int $balance
+ * @property int $held
+ * @property string $currency
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property User|null $user
+ * @property \Illuminate\Database\Eloquent\Collection<int, WalletTransaction> $transactions
  */
 class Wallet extends Model
 {
@@ -41,6 +52,7 @@ class Wallet extends Model
         return $this->belongsTo(User::class);
     }
 
+    /** @return HasMany<WalletTransaction, $this> */
     public function transactions(): HasMany
     {
         return $this->hasMany(WalletTransaction::class)->latest('created_at')->latest('id');

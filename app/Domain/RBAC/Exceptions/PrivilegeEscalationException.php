@@ -13,7 +13,7 @@ class PrivilegeEscalationException extends DomainException
         parent::__construct(
             __('rbac.privilege_escalation_detected'),
             'privilege_escalation_detected',
-            403
+            status: 403
         );
     }
 }

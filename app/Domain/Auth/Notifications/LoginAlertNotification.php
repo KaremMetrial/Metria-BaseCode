@@ -41,7 +41,7 @@ class LoginAlertNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject(__('Security Alert: New Login Detected'))
-            ->greeting(__('Hello, :name', ['name' => $notifiable->name]))
+            ->greeting(__('Hello, :name', ['name' => $this->getName($notifiable)]))
             ->line(__('A new login to your account was detected.'))
             ->line(__('**Details:**'))
             ->line(__('• **Time:** :time', ['time' => $this->loginTime]))
@@ -63,5 +63,10 @@ class LoginAlertNotification extends Notification implements ShouldQueue
                 'agent' => $this->userAgent,
             ],
         ];
+    }
+
+    private function getName(object $notifiable): string
+    {
+        return property_exists($notifiable, 'name') ? (string) $notifiable->name : 'User';
     }
 }

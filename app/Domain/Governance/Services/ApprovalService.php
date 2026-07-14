@@ -47,33 +47,48 @@ class ApprovalService
             throw new DomainException(__('governance.cannot_approve_own_request'), 'self_approval_forbidden');
         }
 
-        /** @var ApprovalRequest $lockedRequest */
-        $lockedRequest = DB::transaction(function () use ($request, $approver) {
-            /** @var ApprovalRequest $lr */
-            $lr = ApprovalRequest::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($request->getKey());
-
-            $this->assertPending($lr);
-
-            $lr->forceFill([
-                'status' => ApprovalStatus::Approved,
-                'decided_by' => $approver->getKey(),
-                'decided_at' => now(),
-            ])->save();
-
-            return $lr;
-        });
-
         try {
-            $handler = app($this->handlerFor($lockedRequest->action));
-            $handler($lockedRequest->payload, $lockedRequest);
+            /** @var ApprovalRequest $lockedRequest */
+            $lockedRequest = DB::transaction(function () use ($request, $approver) {
+                /** @var ApprovalRequest $lr */
+                $lr = ApprovalRequest::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($request->getKey());
 
-            $lockedRequest->forceFill(['status' => ApprovalStatus::Executed])->save();
+                $this->assertPending($lr);
+
+                $lr->forceFill([
+                    'status' => ApprovalStatus::Approved,
+                    'decided_by' => $approver->getKey(),
+                    'decided_at' => now(),
+                ])->save();
+
+                $tenantId = $lr->tenant_id ?? ($lr->payload['tenant_id'] ?? null);
+                app(\App\Core\Tenancy\TenantManager::class)->runInContext($tenantId, function () use ($lr) {
+                    $handler = app($this->handlerFor($lr->action));
+                    $handler($lr->payload, $lr);
+                });
+
+                $lr->forceFill(['status' => ApprovalStatus::Executed])->save();
+
+                return $lr;
+            });
         } catch (Throwable $e) {
             report($e);
-            $lockedRequest->forceFill([
-                'status' => ApprovalStatus::Failed,
-                'reason' => mb_substr($e->getMessage(), 0, 500),
-            ])->save();
+            $lockedRequest = DB::transaction(function () use ($request, $approver, $e) {
+                /** @var ApprovalRequest $lr */
+                $lr = ApprovalRequest::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($request->getKey());
+                $lr->forceFill([
+                    'status' => ApprovalStatus::Failed,
+                    'decided_by' => $approver->getKey(),
+                    'decided_at' => now(),
+                    'reason' => mb_substr($e->getMessage(), 0, 500),
+                ])->save();
+
+                return $lr;
+            });
+
+            if ($e instanceof DomainException || $e instanceof \App\Core\Exceptions\ApiException) {
+                throw $e;
+            }
         }
 
         $this->audit->log('approval.decided', $lockedRequest, newValues: ['status' => $lockedRequest->status->value]);

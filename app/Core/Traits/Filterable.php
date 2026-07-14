@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Trait enabling Eloquent Models or Repositories to apply QueryFilter specifications.
+ * @phpstan-ignore trait.unused
  */
 trait Filterable
 {

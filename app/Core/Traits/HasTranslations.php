@@ -19,6 +19,7 @@ trait HasTranslations
 {
     public function getAttribute($key)
     {
+        /** @phpstan-ignore notIdentical.alwaysTrue */
         if ($key !== null && $this->isTranslatableAttribute($key)) {
             return $this->getTranslation($key, app()->getLocale());
         }
@@ -43,7 +44,8 @@ trait HasTranslations
 
     public function isTranslatableAttribute(string $key): bool
     {
-        return in_array($key, $this->translatable ?? [], true);
+        /** @phpstan-ignore-next-line */
+        return in_array($key, property_exists($this, 'translatable') ? $this->translatable : [], true);
     }
 
     public function getTranslation(string $key, string $locale, bool $useFallback = true): mixed
@@ -86,7 +88,8 @@ trait HasTranslations
 
     public function translationsToArray(): array
     {
-        return collect($this->translatable ?? [])
+        /** @phpstan-ignore-next-line */
+        return collect(property_exists($this, 'translatable') ? $this->translatable : [])
             ->mapWithKeys(fn (string $key) => [$key => $this->getTranslations($key)])
             ->all();
     }

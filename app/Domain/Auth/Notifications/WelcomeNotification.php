@@ -41,7 +41,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject(__('Welcome to :app!', ['app' => $appName]))
-            ->greeting(__('Welcome, :name!', ['name' => $notifiable->name]))
+            ->greeting(__('Welcome, :name!', ['name' => $this->getName($notifiable)]))
             ->line(__('Thank you for registering. We are thrilled to have you with us.'))
             ->line(__('Your account is now active and ready. Explore the dashboard to discover all key features.'))
             ->action(__('Go to Dashboard'), url('/'))
@@ -55,7 +55,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
         return __('Welcome to :app, :name! Your account is active.', [
             'app' => $appName,
-            'name' => $notifiable->name,
+            'name' => $this->getName($notifiable),
         ]);
     }
 
@@ -65,11 +65,16 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
         return [
             'title' => __('Welcome to :app!', ['app' => $appName]),
-            'body' => __('Hey :name, thanks for joining us! Your account is active.', ['name' => $notifiable->name]),
+            'body' => __('Hey :name, thanks for joining us! Your account is active.', ['name' => $this->getName($notifiable)]),
             'data' => [
                 'type' => 'welcome',
                 'action' => 'open_dashboard',
             ],
         ];
+    }
+
+    private function getName(object $notifiable): string
+    {
+        return property_exists($notifiable, 'name') ? (string) $notifiable->name : 'User';
     }
 }

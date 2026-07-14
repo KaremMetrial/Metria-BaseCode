@@ -16,6 +16,9 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
         parent::__construct($model);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Role>
+     */
     public function all(array $columns = ['*'], ?string $tenantId = null): \Illuminate\Database\Eloquent\Collection
     {
         $query = $this->model->with(['metadata', 'permissions']);
@@ -24,17 +27,26 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
             $query->where('tenant_id', $tenantId);
         }
 
-        return $query->get($columns);
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Role> $result */
+        $result = $query->get($columns);
+
+        return $result;
     }
 
     public function findById(string $id): Role
     {
-        return $this->query()->with('metadata')->findOrFail($id);
+        /** @var Role $role */
+        $role = $this->query()->with('metadata')->findOrFail($id);
+
+        return $role;
     }
 
     public function findByName(string $name): Role
     {
-        return $this->query()->with('metadata')->where('name', $name)->firstOrFail();
+        /** @var Role $role */
+        $role = $this->query()->with('metadata')->where('name', $name)->firstOrFail();
+
+        return $role;
     }
 
     public function createWithMetadata(array $attributes, array $metadata = [], ?string $tenantId = null): Role
@@ -49,7 +61,7 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
         return $role->load('metadata');
     }
 
-    public function updateWithMetadata(Role|Model $role, array $attributes, array $metadata = [], ?string $tenantId = null): Role
+    public function updateWithMetadata(Role $role, array $attributes, array $metadata = [], ?string $tenantId = null): Role
     {
         if (! empty($attributes)) {
             parent::update($role, $attributes, $tenantId);
@@ -59,10 +71,16 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
             $role->metadata()->updateOrCreate(['role_id' => $role->id], $metadata);
         }
 
-        return $role->refresh()->load('metadata');
+        /** @var Role $refreshed */
+        $refreshed = $role->refresh()->load('metadata');
+
+        return $refreshed;
     }
 
-    public function delete(Role|Model $role, ?string $tenantId = null): bool
+    /**
+     * @param  Role  $role
+     */
+    public function delete(Model $role, ?string $tenantId = null): bool
     {
         return parent::delete($role, $tenantId);
     }

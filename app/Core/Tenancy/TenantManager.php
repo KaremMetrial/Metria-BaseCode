@@ -17,17 +17,20 @@ class TenantManager
     {
         $this->tenantId = $tenantId;
 
-        // Securely partition Spatie's cache to prevent multi-tenant cache bleeding
-        if (class_exists(PermissionRegistrar::class)) {
-            // Set Spatie's team context to our tenant ID
-            setPermissionsTeamId($tenantId);
-
+        if (class_exists(\Spatie\Permission\PermissionRegistrar::class)) {
+            if (function_exists('setPermissionsTeamId')) {
+                setPermissionsTeamId($tenantId);
+            }
             $cacheKey = 'spatie.permission.cache.'.($tenantId ?? 'system');
             config(['permission.cache.key' => $cacheKey]);
 
-            $registrar = app(PermissionRegistrar::class);
-            $registrar->cacheKey = $cacheKey;
-            $registrar->forgetCachedPermissions(); // Clear in-memory cache for the new context
+            if (app()->bound(\Spatie\Permission\PermissionRegistrar::class)) {
+                $registrar = app(\Spatie\Permission\PermissionRegistrar::class);
+                if ($registrar->cacheKey !== $cacheKey) {
+                    $registrar->cacheKey = $cacheKey;
+                    $registrar->forgetCachedPermissions();
+                }
+            }
         }
     }
 
@@ -39,5 +42,24 @@ class TenantManager
     public function check(): bool
     {
         return $this->tenantId !== null;
+    }
+
+    /**
+     * Run a callback within the scope of a given tenant ID, restoring the previous context afterwards.
+     *
+     * @template T
+     * @param  callable(): T  $callback
+     * @return T
+     */
+    public function runInContext(int|string|null $tenantId, callable $callback): mixed
+    {
+        $previous = $this->tenantId;
+        $this->set($tenantId);
+
+        try {
+            return $callback();
+        } finally {
+            $this->set($previous);
+        }
     }
 }

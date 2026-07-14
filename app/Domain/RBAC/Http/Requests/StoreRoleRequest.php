@@ -10,7 +10,7 @@ class StoreRoleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('rbac.roles.manage');
+        return $this->user()?->can('rbac.roles.manage') ?? false;
     }
 
     public function rules(): array

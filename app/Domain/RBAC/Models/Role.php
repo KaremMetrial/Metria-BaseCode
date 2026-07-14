@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\PermissionRegistrar;
 
+/**
+ * @property \App\Domain\RBAC\Models\RoleMetadata|null $metadata
+ */
 class Role extends SpatieRole
 {
     protected $fillable = ['name', 'guard_name', 'tenant_id'];

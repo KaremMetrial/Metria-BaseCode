@@ -15,7 +15,7 @@ class EnforceMfaPipe
      */
     public function handle(AuthContext $context, Closure $next): mixed
     {
-        if ($context->user && method_exists($context->user, 'hasMfaEnabled') && $context->user->hasMfaEnabled()) {
+        if ($context->user !== null && $context->user->hasMfaEnabled()) {
             $context->requireMfa();
             $context->payload = [
                 'mfa_required' => true,

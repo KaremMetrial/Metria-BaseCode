@@ -31,7 +31,8 @@ class AuditLogger
             return null;
         }
 
-        $resolvedTenantId = $tenantId ?? $auditable?->tenant_id ?? app(TenantManager::class)->id();
+        $auditableTenant = ($auditable !== null && property_exists($auditable, 'tenant_id')) ? (string) $auditable->tenant_id : null;
+        $resolvedTenantId = $tenantId ?? $auditableTenant ?? app(TenantManager::class)->id();
 
         // Resolve actor: explicit > authenticated user > null (not 'unknown', so
         // the column stays null and is distinguishable from a real user ID of 0).

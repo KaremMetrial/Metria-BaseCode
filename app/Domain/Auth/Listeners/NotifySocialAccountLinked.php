@@ -13,13 +13,11 @@ class NotifySocialAccountLinked
     {
         $user = $event->user;
 
-        if (method_exists($user, 'notify')) {
-            $ip = request()->ip() ?: '127.0.0.1';
-            $agent = request()->userAgent() ?: 'Unknown Device';
-            $time = now()->toDateTimeString();
+        $ip = request()->ip() ?: '127.0.0.1';
+        $agent = request()->userAgent() ?: 'Unknown Device';
+        $time = now()->toDateTimeString();
 
-            // Notify user about new OAuth link
-            $user->notify(new LoginAlertNotification($ip, "Linked {$event->provider} on {$agent}", $time));
-        }
+        // Notify user about new OAuth link
+        $user->notify(new LoginAlertNotification($ip, "Linked {$event->provider} on {$agent}", $time));
     }
 }

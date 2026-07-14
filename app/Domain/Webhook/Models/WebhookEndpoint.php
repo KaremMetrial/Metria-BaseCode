@@ -15,6 +15,17 @@ use Illuminate\Support\Str;
  * A consumer-registered URL that receives outbox events. `events` is a list
  * of dot-notation names ('payment.succeeded', ...) or ['*'] for everything.
  * The secret signs every delivery so consumers can authenticate us.
+ *
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string|null $name
+ * @property array<int, string> $events
+ * @property string $url
+ * @property string $secret
+ * @property bool $active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Database\Eloquent\Collection<int, WebhookDelivery> $deliveries
  */
 class WebhookEndpoint extends Model
 {

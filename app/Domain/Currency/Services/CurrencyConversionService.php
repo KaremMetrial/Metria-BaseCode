@@ -72,6 +72,7 @@ class CurrencyConversionService
         $exchangeRate = bcdiv((string) $sourceRateVal, (string) $targetRateVal, 18);
 
         // Convert the source amount in minor units to its decimal form
+        /** @var numeric-string $sourceDecimal */
         $sourceDecimal = $money->toDecimalString();
 
         // Perform the multiplication to target decimal
@@ -111,6 +112,9 @@ class CurrencyConversionService
 
     /**
      * High-precision round implementation for BCMath.
+     *
+     * @param numeric-string $number
+     * @return numeric-string
      */
     public static function bcRound(string $number, int $precision, int $mode = PHP_ROUND_HALF_UP): string
     {
@@ -151,16 +155,23 @@ class CurrencyConversionService
             $shouldIncrement = false;
         }
 
+        /** @var numeric-string $base */
         $base = $precision > 0 ? $unsignedWhole.'.'.$kept : $unsignedWhole;
 
         if ($shouldIncrement) {
+            /** @var numeric-string $increment */
             $increment = bcpow('10', (string) -$precision, $precision + 2);
             $base = bcadd($base, $increment, $precision);
         } else {
             $base = bcadd($base, '0', $precision);
         }
 
-        return $sign.$base;
+        $raw = $sign.$base;
+        if (! is_numeric($raw)) {
+            return '0';
+        }
+
+        return $raw;
     }
 
     protected function resolveRoundingMode(string $mode): int

@@ -30,7 +30,7 @@ class MfaService
         $hashedCodes = array_map(fn ($code) => Hash::make($code), $rawCodes);
 
         $user->two_factor_secret = $secret;
-        $user->two_factor_recovery_codes = json_encode($hashedCodes);
+        $user->two_factor_recovery_codes = json_encode($hashedCodes) ?: null;
         $user->two_factor_confirmed_at = null; // Needs confirmation
         $user->save();
 
@@ -51,7 +51,7 @@ class MfaService
             throw new DomainException(__('auth.mfa.not_initialized'), errorCode: 'mfa_not_initialized');
         }
 
-        if (! $this->verifyTotp($user->two_factor_secret, $code)) {
+        if (! $this->verifyTotp((string) $user->two_factor_secret, $code)) {
             return false;
         }
 
@@ -76,7 +76,7 @@ class MfaService
             return false; // Replay-attack protection: same code already consumed
         }
 
-        if ($this->verifyTotp($user->two_factor_secret, $code)) {
+        if ($this->verifyTotp((string) $user->two_factor_secret, $code)) {
             Cache::put($cacheKey, true, 60);
             $this->audit->log('auth.mfa_verified', $user);
             event(new MfaVerified($user));
@@ -97,7 +97,7 @@ class MfaService
 
     public function disable(User $user, string $password): void
     {
-        if (! Hash::check($password, $user->password)) {
+        if (! Hash::check($password, (string) $user->password)) {
             throw new DomainException(__('auth.mfa.invalid_password'), errorCode: 'invalid_password');
         }
 
@@ -141,7 +141,7 @@ class MfaService
         foreach ($hashedCodes as $index => $hash) {
             if (Hash::check($code, $hash)) {
                 unset($hashedCodes[$index]);
-                $user->two_factor_recovery_codes = json_encode(array_values($hashedCodes));
+                $user->two_factor_recovery_codes = json_encode(array_values($hashedCodes)) ?: null;
                 $user->save();
 
                 return true;

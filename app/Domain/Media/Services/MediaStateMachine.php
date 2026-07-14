@@ -67,7 +67,7 @@ class MediaStateMachine
             return;
         }
 
-        $allowed = self::ALLOWED_TRANSITIONS[$current->value] ?? [];
+        $allowed = self::ALLOWED_TRANSITIONS[$current->value];
 
         if (! in_array($newStatus->value, $allowed, true)) {
             throw new DomainException(

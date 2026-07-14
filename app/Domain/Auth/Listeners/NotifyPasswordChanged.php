@@ -13,13 +13,11 @@ class NotifyPasswordChanged
     {
         $user = $event->user;
 
-        if (method_exists($user, 'notify')) {
-            $ip = request()->ip() ?: '127.0.0.1';
-            $agent = request()->userAgent() ?: 'Unknown Device';
-            $time = now()->toDateTimeString();
+        $ip = request()->ip() ?: '127.0.0.1';
+        $agent = request()->userAgent() ?: 'Unknown Device';
+        $time = now()->toDateTimeString();
 
-            // Notify user about security change
-            $user->notify(new LoginAlertNotification($ip, "Password Reset on {$agent}", $time));
-        }
+        // Notify user about security change
+        $user->notify(new LoginAlertNotification($ip, "Password Reset on {$agent}", $time));
     }
 }

@@ -8,14 +8,29 @@ use App\Core\Tenancy\BelongsToTenant;
 use App\Core\Traits\HasTranslations;
 use App\Core\Traits\HasUuid;
 use App\Domain\Governance\Traits\Auditable;
+use App\Infrastructure\Translation\Traits\AutoTranslates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string $city_id
+ * @property string $name
+ * @property string $code
+ * @property array $polygon_coordinates
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property City|null $city
+ */
 class Zone extends Model
 {
     use Auditable;
+    use AutoTranslates;
     use BelongsToTenant;
     use HasFactory;
     use HasTranslations;

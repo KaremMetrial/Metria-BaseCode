@@ -23,13 +23,27 @@ class ProcessMediaVariants implements ShouldQueue
 
     public int $tries = 3;
 
-    public int $backoff = 10;
+    public int $maxExceptions = 3;
+
+    public int $timeout = 300;
+
+    public bool $failOnTimeout = true;
+
+    public function backoff(): array
+    {
+        return [10, 60, 300];
+    }
+
+    public function retryUntil(): \DateTimeInterface
+    {
+        return now()->addHours(2);
+    }
 
     public function __construct(private readonly string $mediaId) {}
 
     public function handle(MediaProcessingService $processor): void
     {
-        /** @var Media $media */
+        /** @var Media|null $media */
         $media = Media::query()->find($this->mediaId);
 
         if (! $media) {

@@ -50,7 +50,7 @@ class PasswordResetService
             throw new DomainException(__('auth.recovery.invalid_token'), errorCode: 'invalid_reset_token');
         }
 
-        /** @var User|null $user */
+        /** @var \App\Domain\Auth\Models\User $user */
         $user = User::query()->where('email', $email)->firstOrFail();
         $user->password = Hash::make($newPassword);
         $user->save();

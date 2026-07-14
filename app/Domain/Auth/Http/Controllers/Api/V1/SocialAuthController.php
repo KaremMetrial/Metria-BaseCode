@@ -34,7 +34,7 @@ class SocialAuthController extends ApiController
         return $this->respond(['url' => $url]);
     }
 
-    public function callback(Request $request, string $provider, SocialIdentityService $socialService, DynamicSocialiteConfigService $configService): JsonResponse
+    public function callback(Request $request, string $provider, SocialIdentityService $socialService, DynamicSocialiteConfigService $configService, SocialProviderStrategy $strategy): JsonResponse
     {
         $this->governance->checkMethodEnabled('social');
 
@@ -55,6 +55,8 @@ class SocialAuthController extends ApiController
             'token' => $request->string('token')->value() ?: null,
         ];
 
+        $strategy->verifySocialIdentity($provider, $socialUser, $tenantId);
+
         ['user' => $user, 'token' => $token, 'is_new' => $isNew] = $socialService->loginOrRegister(
             $provider,
             $socialUser,
@@ -71,7 +73,7 @@ class SocialAuthController extends ApiController
         ]);
     }
 
-    public function link(Request $request, string $provider, SocialIdentityService $socialService): JsonResponse
+    public function link(Request $request, string $provider, SocialIdentityService $socialService, SocialProviderStrategy $strategy): JsonResponse
     {
         $request->validate([
             'id' => ['required', 'string'],
@@ -87,16 +89,29 @@ class SocialAuthController extends ApiController
             'token' => $request->string('token')->value() ?: null,
         ];
 
-        $socialService->linkIdentity($request->user(), $provider, $socialUser);
+        $user = $this->getAuthenticatedUser($request);
+        $strategy->verifySocialIdentity($provider, $socialUser, $user->tenant_id);
+
+        $socialService->linkIdentity($user, $provider, $socialUser);
 
         return $this->respond(message: __('auth.social.linked', ['provider' => $provider]));
     }
 
     public function unlink(Request $request, string $provider, SocialIdentityService $socialService): JsonResponse
     {
-        $socialService->unlinkIdentity($request->user(), $provider);
+        $socialService->unlinkIdentity($this->getAuthenticatedUser($request), $provider);
 
         return $this->respond(message: __('auth.social.unlinked', ['provider' => $provider]));
+    }
+
+    private function getAuthenticatedUser(Request $request): User
+    {
+        $user = $request->user();
+        if (! $user instanceof User) {
+            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+        }
+
+        return $user;
     }
 
     private function recordSession(User $user, Request $request): void

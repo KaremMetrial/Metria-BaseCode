@@ -22,7 +22,7 @@ class ApprovalController extends ApiController
         Gate::authorize('viewAny', ApprovalRequest::class);
         $requests = ApprovalRequest::query()
             ->with(['requester', 'approver'])
-            ->when($request->query('status'), fn ($q, $status) => $q->where('status', ApprovalStatus::from($status)))
+            ->when($request->query('status'), fn ($q, $status) => $q->where('status', ApprovalStatus::from(is_array($status) ? (string) reset($status) : (string) $status)))
             ->latest()
             ->paginate((int) config('core.api.per_page', 20));
 
@@ -32,7 +32,7 @@ class ApprovalController extends ApiController
     public function approve(Request $request, ApprovalRequest $approvalRequest): JsonResponse
     {
         Gate::authorize('decide', $approvalRequest);
-        $approved = $this->approvals->approve($approvalRequest, $request->user());
+        $approved = $this->approvals->approve($approvalRequest, $this->getAuthenticatedUser($request));
 
         return $this->respond(new ApprovalRequestResource($approved->load(['requester', 'approver'])), __('governance.approved'));
     }
@@ -42,8 +42,18 @@ class ApprovalController extends ApiController
         Gate::authorize('decide', $approvalRequest);
         $request->validate(['reason' => ['nullable', 'string', 'max:500']]);
 
-        $rejected = $this->approvals->reject($approvalRequest, $request->user(), $request->input('reason'));
+        $rejected = $this->approvals->reject($approvalRequest, $this->getAuthenticatedUser($request), $request->string('reason')->value() ?: null);
 
         return $this->respond(new ApprovalRequestResource($rejected->load(['requester', 'approver'])), __('governance.rejected'));
+    }
+
+    private function getAuthenticatedUser(Request $request): \App\Domain\Auth\Models\User
+    {
+        $user = $request->user();
+        if (! $user instanceof \App\Domain\Auth\Models\User) {
+            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+        }
+
+        return $user;
     }
 }

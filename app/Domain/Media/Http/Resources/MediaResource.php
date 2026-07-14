@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * @property Media $resource
+ * @mixin Media
  */
 class MediaResource extends JsonResource
 {
@@ -40,14 +41,14 @@ class MediaResource extends JsonResource
             'is_public' => $this->resource->is_public,
             'status' => $this->resource->status->value,
             'filename' => $this->resource->custom_properties['filename'] ?? '',
-            'size' => $this->resource->blob?->size ?? 0,
-            'mime_type' => $this->resource->blob?->mime_type ?? '',
+            'size' => $this->resource->blob !== null ? $this->resource->blob->size : 0,
+            'mime_type' => $this->resource->blob !== null ? $this->resource->blob->mime_type : '',
             'download_url' => $downloadUrl,
             'moderation_status' => $this->resource->moderation_status,
             'processing_error' => $this->resource->processing_error,
             'custom_properties' => $this->resource->custom_properties,
-            'created_at' => $this->resource->created_at?->toIso8601String(),
-            'activated_at' => $this->resource->activated_at?->toIso8601String(),
+            'created_at' => $this->resource->created_at instanceof \DateTimeInterface ? $this->resource->created_at->toIso8601String() : $this->resource->created_at,
+            'activated_at' => $this->resource->activated_at instanceof \DateTimeInterface ? $this->resource->activated_at->toIso8601String() : $this->resource->activated_at,
         ];
     }
 }

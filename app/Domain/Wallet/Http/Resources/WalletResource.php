@@ -8,6 +8,7 @@ use App\Core\Support\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin \App\Domain\Wallet\Models\Wallet */
 class WalletResource extends JsonResource
 {
     public function toArray(Request $request): array

@@ -13,7 +13,7 @@ class RoleNotEditableException extends DomainException
         parent::__construct(
             __('rbac.role_not_editable', ['role' => $roleName]),
             'role_not_editable',
-            403
+            status: 403
         );
     }
 }

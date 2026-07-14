@@ -18,8 +18,9 @@ class SystemAwareTenantScope implements Scope
             return;
         }
 
+        $user = Auth::user();
         $tenantId = app(TenantManager::class)->id()
-            ?? (Auth::check() ? Auth::user()->tenant_id : null);
+            ?? ($user ? $user->tenant_id : null);
 
         if ($tenantId === null) {
             return;

@@ -39,6 +39,7 @@ class SocialIdentityService
             $user = null;
 
             if ($identity) {
+                /** @var User|null $user */
                 $user = User::query()->withoutGlobalScopes()->find($identity->user_id);
                 if ($user && $tenantId !== null && (string) $user->tenant_id !== (string) $tenantId) {
                     throw new DomainException(__('auth.social.tenant_mismatch'), errorCode: 'social_tenant_mismatch');
@@ -59,7 +60,7 @@ class SocialIdentityService
                     }
                 }
 
-                if (! $user) {
+                if (! $user instanceof User) {
                     $isNew = true;
                     $user = User::query()->create([
                         'tenant_id' => $tenantId,
@@ -81,6 +82,10 @@ class SocialIdentityService
                 ]);
 
                 event(new SocialIdentityLinked($user, $provider));
+            }
+
+            if (! $user instanceof User) {
+                throw new DomainException(__('auth.social.failed', ['default' => 'Social login failed.']), errorCode: 'social_login_failed');
             }
 
             $abilities = $user->hasPermissionTo('admin.super')

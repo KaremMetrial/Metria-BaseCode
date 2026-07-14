@@ -17,6 +17,7 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->app->singleton(TenantManager::class);
         $this->app->singleton(EventBus::class);
+        $this->app->register(QueueTenantProvider::class);
     }
 
     public function boot(): void

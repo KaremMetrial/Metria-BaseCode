@@ -103,6 +103,8 @@ class PaymentService
             ->where('gateway_reference', $webhook->gatewayReference)
             ->firstOrFail();
 
+        app(\App\Core\Tenancy\TenantManager::class)->set($payment->tenant_id);
+
         return DB::transaction(function () use ($payment, $webhook) {
             $payment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
             $previous = $payment->status;
@@ -154,34 +156,78 @@ class PaymentService
     /** Actually perform the refund on the gateway. Called by ApproveRefundHandler. */
     public function executeRefund(Payment $payment, ?int $amountMinor = null): Payment
     {
-        return DB::transaction(function () use ($payment, $amountMinor) {
-            // Acquire the row lock FIRST so concurrent refund requests serialize here.
-            $payment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
+        if (! config('features.payment_v2', true)) {
+            return DB::transaction(function () use ($payment, $amountMinor) {
+                $payment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
+                $amount = $amountMinor !== null ? Money::of($amountMinor, $payment->currency) : null;
+                $this->assertRefundable($payment, $amount);
 
-            $amount = $amountMinor !== null ? Money::of($amountMinor, $payment->currency) : null;
+                $driver = $this->gateways->driver($payment->gateway);
+                $driver->refund($payment, $amount);
 
-            // Re-validate under the lock — a concurrent request may have already
-            // changed the refunded_amount between the caller's check and this point.
-            $this->assertRefundable($payment, $amount);
+                $refunded = ($amount ?? $payment->remainingRefundable())->amount;
+                $newRefundedAmount = $payment->refunded_amount + $refunded;
+                $status = $newRefundedAmount >= $payment->amount ? PaymentStatus::Refunded : PaymentStatus::PartiallyRefunded;
 
+                $payment->update([
+                    'refunded_amount' => $newRefundedAmount,
+                    'status' => $status,
+                ]);
+
+                $this->events->publish(new PaymentRefunded($payment, $refunded));
+
+                return $payment->refresh();
+            });
+        }
+
+        // Phase 1: Local DB transaction to lock row, validate, and transition to ProcessingRefund
+        ['payment' => $payment, 'amount' => $amount, 'refunded' => $refunded, 'previous_status' => $previousStatus] = DB::transaction(function () use ($payment, $amountMinor) {
+            $lockedPayment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
+            $amount = $amountMinor !== null ? Money::of($amountMinor, $lockedPayment->currency) : null;
+            $this->assertRefundable($lockedPayment, $amount);
+
+            $previousStatus = $lockedPayment->status;
+            $refunded = ($amount ?? $lockedPayment->remainingRefundable())->amount;
+
+            $lockedPayment->update(['status' => PaymentStatus::ProcessingRefund]);
+
+            return [
+                'payment' => $lockedPayment,
+                'amount' => $amount,
+                'refunded' => $refunded,
+                'previous_status' => $previousStatus,
+            ];
+        });
+
+        // Phase 2: Execute gateway API network call outside any DB row lock
+        try {
             $driver = $this->gateways->driver($payment->gateway);
             $driver->refund($payment, $amount);
+        } catch (\Throwable $e) {
+            // Phase 3 (Failure): Saga compensation transition
+            DB::transaction(function () use ($payment, $refunded, $e) {
+                $lockedPayment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
+                $lockedPayment->update(['status' => PaymentStatus::RefundFailed]);
+                $this->events->publish(new \App\Domain\Payment\Events\PaymentRefundFailed($lockedPayment, $refunded, $e->getMessage()));
+            });
 
-            $refunded = ($amount ?? $payment->remainingRefundable())->amount;
-            $newRefundedAmount = $payment->refunded_amount + $refunded;
+            throw $e;
+        }
 
-            $status = $newRefundedAmount >= $payment->amount
-                ? PaymentStatus::Refunded
-                : PaymentStatus::PartiallyRefunded;
+        // Phase 3 (Success): Finalize refund state inside DB transaction
+        return DB::transaction(function () use ($payment, $refunded) {
+            $lockedPayment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
+            $newRefundedAmount = $lockedPayment->refunded_amount + $refunded;
+            $status = $newRefundedAmount >= $lockedPayment->amount ? PaymentStatus::Refunded : PaymentStatus::PartiallyRefunded;
 
-            $payment->update([
+            $lockedPayment->update([
                 'refunded_amount' => $newRefundedAmount,
                 'status' => $status,
             ]);
 
-            $this->events->publish(new PaymentRefunded($payment, $refunded));
+            $this->events->publish(new PaymentRefunded($lockedPayment, $refunded));
 
-            return $payment->refresh();
+            return $lockedPayment->refresh();
         });
     }
 

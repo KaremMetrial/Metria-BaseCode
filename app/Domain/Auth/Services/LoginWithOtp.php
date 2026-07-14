@@ -43,7 +43,7 @@ class LoginWithOtp
 
         // 4. Generate abilities & Sanctum token
         $abilities = [];
-        if (method_exists($user, 'hasPermissionTo') && method_exists($user, 'getPermissionsViaRoles')) {
+        if ($user instanceof User) {
             $abilities = $user->hasPermissionTo('admin.super')
                 ? ['*']
                 : $user->getPermissionsViaRoles()->pluck('name')->toArray();

@@ -17,16 +17,41 @@ class ProvisionUserDefaults implements ShouldQueue
 {
     use InteractsWithQueue;
 
+    public int $tries = 3;
+
+    public int $maxExceptions = 3;
+
+    public int $timeout = 30;
+
+    public bool $failOnTimeout = true;
+
+    public string $queue = 'default';
+
     public function __construct(private readonly WalletService $wallets) {}
+
+    public function backoff(): array
+    {
+        return [10, 30, 60];
+    }
+
+    public function retryUntil(): \DateTimeInterface
+    {
+        return now()->addHours(1);
+    }
 
     public function handle(object $event): void
     {
-        $this->wallets->firstOrCreateFor($event->user);
-
-        if (method_exists($event->user, 'hasAnyRole') && ! $event->user->hasAnyRole()) {
-            $event->user->assignRole('customer');
+        if (! property_exists($event, 'user') || ! ($event->user instanceof \App\Domain\Auth\Models\User)) {
+            return;
         }
 
-        $event->user->notify(new WelcomeNotification);
+        $user = $event->user;
+        $this->wallets->firstOrCreateFor($user);
+
+        if (! $user->hasAnyRole()) {
+            $user->assignRole('customer');
+        }
+
+        $user->notify(new WelcomeNotification);
     }
 }

@@ -172,7 +172,8 @@ class WalletService
 
     private function ledger(Wallet $wallet, WalletTransactionType $type, int $amount, ?string $description, ?Model $reference): WalletTransaction
     {
-        return $wallet->transactions()->create([
+        /** @var WalletTransaction $transaction */
+        $transaction = $wallet->transactions()->create([
             'type' => $type,
             'amount' => $amount,
             'balance_after' => $wallet->balance,
@@ -181,6 +182,8 @@ class WalletService
             'reference_id' => $reference?->getKey(),
             'description' => $description,
         ]);
+
+        return $transaction;
     }
 
     private function assertCurrency(Wallet $wallet, Money $amount): void

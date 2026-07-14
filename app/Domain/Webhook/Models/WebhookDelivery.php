@@ -8,6 +8,20 @@ use App\Core\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $endpoint_id
+ * @property string $event
+ * @property array $payload
+ * @property string $status
+ * @property int $attempts
+ * @property int|null $response_status
+ * @property string|null $response_body
+ * @property \Illuminate\Support\Carbon|null $delivered_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property WebhookEndpoint|null $endpoint
+ */
 class WebhookDelivery extends Model
 {
     use HasUuid;

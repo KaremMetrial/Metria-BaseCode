@@ -16,18 +16,33 @@ class PermissionRepository extends BaseRepository implements PermissionRepositor
         parent::__construct($model);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Permission>
+     */
     public function all(array $columns = ['*'], ?string $tenantId = null): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->query($tenantId)->get($columns);
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Permission> $result */
+        $result = $this->query($tenantId)->get($columns);
+
+        return $result;
     }
 
     public function findByName(string $name): Permission
     {
-        return clone $this->query()->where('name', $name)->firstOrFail();
+        /** @var Permission $perm */
+        $perm = $this->query()->where('name', $name)->firstOrFail();
+
+        return clone $perm;
     }
 
-    public function findByNames(array $names): Collection
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, Permission>
+     */
+    public function findByNames(array $names): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->query()->whereIn('name', $names)->get();
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Permission> $result */
+        $result = $this->query()->whereIn('name', $names)->get();
+
+        return $result;
     }
 }

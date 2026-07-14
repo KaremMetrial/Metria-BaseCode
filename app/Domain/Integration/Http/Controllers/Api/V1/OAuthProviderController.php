@@ -17,7 +17,7 @@ class OAuthProviderController extends ApiController
     public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', OAuthProvider::class);
-        $tenantId = app(TenantManager::class)->id() ?: ($request->header('X-Tenant-ID') ?: null);
+        $tenantId = app(TenantManager::class)->id() !== null ? (string) app(TenantManager::class)->id() : ($request->header('X-Tenant-ID') ? (string) $request->header('X-Tenant-ID') : null);
         $providers = OAuthProvider::query()->forTenant($tenantId)->get();
 
         return $this->respond(['providers' => $providers]);
@@ -26,7 +26,7 @@ class OAuthProviderController extends ApiController
     public function store(UpdateOAuthProviderRequest $request): JsonResponse
     {
         Gate::authorize('create', OAuthProvider::class);
-        $tenantId = app(TenantManager::class)->id() ?: ($request->header('X-Tenant-ID') ?: null);
+        $tenantId = app(TenantManager::class)->id() !== null ? (string) app(TenantManager::class)->id() : ($request->header('X-Tenant-ID') ? (string) $request->header('X-Tenant-ID') : null);
 
         $provider = OAuthProvider::query()->updateOrCreate(
             [

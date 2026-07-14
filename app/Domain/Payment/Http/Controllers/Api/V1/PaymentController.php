@@ -25,7 +25,7 @@ class PaymentController extends ApiController
     {
         Gate::authorize('viewAny', Payment::class);
         $payments = Payment::query()
-            ->where('user_id', $request->user()->id)
+            ->where('user_id', $this->getAuthenticatedUser($request)->id)
             ->latest()
             ->paginate(min((int) $request->query('per_page', (string) config('core.api.per_page', 20)), (int) config('core.api.max_per_page', 100)));
 
@@ -44,7 +44,7 @@ class PaymentController extends ApiController
         );
 
         ['payment' => $payment, 'result' => $result] = $this->payments->create(
-            user: $request->user(),
+            user: $this->getAuthenticatedUser($request),
             money: $money,
             gateway: $request->validated('gateway'),
             options: [
@@ -80,7 +80,7 @@ class PaymentController extends ApiController
             ? Money::fromDecimal($request->validated('amount'), $payment->currency)
             : null;
 
-        $outcome = $this->payments->requestRefund($payment, $amount, $request->user(), $request->validated('reason'));
+        $outcome = $this->payments->requestRefund($payment, $amount, $this->getAuthenticatedUser($request), $request->validated('reason'));
 
         if ($outcome instanceof ApprovalRequest) {
             return $this->respond(
@@ -91,5 +91,15 @@ class PaymentController extends ApiController
         }
 
         return $this->respond(new PaymentResource($outcome), __('payments.refunded'));
+    }
+
+    private function getAuthenticatedUser(Request $request): \App\Domain\Auth\Models\User
+    {
+        $user = $request->user();
+        if (! $user instanceof \App\Domain\Auth\Models\User) {
+            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+        }
+
+        return $user;
     }
 }

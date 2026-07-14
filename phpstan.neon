@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+    level: 8
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        -
+            identifier: missingType.iterableValue
+        -
+            identifier: missingType.generics
+        -
+            identifier: function.alreadyNarrowedType
+            path: app/Core/Traits/HasTranslations.php
+        -
+            identifier: function.alreadyNarrowedType
+            path: app/Infrastructure/Translation/Traits/AutoTranslates.php

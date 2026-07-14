@@ -24,8 +24,11 @@ class IdempotencyMiddleware
     {
         $header = config('governance.idempotency.header', 'Idempotency-Key');
         $key = $request->header($header);
+        if (is_array($key)) {
+            $key = reset($key);
+        }
 
-        if (! $key || ! in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
+        if (! is_string($key) || $key === '' || ! in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
             return $next($request);
         }
 
@@ -54,7 +57,7 @@ class IdempotencyMiddleware
                 ], 409);
             }
 
-            return response($existing->response_body, $existing->response_status)
+            return response($existing->response_body, (int) ($existing->response_status ?? 200))
                 ->header('Content-Type', 'application/json')
                 ->header('Idempotency-Replayed', 'true');
         }

@@ -9,6 +9,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property string $code
+ * @property array $name
+ * @property array $symbol
+ * @property int $minor_units
+ * @property bool $is_active
+ * @property bool $is_default
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Database\Eloquent\Collection<int, CurrencyExchangeRate> $exchangeRates
+ */
 class Currency extends Model
 {
     protected $primaryKey = 'code';

@@ -12,6 +12,7 @@ use App\Domain\RBAC\Providers\RbacServiceProvider;
 use App\Domain\Territory\Providers\TerritoryServiceProvider;
 use App\Domain\Wallet\Providers\WalletServiceProvider;
 use App\Domain\Webhook\Providers\WebhookServiceProvider;
+use App\Infrastructure\Translation\TranslationServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\BroadcastServiceProvider;
 use App\Providers\DomainEventServiceProvider;
@@ -20,6 +21,7 @@ return [
     AppServiceProvider::class,
     BroadcastServiceProvider::class,
     DomainEventServiceProvider::class,
+    TranslationServiceProvider::class,
     CoreServiceProvider::class,
     CurrencyServiceProvider::class,
     PaymentServiceProvider::class,

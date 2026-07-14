@@ -10,17 +10,17 @@ use Illuminate\Support\Collection;
 interface RoleRepositoryInterface
 {
     /**
-     * @return Collection<int, Role>
+     * @return \Illuminate\Database\Eloquent\Collection<int, Role>
      */
-    public function all(): Collection;
+    public function all(): \Illuminate\Database\Eloquent\Collection;
 
     public function findById(string $id): Role;
 
     public function findByName(string $name): Role;
 
-    public function createWithMetadata(array $attributes, array $metadata = []): Role;
+    public function createWithMetadata(array $attributes, array $metadata = [], ?string $tenantId = null): Role;
 
-    public function updateWithMetadata(Role $role, array $attributes, array $metadata = []): Role;
+    public function updateWithMetadata(Role $role, array $attributes, array $metadata = [], ?string $tenantId = null): Role;
 
     public function delete(Role $role): bool;
 }

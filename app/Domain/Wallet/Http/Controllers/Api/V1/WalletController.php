@@ -16,7 +16,7 @@ class WalletController extends ApiController
 {
     public function show(Request $request, WalletService $wallets): JsonResponse
     {
-        $wallet = $wallets->firstOrCreateFor($request->user());
+        $wallet = $wallets->firstOrCreateFor($this->getAuthenticatedUser($request));
         Gate::authorize('view', $wallet);
 
         return $this->respond(new WalletResource($wallet));
@@ -24,7 +24,7 @@ class WalletController extends ApiController
 
     public function transactions(Request $request, WalletService $wallets): JsonResponse
     {
-        $wallet = $wallets->firstOrCreateFor($request->user());
+        $wallet = $wallets->firstOrCreateFor($this->getAuthenticatedUser($request));
         Gate::authorize('viewTransactions', $wallet);
 
         $transactions = $wallet->transactions()
@@ -32,5 +32,15 @@ class WalletController extends ApiController
             ->paginate(min((int) $request->query('per_page', (string) config('core.api.per_page', 20)), (int) config('core.api.max_per_page', 100)));
 
         return $this->respond(WalletTransactionResource::collection($transactions));
+    }
+
+    private function getAuthenticatedUser(Request $request): \App\Domain\Auth\Models\User
+    {
+        $user = $request->user();
+        if (! $user instanceof \App\Domain\Auth\Models\User) {
+            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+        }
+
+        return $user;
     }
 }

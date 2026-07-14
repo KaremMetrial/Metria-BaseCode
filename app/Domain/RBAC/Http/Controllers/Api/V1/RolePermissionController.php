@@ -61,6 +61,6 @@ class RolePermissionController extends ApiController
 
         $this->syncAction->execute($role, $validated['permissions'], 'remove');
 
-        return $this->respondSuccess(__('rbac.permissions_removed'));
+        return $this->respond(null, __('rbac.permissions_removed'));
     }
 }

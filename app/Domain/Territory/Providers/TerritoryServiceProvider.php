@@ -26,5 +26,11 @@ class TerritoryServiceProvider extends ServiceProvider
         Gate::policy(City::class, CityPolicy::class);
         Gate::policy(District::class, DistrictPolicy::class);
         Gate::policy(Zone::class, ZonePolicy::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \App\Domain\Territory\Console\Commands\CheckDuplicatesCommand::class,
+            ]);
+        }
     }
 }

@@ -82,10 +82,10 @@ class PaymobGateway implements PaymentGateway
             'integration_id' => (int) ($this->config['integration_id'] ?? 0),
             // Paymob requires every billing field; "NA" is its documented placeholder.
             'billing_data' => array_merge([
-                'first_name' => $user?->name ?? 'NA',
+                'first_name' => $user !== null ? $user->name : 'NA',
                 'last_name' => 'NA',
-                'email' => $user?->email ?? 'na@example.com',
-                'phone_number' => $user?->phone ?? 'NA',
+                'email' => $user !== null ? $user->email : 'na@example.com',
+                'phone_number' => $user !== null ? ($user->phone ?? 'NA') : 'NA',
                 'apartment' => 'NA', 'floor' => 'NA', 'street' => 'NA',
                 'building' => 'NA', 'shipping_method' => 'NA', 'postal_code' => 'NA',
                 'city' => 'NA', 'country' => 'NA', 'state' => 'NA',

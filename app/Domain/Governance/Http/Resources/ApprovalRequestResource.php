@@ -8,6 +8,10 @@ use App\Domain\Auth\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property \App\Domain\Governance\Models\ApprovalRequest $resource
+ * @mixin \App\Domain\Governance\Models\ApprovalRequest
+ */
 class ApprovalRequestResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -20,8 +24,8 @@ class ApprovalRequestResource extends JsonResource
             'reason' => $this->reason,
             'requested_by' => $this->whenLoaded('requester', fn () => new UserResource($this->requester)),
             'decided_by' => $this->whenLoaded('approver', fn () => $this->approver ? new UserResource($this->approver) : null),
-            'decided_at' => $this->decided_at?->toIso8601String(),
-            'created_at' => $this->created_at?->toIso8601String(),
+            'decided_at' => $this->decided_at instanceof \DateTimeInterface ? $this->decided_at->toIso8601String() : $this->decided_at,
+            'created_at' => $this->created_at instanceof \DateTimeInterface ? $this->created_at->toIso8601String() : $this->created_at,
         ];
     }
 }

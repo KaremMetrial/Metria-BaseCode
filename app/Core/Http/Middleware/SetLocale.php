@@ -22,7 +22,7 @@ class SetLocale
         $supported = config('localization.supported', ['en']);
 
         $locale = $request->query('lang')
-            ?? $request->user()?->locale
+            ?? $request->user()->locale
             ?? $request->getPreferredLanguage($supported)
             ?? config('localization.fallback', 'en');
 

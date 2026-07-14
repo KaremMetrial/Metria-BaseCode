@@ -58,10 +58,10 @@ class MediaProcessingService
         try {
             $modified = false;
             if ($media->media_type === MediaType::Image) {
-                $this->processImage($media, $filePath, $disk);
+                $this->processImage($media, $blob, $filePath, $disk);
                 $modified = class_exists('Imagick');
             } elseif ($media->media_type === MediaType::Video) {
-                $this->processVideo($media, $filePath, $disk);
+                $this->processVideo($media, $blob, $filePath, $disk);
             }
 
             // If file was modified (EXIF stripped) and disk is not local, upload it back
@@ -96,7 +96,7 @@ class MediaProcessingService
         }
     }
 
-    private function processImage(Media $media, string $filePath, $disk): void
+    private function processImage(Media $media, \App\Domain\Media\Models\MediaBlob $blob, string $filePath, \Illuminate\Contracts\Filesystem\Filesystem $disk): void
     {
         // 1. Extract metadata (Width, Height, Orientation)
         $width = 800;
@@ -136,7 +136,7 @@ class MediaProcessingService
         foreach ($variants as $name => $specs) {
             // Safely build the variant path by replacing only the final extension,
             // preventing corruption of paths that contain multiple dots.
-            $blobPath = $media->blob->path;
+            $blobPath = $blob->path;
             $ext = pathinfo($blobPath, PATHINFO_EXTENSION);
             $base = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
             $variantPath = "{$base}_{$name}.{$ext}";
@@ -157,19 +157,19 @@ class MediaProcessingService
                 'media_id' => $media->id,
                 'variant' => MediaVariantType::from($name),
                 'path' => $variantPath,
-                'mime_type' => $media->blob->mime_type,
+                'mime_type' => $blob->mime_type,
                 'checksum' => $media->checksum,
-                'disk' => $media->blob->disk,
+                'disk' => $blob->disk,
                 'is_generated' => true,
                 'processing_time_ms' => $processingTime,
                 'width' => $specs['width'],
                 'height' => $specs['height'],
-                'size' => $media->blob->size, // Simulating size
+                'size' => $blob->size, // Simulating size
             ]);
         }
     }
 
-    private function processVideo(Media $media, string $filePath, $disk): void
+    private function processVideo(Media $media, \App\Domain\Media\Models\MediaBlob $blob, string $filePath, \Illuminate\Contracts\Filesystem\Filesystem $disk): void
     {
         $duration = null;
         $fps = null;
@@ -181,13 +181,20 @@ class MediaProcessingService
         exec('ffprobe -v quiet -print_format json -show_format -show_streams '.escapeshellarg($filePath), $output, $resultCode);
         if ($resultCode === 0 && ! empty($output)) {
             $json = json_decode(implode('', $output), true);
-            if ($json) {
+            if ($json && is_array($json)) {
                 $duration = isset($json['format']['duration']) ? (float) $json['format']['duration'] : null;
-                $videoStream = collect($json['streams'] ?? [])->firstWhere('codec_type', 'video');
+                $streams = isset($json['streams']) && is_array($json['streams']) ? $json['streams'] : [];
+                $videoStream = null;
+                foreach ($streams as $s) {
+                    if (is_array($s) && ($s['codec_type'] ?? '') === 'video') {
+                        $videoStream = $s;
+                        break;
+                    }
+                }
                 if ($videoStream) {
                     $width = $videoStream['width'] ?? null;
                     $height = $videoStream['height'] ?? null;
-                    if (isset($videoStream['r_frame_rate'])) {
+                    if (isset($videoStream['r_frame_rate']) && is_string($videoStream['r_frame_rate'])) {
                         $parts = explode('/', $videoStream['r_frame_rate']);
                         if (count($parts) === 2 && (int) $parts[1] !== 0) {
                             $fps = round((float) $parts[0] / (float) $parts[1], 2);
@@ -207,24 +214,24 @@ class MediaProcessingService
         ]);
 
         // Generate alternate quality variant (e.g. 720p resolution)
-        $blobPath = $media->blob->path;
+        $blobPath = $blob->path;
         $ext = pathinfo($blobPath, PATHINFO_EXTENSION);
         $base = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
         $variantPath = "{$base}_720p.{$ext}";
-        $disk->copy($media->blob->path, $variantPath);
+        $disk->copy($blob->path, $variantPath);
 
         MediaVariant::query()->create([
             'media_id' => $media->id,
             'variant' => MediaVariantType::Res_720p,
             'path' => $variantPath,
-            'mime_type' => $media->blob->mime_type,
+            'mime_type' => $blob->mime_type,
             'checksum' => $media->checksum,
-            'disk' => $media->blob->disk,
+            'disk' => $blob->disk,
             'is_generated' => true,
             'processing_time_ms' => 1200,
             'width' => 1280,
             'height' => 720,
-            'size' => (int) ($media->blob->size * 0.7),
+            'size' => (int) ($blob->size * 0.7),
         ]);
     }
 }

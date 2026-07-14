@@ -51,14 +51,14 @@ class MediaUploadService
         $mediaId = (string) Str::uuid();
 
         // Sanitize filename to prevent directory traversal
-        $sanitizedName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($filename));
+        $sanitizedName = (string) preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($filename));
         $extension = pathinfo($sanitizedName, PATHINFO_EXTENSION);
         $diskName = $isPublic ? config('media.default_disk', 'public') : config('media.private_disk', 'local');
 
         // Storage path layout: tenants/{tenant_id}/{media_type}/{uuid}.{ext}
         $storagePath = sprintf('tenants/%s/%s/%s.%s', $tenantId ?? 'global', $mediaType->value, $mediaId, $extension ?: 'bin');
 
-        return DB::transaction(function () use ($user, $tenantId, $mediaId, $mediaType, $purpose, $isPublic, $sanitizedName, $size, $diskName, $storagePath, $options) {
+        return DB::transaction(function () use ($user, $tenantId, $mediaId, $mediaType, $purpose, $isPublic, $sanitizedName, $size, $diskName, $storagePath, $options): array {
             $media = Media::query()->create([
                 'id' => $mediaId,
                 'tenant_id' => $tenantId,
@@ -81,14 +81,17 @@ class MediaUploadService
             $presignedUrl = '';
             try {
                 if (method_exists($disk->getAdapter(), 'temporaryUploadUrl')) {
-                    $presignedUrl = $disk->temporaryUploadUrl($storagePath, now()->addMinutes(60));
+                    $urlResult = $disk->temporaryUploadUrl($storagePath, now()->addMinutes(60));
+                    $presignedUrl = is_array($urlResult) ? (string) reset($urlResult) : (string) $urlResult;
                 } else {
                     // Fallback to local API upload endpoint
-                    $presignedUrl = route('media.confirm', ['media' => $mediaId]);
+                    $presignedUrl = (string) route('media.confirm', ['media' => $mediaId]);
                 }
             } catch (\Throwable) {
-                $presignedUrl = route('media.confirm', ['media' => $mediaId]);
+                $presignedUrl = (string) route('media.confirm', ['media' => $mediaId]);
             }
+
+            $presignedUrlStr = (string) $presignedUrl;
 
             // If file is larger than 100MB, return multipart upload parameters
             $multipart = [];
@@ -97,8 +100,8 @@ class MediaUploadService
                     'upload_id' => (string) Str::uuid(),
                     'chunk_size' => 10 * 1024 * 1024, // 10MB chunks
                     'urls' => [
-                        $presignedUrl.'?part=1',
-                        $presignedUrl.'?part=2',
+                        $presignedUrlStr.'?part=1',
+                        $presignedUrlStr.'?part=2',
                     ],
                 ];
             }
@@ -117,7 +120,7 @@ class MediaUploadService
     public function confirmUpload(string $mediaId, string $clientChecksum, ?string $idempotencyKey = null): Media
     {
         try {
-            return DB::transaction(function () use ($mediaId, $clientChecksum) {
+            return DB::transaction(function () use ($mediaId, $clientChecksum): Media {
                 // Pessimistic locking to prevent double confirmation race conditions
                 /** @var Media $media */
                 $media = Media::query()->lockForUpdate()->findOrFail($mediaId);
@@ -235,7 +238,7 @@ class MediaUploadService
         }
 
         $allowedMimes = config('media.allowed_mimes', []);
-        $mimeType = $file->getMimeType();
+        $mimeType = (string) $file->getMimeType();
         if (! in_array($mimeType, $allowedMimes, true)) {
             throw new DomainException(__('media.disallowed_mime_type', ['mime' => $mimeType]), errorCode: 'disallowed_mime_type');
         }
@@ -243,7 +246,7 @@ class MediaUploadService
         $mediaType = $this->determineMediaType($mimeType);
         $mediaId = (string) Str::uuid();
 
-        $sanitizedName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($file->getClientOriginalName()));
+        $sanitizedName = (string) preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($file->getClientOriginalName()));
         $extension = pathinfo($sanitizedName, PATHINFO_EXTENSION);
         $diskName = $isPublic ? config('media.default_disk', 'public') : config('media.private_disk', 'local');
         $storagePath = sprintf('tenants/%s/%s/%s.%s', $tenantId ?? 'global', $mediaType->value, $mediaId, $extension ?: 'bin');
@@ -251,9 +254,9 @@ class MediaUploadService
         $disk = Storage::disk($diskName);
         $disk->putFileAs(dirname($storagePath), $file, basename($storagePath));
 
-        $checksum = hash_file('sha256', $file->getRealPath());
+        $checksum = (string) hash_file('sha256', (string) $file->getRealPath());
 
-        return DB::transaction(function () use ($user, $tenantId, $mediaId, $mediaType, $purpose, $isPublic, $sanitizedName, $mimeType, $checksum, $diskName, $storagePath, $options, $mediableType, $mediableId) {
+        return DB::transaction(function () use ($user, $tenantId, $mediaId, $mediaType, $purpose, $isPublic, $sanitizedName, $mimeType, $checksum, $diskName, $storagePath, $options, $mediableType, $mediableId): Media {
             $blob = MediaBlob::query()->create([
                 'tenant_id' => $tenantId,
                 'sha256' => $checksum,

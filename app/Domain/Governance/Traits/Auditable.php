@@ -11,6 +11,7 @@ use App\Domain\Governance\Observers\AuditableObserver;
  * Optionally define `protected array $auditExclude = [...]` on the model to
  * skip noisy attributes (in addition to globally masked ones).
  */
+/** @phpstan-ignore trait.unused */
 trait Auditable
 {
     public static function bootAuditable(): void
@@ -21,7 +22,7 @@ trait Auditable
     public function auditExcluded(): array
     {
         return array_merge(
-            $this->auditExclude ?? [],
+            property_exists($this, 'auditExclude') ? $this->auditExclude : [],
             ['updated_at', 'created_at', 'remember_token'],
         );
     }

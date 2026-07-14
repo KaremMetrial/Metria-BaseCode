@@ -22,6 +22,7 @@ class SendPushToUser
     public function __invoke(User $user, string $title, string $body, array $data = []): array
     {
         $results = [];
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Domain\Auth\Models\FcmDeviceToken> $tokens */
         $tokens = $user->fcmDeviceTokens()->get();
 
         foreach ($tokens as $tokenModel) {

@@ -24,8 +24,11 @@ class EffectivePermissionController extends ApiController
 
         // Build the source map
         $sourceMap = [];
-        foreach ($user->roles()->with('permissions')->get() as $role) {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Domain\RBAC\Models\Role> $userRoles */
+        $userRoles = $user->roles()->with('permissions')->get();
+        foreach ($userRoles as $role) {
             foreach ($role->permissions as $permission) {
+                /** @var \Spatie\Permission\Models\Permission $permission */
                 $sourceMap[$permission->name] = "Role: {$role->name}";
             }
         }

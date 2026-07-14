@@ -10,12 +10,13 @@ class UpdateRoleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('rbac.roles.manage');
+        return $this->user()?->can('rbac.roles.manage') ?? false;
     }
 
     public function rules(): array
     {
-        $roleId = $this->route('role')->id ?? '';
+        $role = $this->route('role');
+        $roleId = (is_object($role) && property_exists($role, 'id')) ? $role->id : ($role ?? '');
 
         return [
             'name' => ['sometimes', 'string', 'max:255', 'unique:roles,name,'.$roleId],

@@ -15,6 +15,9 @@ class ZoneRepository extends BaseRepository
         parent::__construct($model);
     }
 
+    /**
+     * @return Collection<int, Zone>
+     */
     public function getActiveZones(?string $cityId = null, ?string $tenantId = null): Collection
     {
         $query = $this->query()->where('is_active', true);
@@ -30,6 +33,9 @@ class ZoneRepository extends BaseRepository
             });
         }
 
-        return $query->get();
+        /** @var Collection<int, Zone> $results */
+        $results = $query->get();
+
+        return $results;
     }
 }

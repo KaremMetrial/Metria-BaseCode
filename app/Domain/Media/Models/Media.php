@@ -18,6 +18,37 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Represents the logical business attachment linked to a specific entity.
  * References a physical MediaBlob.
+ *
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string|int|null $media_blob_id
+ * @property string|null $mediable_type
+ * @property string|int|null $mediable_id
+ * @property \App\Domain\Media\Enums\MediaType $media_type
+ * @property string|null $purpose
+ * @property bool $is_public
+ * @property \App\Domain\Media\Enums\MediaStatus $status
+ * @property string|null $checksum
+ * @property string|null $hash_algorithm
+ * @property array $custom_properties
+ * @property string|null $moderation_status
+ * @property array|null $moderation_details
+ * @property string|null $processing_error
+ * @property int $retry_count
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property \Illuminate\Support\Carbon|null $processing_started_at
+ * @property \Illuminate\Support\Carbon|null $processing_finished_at
+ * @property \Illuminate\Support\Carbon|null $activated_at
+ * @property \Illuminate\Support\Carbon|null $quarantined_at
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property \Illuminate\Support\Carbon|null $restored_at
+ * @property \Illuminate\Support\Carbon|null $last_downloaded_at
+ * @property int $download_count
+ * @property string|null $created_by
+ * @property string|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \App\Domain\Media\Models\MediaBlob|null $blob
  */
 class Media extends Model
 {

@@ -33,7 +33,7 @@ class FeatureFlagService
         }
 
         if ($user && ! empty($flag->allowed_user_ids)) {
-            return in_array($user->getAuthIdentifier(), $flag->allowed_user_ids, true);
+            return in_array($user->getAuthIdentifier(), (array) $flag->allowed_user_ids, true);
         }
 
         if ($flag->percentage !== null && $flag->percentage < 100) {

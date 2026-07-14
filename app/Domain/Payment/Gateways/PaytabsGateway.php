@@ -46,9 +46,9 @@ class PaytabsGateway implements PaymentGateway
             'callback' => $options['callback_url'] ?? route('webhooks.payments', ['gateway' => 'paytabs']),
             'return' => $options['return_url'] ?? config('app.url'),
             'customer_details' => [
-                'name' => $payment->user?->name ?? 'NA',
-                'email' => $payment->user?->email ?? 'na@example.com',
-                'phone' => $payment->user?->phone ?? 'NA',
+                'name' => $payment->user !== null ? $payment->user->name : 'NA',
+                'email' => $payment->user !== null ? $payment->user->email : 'na@example.com',
+                'phone' => $payment->user !== null ? ($payment->user->phone ?? 'NA') : 'NA',
                 'street1' => 'NA', 'city' => 'NA', 'country' => 'EG', 'ip' => request()->ip(),
             ],
         ]);

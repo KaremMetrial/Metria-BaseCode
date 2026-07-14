@@ -10,15 +10,15 @@ use Spatie\Permission\Models\Permission;
 interface PermissionRepositoryInterface
 {
     /**
-     * @return Collection<int, Permission>
+     * @return \Illuminate\Database\Eloquent\Collection<int, Permission>
      */
-    public function all(): Collection;
+    public function all(): \Illuminate\Database\Eloquent\Collection;
 
     public function findByName(string $name): Permission;
 
     /**
      * @param  array<int, string>  $names
-     * @return Collection<int, Permission>
+     * @return \Illuminate\Database\Eloquent\Collection<int, Permission>
      */
-    public function findByNames(array $names): Collection;
+    public function findByNames(array $names): \Illuminate\Database\Eloquent\Collection;
 }

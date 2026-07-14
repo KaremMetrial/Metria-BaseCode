@@ -21,6 +21,9 @@ class ZoneService
         private readonly AuditLogger $audit,
     ) {}
 
+    /**
+     * @return Collection<int, Zone>
+     */
     public function getZones(?string $cityId = null, ?string $tenantId = null, ?TerritoryFilter $filter = null): Collection
     {
         if ($filter !== null) {
@@ -35,17 +38,25 @@ class ZoneService
                 });
             }
 
-            return $query->get();
+            /** @var Collection<int, Zone> $results */
+            $results = $query->get();
+
+            return $results;
         }
 
-        return $this->repository->getActiveZones($cityId, $tenantId);
+        /** @var Collection<int, Zone> $activeZones */
+        $activeZones = $this->repository->getActiveZones($cityId, $tenantId);
+
+        return $activeZones;
     }
 
     public function resolveZoneByCoordinates(float $lat, float $lng, ?string $tenantId = null, ?string $cityId = null): ?Zone
     {
+        /** @var Collection<int, Zone> $zones */
         $zones = $this->getZones($cityId, $tenantId);
 
         foreach ($zones as $zone) {
+            /** @var Zone $zone */
             if ($zone->containsCoordinate($lat, $lng)) {
                 return $zone;
             }

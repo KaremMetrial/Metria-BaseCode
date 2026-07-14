@@ -38,7 +38,7 @@ class IssueApiToken
 
         $user = User::query()->where('email', $email)->first();
 
-        if (! $user || ! Hash::check($password, $user->password)) {
+        if (! $user || ! Hash::check($password, (string) $user->password)) {
             RateLimiter::hit($throttleKey, 300); // 5 minutes decay
 
             $this->audit->log('auth.login_failed', context: ['email' => $email]);

@@ -32,11 +32,9 @@ class IssueTokenPipe
         }
 
         $abilities = [];
-        if (method_exists($user, 'hasPermissionTo') && method_exists($user, 'getPermissionsViaRoles')) {
-            $abilities = $user->hasPermissionTo('admin.super')
-                ? ['*']
-                : $user->getPermissionsViaRoles()->pluck('name')->toArray();
-        }
+        $abilities = $user->hasPermissionTo('admin.super')
+            ? ['*']
+            : $user->getPermissionsViaRoles()->pluck('name')->toArray();
 
         if (empty($abilities)) {
             $abilities = [];
@@ -45,7 +43,7 @@ class IssueTokenPipe
         $token = $user->createToken($context->deviceName, $abilities)->plainTextToken;
         $context->setToken($token);
 
-        if ($context->request->filled('device_token') && method_exists($user, 'updateFcmDeviceToken')) {
+        if ($context->request->filled('device_token')) {
             $user->updateFcmDeviceToken(
                 $context->request->string('device_token')->value(),
                 $context->request->string('device_id')->value() ?: null,
@@ -54,18 +52,16 @@ class IssueTokenPipe
             );
         }
 
-        if (method_exists($user, 'tokens') && method_exists($user, 'sessions')) {
-            if ($tokenModel = $user->tokens()->latest('id')->first()) {
-                $user->sessions()->updateOrCreate(
-                    ['personal_access_token_id' => $tokenModel->id],
-                    [
-                        'ip_address' => $context->request->ip() ?: '127.0.0.1',
-                        'user_agent' => $context->request->userAgent() ?: 'Unknown',
-                        'device_fingerprint' => $context->request->string('device_fingerprint')->value() ?: null,
-                        'last_activity_at' => now(),
-                    ]
-                );
-            }
+        if ($tokenModel = $user->tokens()->latest('id')->first()) {
+            $user->sessions()->updateOrCreate(
+                ['personal_access_token_id' => $tokenModel->id],
+                [
+                    'ip_address' => $context->request->ip() ?: '127.0.0.1',
+                    'user_agent' => $context->request->userAgent() ?: 'Unknown',
+                    'device_fingerprint' => $context->request->string('device_fingerprint')->value() ?: null,
+                    'last_activity_at' => now(),
+                ]
+            );
         }
 
         $this->audit->log('auth.login', $user);

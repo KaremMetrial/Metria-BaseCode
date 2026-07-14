@@ -9,6 +9,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Sanctum\PersonalAccessToken;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string|null $personal_access_token_id
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property string|null $device_fingerprint
+ * @property \Illuminate\Support\Carbon|null $last_activity_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property User|null $user
+ * @property PersonalAccessToken|null $token
+ */
 class UserSession extends Model
 {
     use HasUuid;

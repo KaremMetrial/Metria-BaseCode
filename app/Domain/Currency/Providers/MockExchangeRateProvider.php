@@ -51,7 +51,7 @@ class MockExchangeRateProvider implements ExchangeRateProviderInterface
         }
 
         $rate = $this->rates[$currencyCode];
-        $payload = json_encode(['rate' => $rate, 'currency' => $currencyCode, 'timestamp' => time()]);
+        $payload = json_encode(['rate' => $rate, 'currency' => $currencyCode, 'timestamp' => time()]) ?: '';
 
         return [
             'rate' => $rate,

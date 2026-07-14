@@ -45,7 +45,7 @@ class RegisterWithOtp
 
             if (! $email && $phone) {
                 // Generate a unique placeholder email if registering by phone and no email was provided
-                $cleanPhone = preg_replace('/[^0-9]/', '', $phone) ?: Str::random(10);
+                $cleanPhone = (string) preg_replace('/[^0-9]/', '', (string) $phone) ?: Str::random(10);
                 $email = "{$cleanPhone}@otp.local";
             }
 
@@ -58,14 +58,9 @@ class RegisterWithOtp
                 'locale' => $data['locale'] ?? app()->getLocale(),
             ]);
 
-            // Assign default role if Spatie roles trait is used
-            if (method_exists($user, 'assignRole')) {
-                $user->assignRole('customer');
-            }
-
-            // Generate token
             $abilities = [];
-            if (method_exists($user, 'hasPermissionTo') && method_exists($user, 'getPermissionsViaRoles')) {
+            if ($user instanceof User) {
+                $user->assignRole('customer');
                 $abilities = $user->hasPermissionTo('admin.super')
                     ? ['*']
                     : $user->getPermissionsViaRoles()->pluck('name')->toArray();

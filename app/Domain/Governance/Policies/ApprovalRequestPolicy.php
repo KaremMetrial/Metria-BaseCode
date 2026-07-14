@@ -31,7 +31,7 @@ class ApprovalRequestPolicy
 
     public function view(User $user, ?ApprovalRequest $approvalRequest = null): bool
     {
-        return ($approvalRequest !== null && (string) $user->id === (string) $approvalRequest->requester_id) || $user->can('governance.approvals.view');
+        return ($approvalRequest !== null && (string) $user->id === (string) $approvalRequest->requested_by) || $user->can('governance.approvals.view');
     }
 
     public function create(User $user): bool

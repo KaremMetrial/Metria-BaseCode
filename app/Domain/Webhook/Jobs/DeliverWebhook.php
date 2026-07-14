@@ -29,6 +29,12 @@ class DeliverWebhook implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public int $timeout = 30;
+
+    public bool $failOnTimeout = true;
+
+    public int $maxExceptions = 3;
+
     public function __construct(public readonly string $deliveryId) {}
 
     public function tries(): int
@@ -40,6 +46,11 @@ class DeliverWebhook implements ShouldQueue
     public function backoff(): array
     {
         return (array) config('integrations.webhooks.backoff', [60, 300, 1800, 7200]);
+    }
+
+    public function retryUntil(): \DateTimeInterface
+    {
+        return now()->addHours(6);
     }
 
     public function handle(): void

@@ -8,11 +8,12 @@ use App\Core\Support\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin \App\Domain\Wallet\Models\WalletTransaction */
 class WalletTransactionResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $currency = $this->wallet?->currency ?? config('payments.currency', 'EGP');
+        $currency = $this->wallet !== null ? $this->wallet->currency : config('payments.currency', 'EGP');
 
         return [
             'id' => $this->id,

@@ -59,20 +59,34 @@ class FcmPushProvider
     {
         return CircuitBreaker::make()->call('fcm', function () use ($deviceToken, $title, $body, $data) {
             try {
+                if ($deviceToken === '') {
+                    throw new IntegrationException(__('integrations.push_send_failed', ['provider' => 'fcm', 'default' => 'Empty device token']), provider: 'fcm');
+                }
+
+                /** @var non-empty-string $token */
+                $token = $deviceToken;
+
                 $message = CloudMessage::new()
-                    ->toToken($deviceToken)
+                    ->toToken($token)
                     ->withNotification(Notification::create($title, $body));
 
                 if (! empty($data)) {
-                    // Ensure all data values are strings as required by FCM data payload
-                    $stringData = array_map(fn ($val) => is_scalar($val) ? (string) $val : json_encode($val), $data);
-                    $message = $message->withData($stringData);
+                    /** @var array<non-empty-string, string> $cleanData */
+                    $cleanData = [];
+                    foreach ($data as $key => $val) {
+                        $keyStr = (string) $key;
+                        if ($keyStr !== '') {
+                            $cleanData[$keyStr] = is_scalar($val) ? (string) $val : (json_encode($val) ?: '');
+                        }
+                    }
+                    $message = $message->withData($cleanData);
                 }
 
                 $result = $this->getMessaging()->send($message);
 
+                /** @phpstan-ignore function.alreadyNarrowedType */
                 return is_array($result) ? ($result['name'] ?? 'sent') : (string) $result;
-            } catch (FirebaseException|Throwable $e) {
+            } catch (Throwable $e) {
                 throw new IntegrationException(__('integrations.push_send_failed', ['provider' => 'fcm']), provider: 'fcm', context: [
                     'error' => $e->getMessage(),
                 ], previous: $e);

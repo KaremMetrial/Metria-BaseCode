@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property bool $is_system
+ * @property bool $is_editable
+ * @property bool $is_assignable
+ */
 class RoleMetadata extends Model
 {
     use HasTranslations;

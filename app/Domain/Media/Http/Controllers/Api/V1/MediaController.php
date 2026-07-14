@@ -19,12 +19,12 @@ class MediaController extends ApiController
     public function presign(GeneratePresignedUrlRequest $request, MediaUploadService $uploadService): JsonResponse
     {
         $result = $uploadService->initiateUpload(
-            user: $request->user(),
-            filename: $request->input('filename'),
-            mimeType: $request->input('mime_type'),
+            user: $this->getAuthenticatedUser($request),
+            filename: $request->string('filename')->value(),
+            mimeType: $request->string('mime_type')->value(),
             size: (int) $request->input('size'),
             isPublic: (bool) $request->input('is_public', false),
-            purpose: $request->input('purpose', 'attachment')
+            purpose: $request->string('purpose', 'attachment')->value()
         );
 
         return $this->respond($result);
@@ -35,7 +35,7 @@ class MediaController extends ApiController
         // Enforce ownership / tenant scoping (inherent in Media query through tenant global scope)
         $media = $uploadService->confirmUpload(
             mediaId: $mediaId,
-            clientChecksum: $request->input('checksum')
+            clientChecksum: $request->string('checksum')->value()
         );
 
         return $this->respond(new MediaResource($media));
@@ -53,5 +53,15 @@ class MediaController extends ApiController
         return $this->respond([
             'download_url' => $url,
         ]);
+    }
+
+    private function getAuthenticatedUser(\Illuminate\Http\Request $request): \App\Domain\Auth\Models\User
+    {
+        $user = $request->user();
+        if (! $user instanceof \App\Domain\Auth\Models\User) {
+            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+        }
+
+        return $user;
     }
 }

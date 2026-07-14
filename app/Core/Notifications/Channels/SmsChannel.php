@@ -17,13 +17,16 @@ class SmsChannel
             return;
         }
 
-        $to = $notifiable->routeNotificationFor('sms', $notification)
-            ?: ($notifiable->phone ?? null);
+        /** @var string|null $to */
+        $to = method_exists($notifiable, 'routeNotificationFor')
+            ? $notifiable->routeNotificationFor('sms', $notification)
+            : ($notifiable->phone ?? null);
 
         if (! $to) {
             return;
         }
 
+        /** @var string $message */
         $message = $notification->toSms($notifiable);
         $this->sms->driver()->send($to, $message);
     }
