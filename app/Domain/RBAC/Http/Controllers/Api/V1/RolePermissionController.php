@@ -30,8 +30,12 @@ class RolePermissionController extends ApiController
             'permissions' => ['required', 'array'],
             'permissions.*' => ['string'],
         ]);
+        $validatedArray = is_array($validated) ? $validated : [];
+        $permissionsVal = $validatedArray['permissions'] ?? [];
+        /** @var array<int, string> $permissions */
+        $permissions = is_array($permissionsVal) ? array_filter($permissionsVal, 'is_string') : [];
 
-        $this->syncAction->execute($role, $validated['permissions'], 'add');
+        $this->syncAction->execute($role, $permissions, 'add');
 
         return $this->respond(new RoleResource($role->load('permissions')), __('rbac.permissions_added'));
     }
@@ -44,8 +48,12 @@ class RolePermissionController extends ApiController
             'permissions' => ['required', 'array'],
             'permissions.*' => ['string'],
         ]);
+        $validatedArray = is_array($validated) ? $validated : [];
+        $permissionsVal = $validatedArray['permissions'] ?? [];
+        /** @var array<int, string> $permissions */
+        $permissions = is_array($permissionsVal) ? array_filter($permissionsVal, 'is_string') : [];
 
-        $this->syncAction->execute($role, $validated['permissions'], 'replace');
+        $this->syncAction->execute($role, $permissions, 'replace');
 
         return $this->respond(new RoleResource($role->load('permissions')), __('rbac.permissions_synced'));
     }
@@ -58,8 +66,12 @@ class RolePermissionController extends ApiController
             'permissions' => ['required', 'array'],
             'permissions.*' => ['string'],
         ]);
+        $validatedArray = is_array($validated) ? $validated : [];
+        $permissionsVal = $validatedArray['permissions'] ?? [];
+        /** @var array<int, string> $permissions */
+        $permissions = is_array($permissionsVal) ? array_filter($permissionsVal, 'is_string') : [];
 
-        $this->syncAction->execute($role, $validated['permissions'], 'remove');
+        $this->syncAction->execute($role, $permissions, 'remove');
 
         return $this->respond(null, __('rbac.permissions_removed'));
     }

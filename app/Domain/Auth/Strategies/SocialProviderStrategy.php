@@ -76,7 +76,8 @@ class SocialProviderStrategy implements AuthStrategyInterface
             return;
         }
 
-        $token = (string) ($socialUser['token'] ?? '');
+        $tokenVal = $socialUser['token'] ?? '';
+        $token = is_scalar($tokenVal) ? (string) $tokenVal : '';
         if (empty($token)) {
             throw new DomainException(__('auth.social.missing_token', ['default' => 'Social authentication token is required.']), 'social_token_missing');
         }
@@ -89,7 +90,9 @@ class SocialProviderStrategy implements AuthStrategyInterface
             if (isset($claims['aud']) && is_scalar($claims['aud']) && (string) $claims['aud'] !== $clientId) {
                 throw new DomainException(__('auth.social.invalid_audience', ['default' => 'Token audience mismatch.']), 'social_token_invalid_aud');
             }
-            if (isset($claims['exp']) && ((int) $claims['exp']) < time()) {
+            $expVal = $claims['exp'] ?? 0;
+            $expInt = is_numeric($expVal) ? (int) $expVal : 0;
+            if (isset($claims['exp']) && $expInt < time()) {
                 throw new DomainException(__('auth.social.token_expired', ['default' => 'Social authentication token has expired.']), 'social_token_expired');
             }
             if (isset($claims['email_verified']) && ! $claims['email_verified']) {
@@ -101,10 +104,14 @@ class SocialProviderStrategy implements AuthStrategyInterface
             /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
             $driver = Socialite::driver($provider);
             $verifiedUser = $driver->userFromToken($token);
-            if ((string) $verifiedUser->getId() !== (string) $socialUser['id']) {
+            $idVal = $socialUser['id'] ?? '';
+            $idStr = is_scalar($idVal) ? (string) $idVal : '';
+            if ((string) $verifiedUser->getId() !== $idStr) {
                 throw new DomainException(__('auth.social.identity_mismatch', ['default' => 'Token identity verification failed.']), 'social_identity_mismatch');
             }
-            if ($verifiedUser->getEmail() && (string) $verifiedUser->getEmail() !== (string) ($socialUser['email'] ?? '')) {
+            $emailVal = $socialUser['email'] ?? '';
+            $emailStr = is_scalar($emailVal) ? (string) $emailVal : '';
+            if ($verifiedUser->getEmail() && (string) $verifiedUser->getEmail() !== $emailStr) {
                 throw new DomainException(__('auth.social.email_mismatch', ['default' => 'Token email verification failed.']), 'social_email_mismatch');
             }
         } catch (DomainException $e) {

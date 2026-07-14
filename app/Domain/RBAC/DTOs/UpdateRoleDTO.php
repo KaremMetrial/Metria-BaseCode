@@ -21,15 +21,21 @@ class UpdateRoleDTO extends DataTransferObject
 
     public static function fromArray(array $data): self
     {
+        $nameVal = $data['name'] ?? null;
+        $displayNameVal = $data['display_name'] ?? null;
+        $descriptionVal = $data['description'] ?? null;
+        $priorityVal = $data['priority'] ?? null;
+        $guardNameVal = $data['guard_name'] ?? null;
+
         return new self(
-            name: $data['name'] ?? null,
-            displayName: $data['display_name'] ?? null,
-            description: $data['description'] ?? null,
-            priority: isset($data['priority']) ? (int) $data['priority'] : null,
+            name: is_string($nameVal) ? $nameVal : null,
+            displayName: is_array($displayNameVal) ? $displayNameVal : null,
+            description: is_array($descriptionVal) ? $descriptionVal : null,
+            priority: is_numeric($priorityVal) ? (int) $priorityVal : null,
             isSystem: isset($data['is_system']) ? (bool) $data['is_system'] : null,
             isEditable: isset($data['is_editable']) ? (bool) $data['is_editable'] : null,
             isAssignable: isset($data['is_assignable']) ? (bool) $data['is_assignable'] : null,
-            guardName: $data['guard_name'] ?? null,
+            guardName: is_string($guardNameVal) ? $guardNameVal : null,
         );
     }
 }

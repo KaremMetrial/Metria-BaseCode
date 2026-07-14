@@ -17,6 +17,7 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
     }
 
     /**
+     * @param array<int, \Illuminate\Contracts\Database\Query\Expression|string> $columns
      * @return \Illuminate\Database\Eloquent\Collection<int, Role>
      */
     public function all(array $columns = ['*'], ?string $tenantId = null): \Illuminate\Database\Eloquent\Collection
@@ -49,6 +50,10 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
         return $role;
     }
 
+    /**
+     * @param array<string, mixed> $attributes
+     * @param array<string, mixed> $metadata
+     */
     public function createWithMetadata(array $attributes, array $metadata = [], ?string $tenantId = null): Role
     {
         /** @var Role $role */
@@ -61,6 +66,10 @@ class RoleRepository extends BaseRepository implements RoleRepositoryInterface
         return $role->load('metadata');
     }
 
+    /**
+     * @param array<string, mixed> $attributes
+     * @param array<string, mixed> $metadata
+     */
     public function updateWithMetadata(Role $role, array $attributes, array $metadata = [], ?string $tenantId = null): Role
     {
         if (! empty($attributes)) {

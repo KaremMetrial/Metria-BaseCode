@@ -48,7 +48,9 @@ class DeliverWebhook implements ShouldQueue
     {
         $backoffVal = config('integrations.webhooks.backoff', [60, 300, 1800, 7200]);
         $backoff = is_array($backoffVal) ? $backoffVal : [60, 300, 1800, 7200];
-        return array_map(fn ($v) => is_numeric($v) ? (int) $v : 0, $backoff);
+        /** @var array<int, int> $result */
+        $result = array_map(fn ($v) => is_numeric($v) ? (int) $v : 0, $backoff);
+        return $result;
     }
 
     public function retryUntil(): \DateTimeInterface

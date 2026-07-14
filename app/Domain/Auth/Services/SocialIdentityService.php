@@ -29,10 +29,17 @@ class SocialIdentityService
         $this->governance->checkMethodEnabled('social');
 
         return DB::transaction(function () use ($provider, $socialUser, $tenantId, $deviceName) {
+            $idVal = $socialUser['id'] ?? '';
+            $idStr = is_scalar($idVal) ? (string) $idVal : '';
+
+            $expiresInVal = $socialUser['expiresIn'] ?? null;
+            $expiresInInt = is_numeric($expiresInVal) ? (int) $expiresInVal : null;
+            $expiresAt = $expiresInInt !== null ? now()->addSeconds($expiresInInt) : null;
+
             /** @var UserSocialIdentity|null $identity */
             $identity = UserSocialIdentity::query()
                 ->where('provider', $provider)
-                ->where('provider_user_id', (string) $socialUser['id'])
+                ->where('provider_user_id', $idStr)
                 ->first();
 
             $isNew = false;
@@ -48,7 +55,7 @@ class SocialIdentityService
                     'provider_email' => $socialUser['email'] ?? null,
                     'access_token' => $socialUser['token'] ?? null,
                     'refresh_token' => $socialUser['refreshToken'] ?? null,
-                    'expires_at' => isset($socialUser['expiresIn']) ? now()->addSeconds((int) $socialUser['expiresIn']) : null,
+                    'expires_at' => $expiresAt,
                 ]);
             } else {
                 // Check if user exists by email
@@ -74,11 +81,11 @@ class SocialIdentityService
                 UserSocialIdentity::query()->create([
                     'user_id' => $user->id,
                     'provider' => $provider,
-                    'provider_user_id' => (string) $socialUser['id'],
+                    'provider_user_id' => $idStr,
                     'provider_email' => $email,
                     'access_token' => $socialUser['token'] ?? null,
                     'refresh_token' => $socialUser['refreshToken'] ?? null,
-                    'expires_at' => isset($socialUser['expiresIn']) ? now()->addSeconds((int) $socialUser['expiresIn']) : null,
+                    'expires_at' => $expiresAt,
                 ]);
 
                 event(new SocialIdentityLinked($user, $provider));
@@ -108,9 +115,12 @@ class SocialIdentityService
 
     public function linkIdentity(User $user, string $provider, array $socialUser): UserSocialIdentity
     {
+        $idVal = $socialUser['id'] ?? '';
+        $idStr = is_scalar($idVal) ? (string) $idVal : '';
+
         $existing = UserSocialIdentity::query()
             ->where('provider', $provider)
-            ->where('provider_user_id', (string) $socialUser['id'])
+            ->where('provider_user_id', $idStr)
             ->first();
 
         if ($existing) {
@@ -120,14 +130,18 @@ class SocialIdentityService
             throw new DomainException(__('auth.social.conflict'), errorCode: 'social_identity_conflict');
         }
 
+        $expiresInVal = $socialUser['expiresIn'] ?? null;
+        $expiresInInt = is_numeric($expiresInVal) ? (int) $expiresInVal : null;
+        $expiresAt = $expiresInInt !== null ? now()->addSeconds($expiresInInt) : null;
+
         $identity = UserSocialIdentity::query()->create([
             'user_id' => $user->id,
             'provider' => $provider,
-            'provider_user_id' => (string) $socialUser['id'],
+            'provider_user_id' => $idStr,
             'provider_email' => $socialUser['email'] ?? null,
             'access_token' => $socialUser['token'] ?? null,
             'refresh_token' => $socialUser['refreshToken'] ?? null,
-            'expires_at' => isset($socialUser['expiresIn']) ? now()->addSeconds((int) $socialUser['expiresIn']) : null,
+            'expires_at' => $expiresAt,
         ]);
 
         $this->audit->log('auth.social_linked', $user, ['provider' => $provider]);

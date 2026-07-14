@@ -39,6 +39,10 @@ abstract class BaseRepository implements RepositoryInterface
         return $this->query($tenantId)->findOrFail($id);
     }
 
+    /**
+     * @param array<int, \Illuminate\Contracts\Database\Query\Expression|string> $columns
+     * @return Collection<int, Model>
+     */
     public function all(array $columns = ['*'], ?string $tenantId = null): Collection
     {
         return $this->query($tenantId)->get($columns);
@@ -73,6 +77,9 @@ abstract class BaseRepository implements RepositoryInterface
         return $this->filter($filter, $tenantId)->paginate($perPage);
     }
 
+    /**
+     * @param array<string, mixed> $attributes
+     */
     public function create(array $attributes, ?string $tenantId = null): Model
     {
         if ($tenantId !== null && ! isset($attributes['tenant_id'])) {
@@ -82,6 +89,9 @@ abstract class BaseRepository implements RepositoryInterface
         return $this->query($tenantId)->create($attributes);
     }
 
+    /**
+     * @param array<string, mixed> $attributes
+     */
     public function update(Model $model, array $attributes, ?string $tenantId = null): Model
     {
         $model->fill($attributes)->save();

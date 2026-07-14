@@ -47,6 +47,7 @@ class SyncUserRolesAction
                 }
             }
 
+            /** @var array<int, string> $finalRoles */
             $finalRoles = array_map(fn ($v) => is_scalar($v) ? (string) $v : '', $user->roles()->pluck('name')->toArray());
 
             $this->eventBus->publish(new UserRolesUpdated($user, $finalRoles));

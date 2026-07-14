@@ -42,11 +42,18 @@ class PasswordResetService
     public function reset(string $email, string $token, string $newPassword): User
     {
         $record = DB::table('password_reset_tokens')->where('email', $email)->first();
-        if (! $record || now()->subMinutes(60)->isAfter($record->created_at)) {
+        if (! $record) {
             throw new DomainException(__('auth.recovery.invalid_token'), errorCode: 'invalid_reset_token');
         }
 
-        if (! Hash::check($token, $record->token)) {
+        $createdAt = isset($record->created_at) && (is_string($record->created_at) || $record->created_at instanceof \DateTimeInterface) ? $record->created_at : null;
+        $tokenHash = isset($record->token) && is_string($record->token) ? $record->token : '';
+
+        if ($createdAt === null || now()->subMinutes(60)->isAfter($createdAt)) {
+            throw new DomainException(__('auth.recovery.invalid_token'), errorCode: 'invalid_reset_token');
+        }
+
+        if ($tokenHash === '' || ! Hash::check($token, $tokenHash)) {
             throw new DomainException(__('auth.recovery.invalid_token'), errorCode: 'invalid_reset_token');
         }
 

@@ -17,6 +17,11 @@ class ForceJsonResponse
     {
         $request->headers->set('Accept', 'application/json');
 
-        return $next($request);
+        $response = $next($request);
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        throw new \UnexpectedValueException('Expected Response instance.');
     }
 }

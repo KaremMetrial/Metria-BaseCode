@@ -30,7 +30,11 @@ class IdempotencyMiddleware
         }
 
         if (! is_string($key) || $key === '' || ! in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
-            return $next($request);
+            $response = $next($request);
+            if ($response instanceof Response) {
+                return $response;
+            }
+            throw new \UnexpectedValueException('Expected Response instance.');
         }
 
         $userId = $request->user()?->getAuthIdentifier();

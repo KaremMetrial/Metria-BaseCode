@@ -44,7 +44,7 @@ class RolePolicy
 
         // Anti-Escalation: Cannot update a role with a higher priority (lower number) than the user's highest role
         $userHighestPriority = $this->getUserHighestPriority($user);
-        $targetPriority = $role->metadata->priority ?? 100;
+        $targetPriority = ($role->metadata !== null) ? $role->metadata->priority : 100;
 
         return $userHighestPriority <= $targetPriority;
     }
@@ -56,7 +56,7 @@ class RolePolicy
         }
 
         $userHighestPriority = $this->getUserHighestPriority($user);
-        $targetPriority = $role->metadata->priority ?? 100;
+        $targetPriority = ($role->metadata !== null) ? $role->metadata->priority : 100;
 
         return $userHighestPriority <= $targetPriority;
     }
@@ -65,8 +65,11 @@ class RolePolicy
     {
         // Lower number = higher power. Default to 100 (lowest)
         $min = $user->roles()->with('metadata')->get()->min(function ($role) {
-            $priority = $role->metadata->priority ?? 100;
-            return is_numeric($priority) ? (int) $priority : 100;
+            if ($role instanceof Role && $role->metadata !== null) {
+                $priority = $role->metadata->priority;
+                return is_numeric($priority) ? (int) $priority : 100;
+            }
+            return 100;
         });
         return is_numeric($min) ? (int) $min : 100;
     }

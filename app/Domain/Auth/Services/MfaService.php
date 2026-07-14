@@ -122,6 +122,9 @@ class MfaService
         return $secret;
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function generateRecoveryCodes(int $count): array
     {
         $codes = [];

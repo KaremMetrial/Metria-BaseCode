@@ -19,7 +19,11 @@ class ResolveTenant
     public function handle(Request $request, Closure $next): Response
     {
         if (! config('tenancy.enabled')) {
-            return $next($request);
+            $response = $next($request);
+            if ($response instanceof Response) {
+                return $response;
+            }
+            throw new \UnexpectedValueException('Expected Response instance.');
         }
 
         $user = $request->user();
@@ -53,6 +57,10 @@ class ResolveTenant
 
         $this->manager->set($tenantId);
 
-        return $next($request);
+        $response = $next($request);
+        if ($response instanceof Response) {
+            return $response;
+        }
+        throw new \UnexpectedValueException('Expected Response instance.');
     }
 }

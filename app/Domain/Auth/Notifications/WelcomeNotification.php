@@ -19,16 +19,18 @@ class WelcomeNotification extends Notification implements ShouldQueue
     {
         $channels = [];
 
-        if (isset($notifiable->email) && str_contains($notifiable->email, '@') && ! str_ends_with($notifiable->email, '@otp.local')) {
+        $email = property_exists($notifiable, 'email') ? $notifiable->email : null;
+        if (is_string($email) && str_contains($email, '@') && ! str_ends_with($email, '@otp.local')) {
             $channels[] = 'mail';
         }
 
-        if (isset($notifiable->phone) && ! empty($notifiable->phone)) {
+        $phone = property_exists($notifiable, 'phone') ? $notifiable->phone : null;
+        if (is_string($phone) && $phone !== '') {
             $channels[] = SmsChannel::class;
         }
 
         // If the user has active FCM device tokens, send a push notification too!
-        if (method_exists($notifiable, 'fcmDeviceTokens') && $notifiable->fcmDeviceTokens()->exists()) {
+        if ($notifiable instanceof \App\Domain\Auth\Models\User && $notifiable->fcmDeviceTokens()->exists()) {
             $channels[] = FcmChannel::class;
         }
 
@@ -78,6 +80,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     private function getName(object $notifiable): string
     {
-        return property_exists($notifiable, 'name') ? (string) $notifiable->name : 'User';
+        $name = property_exists($notifiable, 'name') ? $notifiable->name : null;
+        return is_string($name) ? $name : 'User';
     }
 }

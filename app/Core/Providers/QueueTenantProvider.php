@@ -27,7 +27,8 @@ class QueueTenantProvider extends ServiceProvider
 
         Queue::before(function (JobProcessing $event) {
             $payload = $event->job->payload();
-            $tenantId = $payload['tenant_id'] ?? null;
+            $tenantIdVal = $payload['tenant_id'] ?? null;
+            $tenantId = (is_string($tenantIdVal) || is_int($tenantIdVal)) ? $tenantIdVal : null;
 
             app(TenantManager::class)->set($tenantId);
 

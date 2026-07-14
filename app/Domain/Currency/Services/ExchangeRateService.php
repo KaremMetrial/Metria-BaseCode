@@ -54,11 +54,21 @@ class ExchangeRateService
      */
     public function registerRate(array $data): CurrencyExchangeRate
     {
-        $currencyCode = strtoupper($data['currency_code']);
-        $effectiveAt = Carbon::parse($data['effective_at']);
+        $codeVal = $data['currency_code'] ?? '';
+        $currencyCode = strtoupper(is_string($codeVal) ? $codeVal : '');
+
+        $effVal = $data['effective_at'] ?? null;
+        if (! is_string($effVal) && ! $effVal instanceof DateTimeInterface && ! is_numeric($effVal)) {
+            $effVal = 'now';
+        }
+        $effectiveAt = Carbon::parse($effVal);
 
         // Default expires_at to far future if not provided
-        $expiresAt = isset($data['expires_at']) ? Carbon::parse($data['expires_at']) : Carbon::parse('2099-12-31 23:59:59');
+        $expVal = $data['expires_at'] ?? null;
+        if ($expVal !== null && ! is_string($expVal) && ! $expVal instanceof DateTimeInterface && ! is_numeric($expVal)) {
+            $expVal = '2099-12-31 23:59:59';
+        }
+        $expiresAt = $expVal !== null ? Carbon::parse($expVal) : Carbon::parse('2099-12-31 23:59:59');
 
         return DB::transaction(function () use ($currencyCode, $effectiveAt, $expiresAt, $data) {
             // Guard: Manual overrides always take precedence over provider updates when locked.

@@ -41,8 +41,11 @@ class SetLocale
         app()->setLocale($locale);
 
         $response = $next($request);
-        $response->headers->set('Content-Language', $locale);
+        if ($response instanceof Response) {
+            $response->headers->set('Content-Language', $locale);
+            return $response;
+        }
 
-        return $response;
+        throw new \UnexpectedValueException('Expected Response instance.');
     }
 }

@@ -31,8 +31,15 @@ class CheckDuplicatesCommand extends Command
 
         $this->error("Found {$duplicates->count()} duplicate (tenant_id, code) pair(s):");
         foreach ($duplicates as $duplicate) {
-            $tenantId = $duplicate->tenant_id ?: 'NULL';
-            $this->line("- tenant_id: {$tenantId}, code: {$duplicate->code} ({$duplicate->count} rows)");
+            if ($duplicate instanceof \stdClass) {
+                $tenantIdVal = $duplicate->tenant_id ?? null;
+                $tenantId = is_scalar($tenantIdVal) ? (string) $tenantIdVal : 'NULL';
+                $codeVal = $duplicate->code ?? '';
+                $code = is_scalar($codeVal) ? (string) $codeVal : '';
+                $countVal = $duplicate->count ?? 0;
+                $count = is_numeric($countVal) ? (int) $countVal : 0;
+                $this->line("- tenant_id: {$tenantId}, code: {$code} ({$count} rows)");
+            }
         }
 
         $this->error('Please resolve or clean up these duplicates before running the zones unique migration.');

@@ -17,6 +17,7 @@ class PermissionRepository extends BaseRepository implements PermissionRepositor
     }
 
     /**
+     * @param array<int, \Illuminate\Contracts\Database\Query\Expression|string> $columns
      * @return \Illuminate\Database\Eloquent\Collection<int, Permission>
      */
     public function all(array $columns = ['*'], ?string $tenantId = null): \Illuminate\Database\Eloquent\Collection

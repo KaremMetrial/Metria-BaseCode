@@ -19,7 +19,7 @@ class WebhookEndpointResource extends JsonResource
             'events' => $this->events,
             'active' => $this->active,
             // Shown only when explicitly passed (creation response).
-            'secret' => $this->when($this->additional['reveal_secret'] ?? false, $this->secret),
+            'secret' => $this->when((bool) ($this->additional['reveal_secret'] ?? false), $this->secret),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }

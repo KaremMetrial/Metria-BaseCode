@@ -21,15 +21,21 @@ class CreateRoleDTO extends DataTransferObject
 
     public static function fromArray(array $data): self
     {
+        $nameVal = $data['name'] ?? '';
+        $displayNameVal = $data['display_name'] ?? null;
+        $descriptionVal = $data['description'] ?? null;
+        $priorityVal = $data['priority'] ?? 100;
+        $guardNameVal = $data['guard_name'] ?? null;
+
         return new self(
-            name: $data['name'],
-            displayName: $data['display_name'] ?? null,
-            description: $data['description'] ?? null,
-            priority: (int) ($data['priority'] ?? 100),
+            name: is_string($nameVal) ? $nameVal : '',
+            displayName: is_array($displayNameVal) ? $displayNameVal : null,
+            description: is_array($descriptionVal) ? $descriptionVal : null,
+            priority: is_numeric($priorityVal) ? (int) $priorityVal : 100,
             isSystem: (bool) ($data['is_system'] ?? false),
             isEditable: (bool) ($data['is_editable'] ?? true),
             isAssignable: (bool) ($data['is_assignable'] ?? true),
-            guardName: $data['guard_name'] ?? null,
+            guardName: is_string($guardNameVal) ? $guardNameVal : null,
         );
     }
 }

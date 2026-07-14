@@ -26,8 +26,10 @@ class RegisterWithOtp
      */
     public function __invoke(array $data, string $guard = 'web', string $deviceName = 'api', ?string $tenantId = null): array
     {
-        $identifier = $data['identifier'];
-        $code = $data['code'];
+        $identifierVal = $data['identifier'] ?? '';
+        $identifier = is_string($identifierVal) ? $identifierVal : '';
+        $codeVal = $data['code'] ?? '';
+        $code = is_string($codeVal) ? $codeVal : '';
 
         // 1. Verify the OTP code
         $this->verifyOtp->__invoke($identifier, $code, 'register', $guard);
@@ -46,19 +48,29 @@ class RegisterWithOtp
             $email = $isEmail ? $identifier : ($data['email'] ?? null);
             $phone = $isEmail ? ($data['phone'] ?? null) : $identifier;
 
-            if (! $email && $phone) {
+            $phoneStr = is_scalar($phone) ? (string) $phone : '';
+            if (! $email && $phoneStr !== '') {
                 // Generate a unique placeholder email if registering by phone and no email was provided
-                $cleanPhone = (string) preg_replace('/[^0-9]/', '', (string) $phone) ?: Str::random(10);
+                $cleanPhone = (string) preg_replace('/[^0-9]/', '', $phoneStr) ?: Str::random(10);
                 $email = "{$cleanPhone}@otp.local";
             }
 
+            $tenantIdVal = $tenantId ?? ($data['tenant_id'] ?? null);
+            $tenantIdToUse = is_scalar($tenantIdVal) ? (string) $tenantIdVal : null;
+
+            $nameVal = $data['name'] ?? '';
+            $nameStr = is_scalar($nameVal) ? (string) $nameVal : 'User';
+
+            $localeVal = $data['locale'] ?? app()->getLocale();
+            $localeStr = is_scalar($localeVal) ? (string) $localeVal : 'en';
+
             $user = $modelClass::query()->create([
-                'tenant_id' => $tenantId ?? ($data['tenant_id'] ?? null),
-                'name' => $data['name'],
+                'tenant_id' => $tenantIdToUse,
+                'name' => $nameStr,
                 'email' => $email,
                 'phone' => $phone,
                 'password' => Hash::make(Str::random(32)),
-                'locale' => $data['locale'] ?? app()->getLocale(),
+                'locale' => $localeStr,
             ]);
 
             $abilities = [];
@@ -69,13 +81,21 @@ class RegisterWithOtp
                     : $user->getPermissionsViaRoles()->pluck('name')->toArray();
             }
 
-            $token = method_exists($user, 'createToken')
-                ? $user->createToken($deviceName, $abilities)->plainTextToken
-                : '';
+            $token = '';
+            if (method_exists($user, 'createToken')) {
+                /** @var \Laravel\Sanctum\NewAccessToken $newToken */
+                $newToken = $user->createToken($deviceName, $abilities);
+                $token = $newToken->plainTextToken;
+            }
 
             // Fire events
             $this->events->publish(new UserRegisteredByOtp($user, $guard));
-            $this->audit->log('auth.registered', $user, tenantId: $user->tenant_id ?? $tenantId);
+
+            $userTenantId = null;
+            if ($user instanceof User) {
+                $userTenantId = is_scalar($user->tenant_id) ? (string) $user->tenant_id : null;
+            }
+            $this->audit->log('auth.registered', $user, tenantId: $userTenantId ?? $tenantIdToUse);
 
             return ['user' => $user, 'token' => $token];
         });

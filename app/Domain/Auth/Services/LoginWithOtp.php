@@ -52,9 +52,12 @@ class LoginWithOtp
                 : $user->getPermissionsViaRoles()->pluck('name')->toArray();
         }
 
-        $token = method_exists($user, 'createToken')
-            ? $user->createToken($deviceName, $abilities)->plainTextToken
-            : '';
+        $token = '';
+        if (method_exists($user, 'createToken')) {
+            /** @var \Laravel\Sanctum\NewAccessToken $newToken */
+            $newToken = $user->createToken($deviceName, $abilities);
+            $token = $newToken->plainTextToken;
+        }
 
         // 5. Fire Login event
         $this->events->publish(new UserLoggedInByOtp($user, $guard));

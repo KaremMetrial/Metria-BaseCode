@@ -56,13 +56,22 @@ class TerritoryController extends ApiController
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'city_id' => ['nullable', 'uuid'],
         ]);
+        $validatedArray = is_array($validated) ? $validated : [];
 
         $tenantId = $request->user()?->tenant_id;
-        $cityId = isset($validated['city_id']) && is_string($validated['city_id']) ? $validated['city_id'] : null;
+
+        $cityIdVal = $validatedArray['city_id'] ?? null;
+        $cityId = is_string($cityIdVal) ? $cityIdVal : null;
+
+        $latVal = $validatedArray['latitude'] ?? 0.0;
+        $latitude = is_numeric($latVal) ? (float) $latVal : 0.0;
+
+        $lngVal = $validatedArray['longitude'] ?? 0.0;
+        $longitude = is_numeric($lngVal) ? (float) $lngVal : 0.0;
 
         $zone = $service->resolveZoneByCoordinates(
-            (float) $validated['latitude'],
-            (float) $validated['longitude'],
+            $latitude,
+            $longitude,
             $tenantId,
             $cityId
         );

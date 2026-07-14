@@ -23,12 +23,24 @@ class FcmChannel
         }
 
         $payload = $notification->toFcm($notifiable);
+        if (! is_array($payload)) {
+            return;
+        }
+
+        $titleVal = $payload['title'] ?? '';
+        $title = is_string($titleVal) ? $titleVal : '';
+
+        $bodyVal = $payload['body'] ?? '';
+        $body = is_string($bodyVal) ? $bodyVal : '';
+
+        $dataVal = $payload['data'] ?? [];
+        $data = is_array($dataVal) ? $dataVal : [];
 
         $this->sendPush->__invoke(
             $notifiable,
-            $payload['title'],
-            $payload['body'],
-            $payload['data'] ?? []
+            $title,
+            $body,
+            $data
         );
     }
 }

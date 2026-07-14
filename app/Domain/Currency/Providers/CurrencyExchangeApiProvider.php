@@ -39,13 +39,21 @@ class CurrencyExchangeApiProvider implements ExchangeRateProviderInterface
      */
     public function fetchRate(string $currencyCode): array
     {
-        $baseUrl = rtrim((string) ($this->config['base_url'] ?? 'https://api.currencyapi.com/v3'), '/');
-        $apiKey = (string) ($this->config['api_key'] ?? '');
-        $baseCurrency = strtoupper((string) ($this->config['base_currency'] ?? 'USD'));
+        $baseUrlVal = $this->config['base_url'] ?? 'https://api.currencyapi.com/v3';
+        $baseUrl = rtrim(is_string($baseUrlVal) ? $baseUrlVal : 'https://api.currencyapi.com/v3', '/');
+
+        $apiKeyVal = $this->config['api_key'] ?? '';
+        $apiKey = is_string($apiKeyVal) ? $apiKeyVal : '';
+
+        $baseCurrencyVal = $this->config['base_currency'] ?? 'USD';
+        $baseCurrency = strtoupper(is_string($baseCurrencyVal) ? $baseCurrencyVal : 'USD');
         $targetCurrency = strtoupper($currencyCode);
 
+        $timeoutVal = $this->config['timeout'] ?? 10;
+        $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 10;
+
         $response = Http::baseUrl($baseUrl)
-            ->timeout((int) ($this->config['timeout'] ?? 10))
+            ->timeout($timeout)
             ->retry(2, 500)
             ->get('/latest', [
                 'apikey' => $apiKey,
