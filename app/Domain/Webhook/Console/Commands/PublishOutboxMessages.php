@@ -26,8 +26,13 @@ class PublishOutboxMessages extends Command
 
     public function handle(WebhookDispatcher $webhooks): int
     {
-        $batch = (int) ($this->option('batch') ?: config('governance.outbox.batch_size', 100));
-        $maxAttempts = (int) config('governance.outbox.max_attempts', 10);
+        $batchOpt = $this->option('batch');
+        $batchConfig = config('governance.outbox.batch_size', 100);
+        $batchVal = is_string($batchOpt) || is_numeric($batchOpt) ? $batchOpt : $batchConfig;
+        $batch = is_numeric($batchVal) ? (int) $batchVal : 100;
+
+        $maxAttemptsVal = config('governance.outbox.max_attempts', 10);
+        $maxAttempts = is_numeric($maxAttemptsVal) ? (int) $maxAttemptsVal : 10;
         $published = 0;
         $workerId = (string) Str::uuid();
 

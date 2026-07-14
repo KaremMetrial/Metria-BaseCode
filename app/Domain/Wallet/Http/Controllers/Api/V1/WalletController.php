@@ -27,9 +27,17 @@ class WalletController extends ApiController
         $wallet = $wallets->firstOrCreateFor($this->getAuthenticatedUser($request));
         Gate::authorize('viewTransactions', $wallet);
 
+        $perPageVal = $request->query('per_page');
+        $defaultPerPageVal = config('core.api.per_page', 20);
+        $defaultPerPage = is_numeric($defaultPerPageVal) ? (int) $defaultPerPageVal : 20;
+        $perPage = is_numeric($perPageVal) ? (int) $perPageVal : $defaultPerPage;
+
+        $maxPerPageVal = config('core.api.max_per_page', 100);
+        $maxPerPage = is_numeric($maxPerPageVal) ? (int) $maxPerPageVal : 100;
+
         $transactions = $wallet->transactions()
             ->with('wallet:id,currency')
-            ->paginate(min((int) $request->query('per_page', (string) config('core.api.per_page', 20)), (int) config('core.api.max_per_page', 100)));
+            ->paginate(min($perPage, $maxPerPage));
 
         return $this->respond(WalletTransactionResource::collection($transactions));
     }

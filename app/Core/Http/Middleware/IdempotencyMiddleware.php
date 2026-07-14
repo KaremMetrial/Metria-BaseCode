@@ -22,7 +22,8 @@ class IdempotencyMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $header = (string) config('governance.idempotency.header', 'Idempotency-Key');
+        $headerVal = config('governance.idempotency.header', 'Idempotency-Key');
+        $header = is_string($headerVal) ? $headerVal : 'Idempotency-Key';
         $key = $request->header($header);
         if (is_array($key)) {
             $key = reset($key);

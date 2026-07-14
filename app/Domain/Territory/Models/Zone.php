@@ -73,10 +73,21 @@ class Zone extends Model
         $inside = false;
         $count = count($polygon);
         for ($i = 0, $j = $count - 1; $i < $count; $j = $i++) {
-            $xi = (float) ($polygon[$i][0] ?? $polygon[$i]['lat'] ?? 0);
-            $yi = (float) ($polygon[$i][1] ?? $polygon[$i]['lng'] ?? 0);
-            $xj = (float) ($polygon[$j][0] ?? $polygon[$j]['lat'] ?? 0);
-            $yj = (float) ($polygon[$j][1] ?? $polygon[$j]['lng'] ?? 0);
+            $pi = $polygon[$i] ?? null;
+            $pj = $polygon[$j] ?? null;
+            if (! is_array($pi) || ! is_array($pj)) {
+                continue;
+            }
+
+            $xiVal = $pi[0] ?? $pi['lat'] ?? 0;
+            $yiVal = $pi[1] ?? $pi['lng'] ?? 0;
+            $xjVal = $pj[0] ?? $pj['lat'] ?? 0;
+            $yjVal = $pj[1] ?? $pj['lng'] ?? 0;
+
+            $xi = is_numeric($xiVal) ? (float) $xiVal : 0.0;
+            $yi = is_numeric($yiVal) ? (float) $yiVal : 0.0;
+            $xj = is_numeric($xjVal) ? (float) $xjVal : 0.0;
+            $yj = is_numeric($yjVal) ? (float) $yjVal : 0.0;
 
             $intersect = (($yi > $lng) !== ($yj > $lng))
                 && ($lat < ($xj - $xi) * ($lng - $yi) / (($yj - $yi) ?: 0.00000001) + $xi);

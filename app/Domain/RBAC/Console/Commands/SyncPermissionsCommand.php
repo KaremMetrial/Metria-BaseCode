@@ -17,23 +17,28 @@ class SyncPermissionsCommand extends Command
 
     public function handle(AuthorizationCache $cache): int
     {
-        $guard = $this->option('guard') ?: config('auth.defaults.guard', 'web');
+        $guardOpt = $this->option('guard');
+        $guard = is_string($guardOpt) && $guardOpt !== '' ? $guardOpt : config('auth.defaults.guard', 'web');
+        $guard = is_string($guard) ? $guard : 'web';
+
         $this->info("Syncing permissions from PermissionRegistry for guard: {$guard}...");
 
-        $registeredPermissions = PermissionRegistry::all();
-        $existingPermissions = Permission::where('guard_name', $guard)->pluck('name')->toArray();
+        $registeredPermissions = array_map(fn ($v) => is_scalar($v) ? (string) $v : '', PermissionRegistry::all());
+        $existingPermissions = array_map(fn ($v) => is_scalar($v) ? (string) $v : '', Permission::where('guard_name', $guard)->pluck('name')->toArray());
 
         $toAdd = array_diff($registeredPermissions, $existingPermissions);
         $toRemove = array_diff($existingPermissions, $registeredPermissions);
 
         foreach ($toAdd as $name) {
-            Permission::create(['name' => $name, 'guard_name' => $guard]);
-            $this->line("<info>Created:</info> {$name} ({$guard})");
+            $nameStr = (string) $name;
+            Permission::create(['name' => $nameStr, 'guard_name' => $guard]);
+            $this->line("<info>Created:</info> {$nameStr} ({$guard})");
         }
 
         foreach ($toRemove as $name) {
-            Permission::where('name', $name)->delete();
-            $this->line("<error>Deleted:</error> {$name}");
+            $nameStr = (string) $name;
+            Permission::where('name', $nameStr)->delete();
+            $this->line("<error>Deleted:</error> {$nameStr}");
         }
 
         if (empty($toAdd) && empty($toRemove)) {

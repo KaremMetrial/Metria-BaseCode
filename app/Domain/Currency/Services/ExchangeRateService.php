@@ -38,7 +38,8 @@ class ExchangeRateService
         }
 
         // Stale rate check
-        $thresholdHours = config('currencies.stale_rate_threshold_hours', 24);
+        $thresholdHoursVal = config('currencies.stale_rate_threshold_hours', 24);
+        $thresholdHours = is_numeric($thresholdHoursVal) ? (int) $thresholdHoursVal : 24;
         $expirationWithGrace = Carbon::instance($rate->expires_at)->addHours($thresholdHours);
 
         if (Carbon::instance($at)->greaterThan($expirationWithGrace)) {

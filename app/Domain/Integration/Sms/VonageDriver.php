@@ -18,29 +18,41 @@ class VonageDriver implements SmsProvider
 
     public function send(string $to, string $message): string
     {
-        return CircuitBreaker::make()->call('vonage', function () use ($to, $message) {
+        $result = CircuitBreaker::make()->call('vonage', function () use ($to, $message) {
+            $timeoutVal = config('integrations.http.timeout', 15);
+            $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+
+            $appNameVal = config('app.name');
+            $appName = is_string($appNameVal) ? $appNameVal : 'Laravel';
+
             $response = Http::asForm()
-                ->timeout((int) config('integrations.http.timeout', 15))
+                ->timeout($timeout)
                 ->post('https://rest.nexmo.com/sms/json', [
                     'api_key' => (string) ($this->config['key'] ?? ''),
                     'api_secret' => (string) ($this->config['secret'] ?? ''),
-                    'from' => (string) ($this->config['from'] ?? config('app.name')),
+                    'from' => (string) ($this->config['from'] ?? $appName),
                     'to' => ltrim($to, '+'),
                     'text' => $message,
                     'type' => 'unicode', // Arabic-safe
                 ]);
 
-            $status = (string) data_get($response->json(), 'messages.0.status', '');
+            $statusVal = data_get($response->json(), 'messages.0.status', '');
+            $status = is_scalar($statusVal) ? (string) $statusVal : '';
 
             if ($response->failed() || $status !== '0') {
+                $errTextVal = data_get($response->json(), 'messages.0.error-text');
+                $errText = is_string($errTextVal) ? $errTextVal : __('integrations.sms_send_failed', ['provider' => 'vonage']);
                 throw new IntegrationException(
-                    (string) data_get($response->json(), 'messages.0.error-text', __('integrations.sms_send_failed', ['provider' => 'vonage'])),
+                    $errText,
                     provider: 'vonage',
                     context: ['status' => $response->status(), 'provider_status' => $status],
                 );
             }
 
-            return (string) data_get($response->json(), 'messages.0.message-id', '');
+            $msgIdVal = data_get($response->json(), 'messages.0.message-id', '');
+            return is_scalar($msgIdVal) ? (string) $msgIdVal : '';
         });
+
+        return is_string($result) ? $result : '';
     }
 }

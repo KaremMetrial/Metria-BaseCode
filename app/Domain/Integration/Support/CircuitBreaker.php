@@ -21,10 +21,13 @@ class CircuitBreaker
 
     public static function make(): self
     {
-        return new self(
-            (int) config('integrations.circuit_breaker.failure_threshold', 5),
-            (int) config('integrations.circuit_breaker.cooldown_seconds', 60),
-        );
+        $thresholdVal = config('integrations.circuit_breaker.failure_threshold', 5);
+        $threshold = is_numeric($thresholdVal) ? (int) $thresholdVal : 5;
+
+        $cooldownVal = config('integrations.circuit_breaker.cooldown_seconds', 60);
+        $cooldown = is_numeric($cooldownVal) ? (int) $cooldownVal : 60;
+
+        return new self($threshold, $cooldown);
     }
 
     public function isOpen(string $service): bool

@@ -34,7 +34,7 @@ class SetLocale
 
         $locale = (is_string($langQuery) && $langQuery !== '') ? $langQuery : ($userLocale ?? $preferred ?? $fallback);
 
-        if (! is_string($locale) || ! in_array($locale, $supported, true)) {
+        if (! in_array($locale, $supported, true)) {
             $locale = $fallback;
         }
 

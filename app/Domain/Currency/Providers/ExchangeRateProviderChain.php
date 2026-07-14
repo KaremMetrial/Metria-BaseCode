@@ -27,10 +27,15 @@ class ExchangeRateProviderChain
      */
     public function fetchRate(string $currencyCode): array
     {
-        $primary = config('currencies.providers.primary');
-        $failovers = config('currencies.providers.failovers', []);
+        $primaryVal = config('currencies.providers.primary');
+        $primary = is_string($primaryVal) ? $primaryVal : '';
 
-        $orderedList = array_filter(array_merge([$primary], $failovers));
+        $failoversVal = config('currencies.providers.failovers', []);
+        $failovers = is_array($failoversVal) ? array_filter($failoversVal, 'is_string') : [];
+
+        $rawList = array_merge([$primary], $failovers);
+        /** @var array<string> $orderedList */
+        $orderedList = array_values(array_filter($rawList, fn ($v) => is_string($v) && $v !== ''));
         $errors = [];
 
         foreach ($orderedList as $providerName) {

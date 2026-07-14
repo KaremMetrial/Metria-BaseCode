@@ -31,7 +31,8 @@ class ResolveTenant
             }
         }
 
-        $headerName = (string) config('tenancy.header', 'X-Tenant-ID');
+        $headerNameVal = config('tenancy.header', 'X-Tenant-ID');
+        $headerName = is_string($headerNameVal) ? $headerNameVal : 'X-Tenant-ID';
         $h1 = $request->header($headerName);
         $headerVal = is_array($h1) ? reset($h1) : $h1;
 

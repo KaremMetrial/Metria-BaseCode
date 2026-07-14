@@ -45,7 +45,7 @@ class SyncRolePermissionsAction
             }
 
             // Pluck the exact final permissions for the event payload
-            $finalPermissions = $role->permissions()->pluck('name')->toArray();
+            $finalPermissions = array_map(fn ($v) => is_scalar($v) ? (string) $v : '', $role->permissions()->pluck('name')->toArray());
 
             $this->eventBus->publish(new RolePermissionsUpdated($role, $finalPermissions));
 

@@ -19,17 +19,20 @@ class SmsManager extends Manager
 {
     public function getDefaultDriver(): string
     {
-        return $this->config->get('integrations.sms.default', 'log');
+        $default = $this->config->get('integrations.sms.default', 'log');
+        return is_string($default) ? $default : 'log';
     }
 
     protected function createTwilioDriver(): SmsProvider
     {
-        return new TwilioDriver($this->config->get('integrations.sms.twilio', []));
+        $config = $this->config->get('integrations.sms.twilio', []);
+        return new TwilioDriver(is_array($config) ? $config : []);
     }
 
     protected function createVonageDriver(): SmsProvider
     {
-        return new VonageDriver($this->config->get('integrations.sms.vonage', []));
+        $config = $this->config->get('integrations.sms.vonage', []);
+        return new VonageDriver(is_array($config) ? $config : []);
     }
 
     protected function createLogDriver(): SmsProvider

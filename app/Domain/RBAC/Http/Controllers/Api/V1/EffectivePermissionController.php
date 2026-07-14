@@ -18,9 +18,9 @@ class EffectivePermissionController extends ApiController
             $this->authorize('rbac.permissions.view');
         }
 
-        $roles = $user->roles()->pluck('name')->toArray();
-        $directPermissions = $user->getDirectPermissions()->pluck('name')->toArray();
-        $allPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+        $roles = array_map(fn ($v) => is_scalar($v) ? (string) $v : '', $user->roles()->pluck('name')->toArray());
+        $directPermissions = array_map(fn ($v) => is_scalar($v) ? (string) $v : '', $user->getDirectPermissions()->pluck('name')->toArray());
+        $allPermissions = array_map(fn ($v) => is_scalar($v) ? (string) $v : '', $user->getAllPermissions()->pluck('name')->toArray());
 
         // Build the source map
         $sourceMap = [];

@@ -28,7 +28,9 @@ class CurrencyConversionService
     {
         $sourceCurrency = strtoupper($money->currency);
         $targetCurrency = strtoupper($targetCurrency);
-        $roundingMode ??= $this->resolveRoundingMode(config('currencies.default_rounding_mode'));
+        $defaultModeVal = config('currencies.default_rounding_mode', 'half_even');
+        $defaultMode = is_string($defaultModeVal) ? $defaultModeVal : 'half_even';
+        $roundingMode ??= $this->resolveRoundingMode($defaultMode);
 
         if ($sourceCurrency === $targetCurrency) {
             return [
@@ -97,7 +99,7 @@ class CurrencyConversionService
             'snapshot' => [
                 'source_currency' => $sourceCurrency,
                 'target_currency' => $targetCurrency,
-                'exchange_rate' => self::bcRound($exchangeRate, config('currencies.scale', 14), PHP_ROUND_HALF_UP),
+                'exchange_rate' => self::bcRound($exchangeRate, is_numeric($scale = config('currencies.scale', 14)) ? (int) $scale : 14, PHP_ROUND_HALF_UP),
                 'rate_provider' => $providerName,
                 'rate_provider_version' => $providerVersion,
                 'conversion_direction' => ($targetCurrency === $baseCurrencyCode) ? 'multiply' : (($sourceCurrency === $baseCurrencyCode) ? 'divide' : 'cross'),

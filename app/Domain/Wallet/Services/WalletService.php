@@ -32,11 +32,15 @@ class WalletService
 
     public function firstOrCreateFor(User $user, ?string $currency = null): Wallet
     {
+        $defaultCurrencyVal = config('payments.currency', 'EGP');
+        $defaultCurrency = is_string($defaultCurrencyVal) ? $defaultCurrencyVal : 'EGP';
+        $currencyStr = strtoupper($currency ?? $defaultCurrency);
+
         return Wallet::query()->withoutGlobalScopes()->firstOrCreate(
             ['user_id' => $user->id],
             [
                 'tenant_id' => $user->getAttributes()['tenant_id'] ?? null,
-                'currency' => strtoupper($currency ?? config('payments.currency', 'EGP')),
+                'currency' => $currencyStr,
                 'balance' => 0,
                 'held' => 0,
             ],
@@ -122,7 +126,12 @@ class WalletService
         DB::transaction(function () use ($from, $to, $amount, $description, $reference) {
             // Acquire BOTH locks once, in deterministic key order to prevent deadlocks.
             // Do NOT call captureHold/credit here — they would re-lock the same rows.
-            if (strcmp((string) $from->getKey(), (string) $to->getKey()) < 0) {
+            $fromKeyVal = $from->getKey();
+            $toKeyVal = $to->getKey();
+            $fromKey = is_scalar($fromKeyVal) ? (string) $fromKeyVal : '';
+            $toKey = is_scalar($toKeyVal) ? (string) $toKeyVal : '';
+
+            if (strcmp($fromKey, $toKey) < 0) {
                 $lockedFrom = $this->locked($from);
                 $lockedTo = $this->locked($to);
             } else {

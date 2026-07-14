@@ -29,7 +29,8 @@ class CurrencyRegistryResolverImpl implements CurrencyRegistryResolver
             }
 
             // Fallback to configuration
-            return (int) (config("payments.minor_units.{$currency}") ?? 2);
+            $minorUnitsVal = config("payments.minor_units.{$currency}");
+            return is_numeric($minorUnitsVal) ? (int) $minorUnitsVal : 2;
         });
     }
 

@@ -64,8 +64,10 @@ class RolePolicy
     private function getUserHighestPriority(User $user): int
     {
         // Lower number = higher power. Default to 100 (lowest)
-        return $user->roles()->with('metadata')->get()->min(function ($role) {
-            return $role->metadata->priority ?? 100;
-        }) ?? 100;
+        $min = $user->roles()->with('metadata')->get()->min(function ($role) {
+            $priority = $role->metadata->priority ?? 100;
+            return is_numeric($priority) ? (int) $priority : 100;
+        });
+        return is_numeric($min) ? (int) $min : 100;
     }
 }

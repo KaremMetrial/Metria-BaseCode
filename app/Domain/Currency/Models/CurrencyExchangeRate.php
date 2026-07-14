@@ -47,8 +47,11 @@ class CurrencyExchangeRate extends Model
 
     protected function casts(): array
     {
+        $scaleVal = config('currencies.scale', 14);
+        $scale = is_numeric($scaleVal) ? (int) $scaleVal : 14;
+
         return [
-            'rate_to_base' => 'decimal:'.config('currencies.scale', 14),
+            'rate_to_base' => 'decimal:'.$scale,
             'is_manual' => 'boolean',
             'is_locked' => 'boolean',
             'effective_at' => 'datetime',

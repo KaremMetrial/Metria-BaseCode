@@ -39,13 +39,16 @@ class DeliverWebhook implements ShouldQueue
 
     public function tries(): int
     {
-        return (int) config('integrations.webhooks.max_tries', 5);
+        $maxTriesVal = config('integrations.webhooks.max_tries', 5);
+        return is_numeric($maxTriesVal) ? (int) $maxTriesVal : 5;
     }
 
     /** @return array<int, int> */
     public function backoff(): array
     {
-        return (array) config('integrations.webhooks.backoff', [60, 300, 1800, 7200]);
+        $backoffVal = config('integrations.webhooks.backoff', [60, 300, 1800, 7200]);
+        $backoff = is_array($backoffVal) ? $backoffVal : [60, 300, 1800, 7200];
+        return array_map(fn ($v) => is_numeric($v) ? (int) $v : 0, $backoff);
     }
 
     public function retryUntil(): \DateTimeInterface
@@ -76,15 +79,20 @@ class DeliverWebhook implements ShouldQueue
 
         $delivery->increment('attempts');
 
+        $appNameVal = config('app.name');
+        $appName = is_string($appNameVal) ? $appNameVal : 'Laravel';
+        $timeoutVal = config('integrations.webhooks.timeout', 10);
+        $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 10;
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-            'User-Agent' => config('app.name').'-Webhooks/1.0',
+            'User-Agent' => $appName.'-Webhooks/1.0',
             'X-Webhook-Id' => $delivery->id,
             'X-Webhook-Event' => $delivery->event,
             'X-Webhook-Timestamp' => (string) $timestamp,
             'X-Webhook-Signature' => "t={$timestamp},v1={$signature}",
         ])
-            ->timeout((int) config('integrations.webhooks.timeout', 10))
+            ->timeout($timeout)
             ->withBody($body, 'application/json')
             ->post($endpoint->url);
 

@@ -42,7 +42,10 @@ class FcmPushProvider
         if (is_string($credentials) && ! empty($credentials)) {
             // Check if it's a valid JSON string or file path
             if (str_starts_with(trim($credentials), '{')) {
-                $factory = $factory->withServiceAccount(json_decode($credentials, true));
+                $decoded = json_decode($credentials, true);
+                if (is_array($decoded)) {
+                    $factory = $factory->withServiceAccount($decoded);
+                }
             } else {
                 $factory = $factory->withServiceAccount($credentials);
             }
@@ -57,7 +60,7 @@ class FcmPushProvider
 
     public function send(string $deviceToken, string $title, string $body, array $data = []): string
     {
-        return CircuitBreaker::make()->call('fcm', function () use ($deviceToken, $title, $body, $data) {
+        $result = CircuitBreaker::make()->call('fcm', function () use ($deviceToken, $title, $body, $data) {
             try {
                 if ($deviceToken === '') {
                     throw new IntegrationException(__('integrations.push_send_failed', ['provider' => 'fcm', 'default' => 'Empty device token']), provider: 'fcm');
@@ -82,15 +85,17 @@ class FcmPushProvider
                     $message = $message->withData($cleanData);
                 }
 
-                $result = $this->getMessaging()->send($message);
+                $res = $this->getMessaging()->send($message);
 
                 /** @phpstan-ignore function.alreadyNarrowedType */
-                return is_array($result) ? ($result['name'] ?? 'sent') : (string) $result;
+                return is_array($res) ? ($res['name'] ?? 'sent') : (string) $res;
             } catch (Throwable $e) {
                 throw new IntegrationException(__('integrations.push_send_failed', ['provider' => 'fcm']), provider: 'fcm', context: [
                     'error' => $e->getMessage(),
                 ], previous: $e);
             }
         });
+
+        return is_string($result) ? $result : '';
     }
 }

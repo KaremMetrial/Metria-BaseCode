@@ -40,11 +40,22 @@ class CurrencyFormatter
         }
 
         // Fallback layout using static configuration if intl is unavailable
-        $fallbackConfig = config("currencies.formatting.{$currencyCode}", [
+        $fallbackConfigVal = config("currencies.formatting.{$currencyCode}", [
             'decimal_separator' => '.',
             'thousands_separator' => ',',
             'symbol_placement' => 'before',
         ]);
+        $fallbackConfig = is_array($fallbackConfigVal) ? $fallbackConfigVal : [
+            'decimal_separator' => '.',
+            'thousands_separator' => ',',
+            'symbol_placement' => 'before',
+        ];
+
+        $decSepVal = $fallbackConfig['decimal_separator'] ?? '.';
+        $decSep = is_string($decSepVal) ? $decSepVal : '.';
+
+        $thousandSepVal = $fallbackConfig['thousands_separator'] ?? ',';
+        $thousandSep = is_string($thousandSepVal) ? $thousandSepVal : ',';
 
         $minorUnits = $this->resolver->minorUnitsFor($currencyCode);
         $symbol = $currencyCode; // Fallback symbol is ISO code itself
@@ -52,11 +63,12 @@ class CurrencyFormatter
         $numberPart = number_format(
             $decimalValue,
             $minorUnits,
-            $fallbackConfig['decimal_separator'] ?? '.',
-            $fallbackConfig['thousands_separator'] ?? ','
+            $decSep,
+            $thousandSep
         );
 
-        $placement = $fallbackConfig['symbol_placement'] ?? 'before';
+        $placementVal = $fallbackConfig['symbol_placement'] ?? 'before';
+        $placement = is_string($placementVal) ? $placementVal : 'before';
 
         return $placement === 'before'
             ? "{$symbol} {$numberPart}"

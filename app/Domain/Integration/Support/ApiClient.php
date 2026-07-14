@@ -41,7 +41,7 @@ abstract class ApiClient
     {
         $breaker = CircuitBreaker::make();
 
-        return $breaker->call($this->service(), function () use ($method, $uri, $data) {
+        $response = $breaker->call($this->service(), function () use ($method, $uri, $data) {
             try {
                 /** @var Response $response */
                 $response = $this->request()->{$method}($uri, $data);
@@ -70,17 +70,32 @@ abstract class ApiClient
 
             return $response;
         });
+
+        if (! $response instanceof Response) {
+            throw new IntegrationException('Invalid response class returned from circuit breaker call.', provider: $this->service());
+        }
+
+        return $response;
     }
 
     protected function request(): PendingRequest
     {
+        $timeoutVal = config('integrations.http.timeout', 15);
+        $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+
+        $retriesVal = config('integrations.http.retries', 2);
+        $retries = is_numeric($retriesVal) ? (int) $retriesVal : 2;
+
+        $retryDelayVal = config('integrations.http.retry_delay_ms', 250);
+        $retryDelay = is_numeric($retryDelayVal) ? (int) $retryDelayVal : 250;
+
         return $this->configureRequest(
             Http::baseUrl($this->baseUrl())
                 ->acceptJson()
-                ->timeout((int) config('integrations.http.timeout', 15))
+                ->timeout($timeout)
                 ->retry(
-                    (int) config('integrations.http.retries', 2),
-                    (int) config('integrations.http.retry_delay_ms', 250),
+                    $retries,
+                    $retryDelay,
                     throw: false,
                 ),
         );

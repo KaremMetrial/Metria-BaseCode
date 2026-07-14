@@ -27,7 +27,8 @@ class CurrencyServiceProvider extends ServiceProvider
 
         $this->app->singleton(ExchangeRateProviderChain::class, function ($app) {
             $chain = new ExchangeRateProviderChain;
-            $chain->registerProvider('currency_exchange_api', new CurrencyExchangeApiProvider(config('currencies.api', [])));
+            $apiConfig = config('currencies.api', []);
+            $chain->registerProvider('currency_exchange_api', new CurrencyExchangeApiProvider(is_array($apiConfig) ? $apiConfig : []));
             $chain->registerProvider('mock', new MockExchangeRateProvider);
 
             return $chain;

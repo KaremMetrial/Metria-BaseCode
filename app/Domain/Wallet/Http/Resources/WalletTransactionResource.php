@@ -13,7 +13,8 @@ class WalletTransactionResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $currency = $this->wallet !== null ? $this->wallet->currency : config('payments.currency', 'EGP');
+        $currencyVal = $this->wallet !== null ? $this->wallet->currency : config('payments.currency', 'EGP');
+        $currency = is_string($currencyVal) ? $currencyVal : 'EGP';
 
         return [
             'id' => $this->id,

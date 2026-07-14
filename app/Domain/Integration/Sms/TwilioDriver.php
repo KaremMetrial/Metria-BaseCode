@@ -18,12 +18,14 @@ class TwilioDriver implements SmsProvider
 
     public function send(string $to, string $message): string
     {
-        return CircuitBreaker::make()->call('twilio', function () use ($to, $message) {
+        $result = CircuitBreaker::make()->call('twilio', function () use ($to, $message) {
             $sid = (string) ($this->config['sid'] ?? '');
+            $timeoutVal = config('integrations.http.timeout', 15);
+            $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
 
             $response = Http::withBasicAuth($sid, (string) ($this->config['token'] ?? ''))
                 ->asForm()
-                ->timeout((int) config('integrations.http.timeout', 15))
+                ->timeout($timeout)
                 ->post("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json", [
                     'To' => $to,
                     'From' => (string) ($this->config['from'] ?? ''),
@@ -31,14 +33,19 @@ class TwilioDriver implements SmsProvider
                 ]);
 
             if ($response->failed()) {
+                $msgVal = $response->json('message');
+                $msg = is_string($msgVal) ? $msgVal : __('integrations.sms_send_failed', ['provider' => 'twilio']);
                 throw new IntegrationException(
-                    (string) $response->json('message', __('integrations.sms_send_failed', ['provider' => 'twilio'])),
+                    $msg,
                     provider: 'twilio',
                     context: ['status' => $response->status()],
                 );
             }
 
-            return (string) $response->json('sid');
+            $sidVal = $response->json('sid');
+            return is_string($sidVal) ? $sidVal : '';
         });
+
+        return is_string($result) ? $result : '';
     }
 }
