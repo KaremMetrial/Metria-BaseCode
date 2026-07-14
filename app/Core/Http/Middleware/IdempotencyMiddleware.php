@@ -22,7 +22,7 @@ class IdempotencyMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $header = config('governance.idempotency.header', 'Idempotency-Key');
+        $header = (string) config('governance.idempotency.header', 'Idempotency-Key');
         $key = $request->header($header);
         if (is_array($key)) {
             $key = reset($key);
@@ -32,17 +32,21 @@ class IdempotencyMiddleware
             return $next($request);
         }
 
+        $userId = $request->user()?->getAuthIdentifier();
         $scope = hash('sha256', implode('|', [
             $key,
             $request->method(),
             $request->path(),
-            (string) $request->user()?->getAuthIdentifier(),
+            is_scalar($userId) ? (string) $userId : '',
             (string) app(TenantManager::class)->id(),
         ]));
 
+        $ttlHours = config('governance.idempotency.ttl_hours', 24);
+        $ttlHoursInt = is_numeric($ttlHours) ? (int) $ttlHours : 24;
+
         $existing = IdempotencyKey::query()
             ->where('scope_hash', $scope)
-            ->where('created_at', '>=', now()->subHours((int) config('governance.idempotency.ttl_hours', 24)))
+            ->where('created_at', '>=', now()->subHours($ttlHoursInt))
             ->first();
 
         if ($existing) {

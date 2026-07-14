@@ -43,7 +43,12 @@ class ApprovalService
 
     public function approve(ApprovalRequest $request, User $approver): ApprovalRequest
     {
-        if ((string) $request->requested_by === (string) $approver->getKey() && ! $approver->can('admin.super')) {
+        $requestedByVal = $request->requested_by;
+        $requestedBy = is_scalar($requestedByVal) ? (string) $requestedByVal : '';
+        $approverKeyVal = $approver->getKey();
+        $approverKey = is_scalar($approverKeyVal) ? (string) $approverKeyVal : '';
+
+        if ($requestedBy === $approverKey && ! $approver->can('admin.super')) {
             throw new DomainException(__('governance.cannot_approve_own_request'), 'self_approval_forbidden');
         }
 
@@ -126,13 +131,16 @@ class ApprovalService
 
     private function assertActionRegistered(string $action): void
     {
-        if (! array_key_exists($action, config('governance.approvals.handlers', []))) {
+        $handlers = config('governance.approvals.handlers', []);
+        if (! is_array($handlers) || ! array_key_exists($action, $handlers)) {
             throw new DomainException(__('governance.unknown_action', ['action' => $action]), 'unknown_approval_action');
         }
     }
 
     private function handlerFor(string $action): string
     {
-        return config('governance.approvals.handlers')[$action];
+        $handlers = config('governance.approvals.handlers', []);
+        $handler = is_array($handlers) ? ($handlers[$action] ?? '') : '';
+        return is_string($handler) ? $handler : '';
     }
 }

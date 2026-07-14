@@ -46,9 +46,11 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function paginate(?int $perPage = null, ?string $tenantId = null): LengthAwarePaginator
     {
+        $configPerPage = config('core.api.per_page', 20);
+        $configMaxPerPage = config('core.api.max_per_page', 100);
         $perPage = min(
-            $perPage ?? (int) config('core.api.per_page', 20),
-            (int) config('core.api.max_per_page', 100),
+            $perPage ?? (is_numeric($configPerPage) ? (int) $configPerPage : 20),
+            is_numeric($configMaxPerPage) ? (int) $configMaxPerPage : 100,
         );
 
         return $this->query($tenantId)->latest()->paginate($perPage);
@@ -61,9 +63,11 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function getFiltered(QueryFilter $filter, ?int $perPage = null, ?string $tenantId = null): LengthAwarePaginator
     {
+        $configPerPage = config('core.api.per_page', 20);
+        $configMaxPerPage = config('core.api.max_per_page', 100);
         $perPage = min(
-            $perPage ?? (int) config('core.api.per_page', 20),
-            (int) config('core.api.max_per_page', 100),
+            $perPage ?? (is_numeric($configPerPage) ? (int) $configPerPage : 20),
+            is_numeric($configMaxPerPage) ? (int) $configMaxPerPage : 100,
         );
 
         return $this->filter($filter, $tenantId)->paginate($perPage);

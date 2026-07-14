@@ -22,9 +22,11 @@ class AuthPipeline
      */
     public function execute(AuthContext $context): AuthContext
     {
-        return $this->pipeline
+        $result = $this->pipeline
             ->send($context)
             ->through($this->pipes)
             ->thenReturn();
+
+        return $result instanceof AuthContext ? $result : $context;
     }
 }

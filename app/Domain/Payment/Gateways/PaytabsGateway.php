@@ -54,18 +54,26 @@ class PaytabsGateway implements PaymentGateway
         ]);
 
         if ($response->failed() || ! $response->json('tran_ref')) {
+            $msgVal = $response->json('message');
+            $msg = is_scalar($msgVal) ? (string) $msgVal : null;
             throw new PaymentException(
-                (string) $response->json('message', __('payments.gateway_creation_failed', ['gateway' => 'paytabs'])),
+                $msg ?? __('payments.gateway_creation_failed', ['gateway' => 'paytabs']),
                 context: ['gateway' => 'paytabs', 'status' => $response->status(), 'body' => $response->json()],
             );
         }
 
+        $tranRefVal = $response->json('tran_ref');
+        $tranRef = is_scalar($tranRefVal) ? (string) $tranRefVal : '';
+        $redirectUrlVal = $response->json('redirect_url');
+        $redirectUrl = is_scalar($redirectUrlVal) ? (string) $redirectUrlVal : '';
+        $rawResponse = $response->json();
+
         return new PaymentResult(
             success: true,
             status: PaymentStatus::Processing,
-            gatewayReference: (string) $response->json('tran_ref'),
-            redirectUrl: (string) $response->json('redirect_url'),
-            raw: $response->json() ?? [],
+            gatewayReference: $tranRef,
+            redirectUrl: $redirectUrl,
+            raw: is_array($rawResponse) ? $rawResponse : [],
         );
     }
 
@@ -83,7 +91,8 @@ class PaytabsGateway implements PaymentGateway
 
     public function parseWebhook(Request $request): WebhookResult
     {
-        $tranRef = (string) $request->input('tran_ref', '');
+        $tranRefVal = $request->input('tran_ref', '');
+        $tranRef = is_scalar($tranRefVal) ? (string) $tranRefVal : '';
 
         // Defence in depth: trust the queried state, not the pushed payload.
         $query = $this->http()->post('/payment/query', [
@@ -91,11 +100,14 @@ class PaytabsGateway implements PaymentGateway
             'tran_ref' => $tranRef,
         ]);
 
-        $data = $query->successful() ? ($query->json() ?? []) : $request->all();
+        $rawQuery = $query->json();
+        $data = $query->successful() && is_array($rawQuery) ? $rawQuery : $request->all();
 
         // response_status: A=authorised, H=hold, P=pending, V=voided,
         // E=error, D=declined, X=expired (per PayTabs transaction API docs).
-        $status = match (strtoupper((string) data_get($data, 'payment_result.response_status', ''))) {
+        $respStatusVal = data_get($data, 'payment_result.response_status', '');
+        $respStatus = is_scalar($respStatusVal) ? (string) $respStatusVal : '';
+        $status = match (strtoupper($respStatus)) {
             'A' => PaymentStatus::Succeeded,
             'H', 'P' => PaymentStatus::Processing,
             'V' => PaymentStatus::Refunded,
@@ -126,31 +138,43 @@ class PaytabsGateway implements PaymentGateway
             'cart_description' => 'Refund for '.$payment->id,
         ]);
 
-        $ok = $response->successful()
-            && strtoupper((string) data_get($response->json(), 'payment_result.response_status', '')) === 'A';
+        $jsonResponse = $response->json();
+        $respStatusVal = is_array($jsonResponse) ? data_get($jsonResponse, 'payment_result.response_status', '') : '';
+        $respStatus = is_scalar($respStatusVal) ? (string) $respStatusVal : '';
+
+        $ok = $response->successful() && strtoupper($respStatus) === 'A';
 
         if (! $ok) {
+            $respMsgVal = is_array($jsonResponse) ? data_get($jsonResponse, 'payment_result.response_message') : null;
+            $respMsg = is_scalar($respMsgVal) ? (string) $respMsgVal : null;
             throw new PaymentException(
-                (string) data_get($response->json(), 'payment_result.response_message', __('payments.gateway_refund_failed', ['gateway' => 'paytabs'])),
-                context: ['gateway' => 'paytabs', 'status' => $response->status(), 'body' => $response->json()],
+                $respMsg ?? __('payments.gateway_refund_failed', ['gateway' => 'paytabs']),
+                context: ['gateway' => 'paytabs', 'status' => $response->status(), 'body' => $jsonResponse],
             );
         }
+
+        $refundTranRefVal = $response->json('tran_ref');
+        $refundTranRef = is_scalar($refundTranRefVal) ? (string) $refundTranRefVal : '';
+        $rawRefundJson = $response->json();
 
         return new PaymentResult(
             success: true,
             status: $refund->amount < $payment->amount
                 ? PaymentStatus::PartiallyRefunded
                 : PaymentStatus::Refunded,
-            gatewayReference: (string) $response->json('tran_ref'),
-            raw: $response->json() ?? [],
+            gatewayReference: $refundTranRef,
+            raw: is_array($rawRefundJson) ? $rawRefundJson : [],
         );
     }
 
     private function http(): PendingRequest
     {
+        $timeoutVal = config('integrations.http.timeout', 15);
+        $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+
         return Http::baseUrl((string) ($this->config['base_url'] ?? 'https://secure-egypt.paytabs.com'))
             ->withHeaders(['authorization' => (string) ($this->config['server_key'] ?? '')])
             ->acceptJson()
-            ->timeout((int) config('integrations.http.timeout', 15));
+            ->timeout($timeout);
     }
 }

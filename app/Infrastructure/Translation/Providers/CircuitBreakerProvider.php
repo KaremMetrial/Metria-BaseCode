@@ -52,7 +52,10 @@ class CircuitBreakerProvider implements TranslationProviderInterface
 
         if ($state === 'open') {
             $openUntil = Cache::get("translation:cb:open_until:{$this->name()}");
-            $retryAfter = $openUntil ? Carbon::createFromTimestamp($openUntil) : null;
+            $retryAfter = null;
+            if (is_numeric($openUntil)) {
+                $retryAfter = Carbon::createFromTimestamp((int) $openUntil);
+            }
 
             return new ProviderHealth(
                 ProviderState::Offline,
@@ -78,10 +81,11 @@ class CircuitBreakerProvider implements TranslationProviderInterface
 
     private function getCircuitState(): string
     {
-        $state = Cache::get("translation:cb:state:{$this->name()}", 'closed');
+        $stateVal = Cache::get("translation:cb:state:{$this->name()}", 'closed');
+        $state = is_string($stateVal) ? $stateVal : 'closed';
         if ($state === 'open') {
             $openUntil = Cache::get("translation:cb:open_until:{$this->name()}");
-            if ($openUntil && now()->timestamp > $openUntil) {
+            if (is_numeric($openUntil) && now()->timestamp > (int) $openUntil) {
                 Cache::put("translation:cb:state:{$this->name()}", 'half_open');
 
                 return 'half_open';
@@ -99,7 +103,8 @@ class CircuitBreakerProvider implements TranslationProviderInterface
 
     private function recordFailure(): void
     {
-        $failures = Cache::get("translation:cb:failures:{$this->name()}", 0) + 1;
+        $failuresVal = Cache::get("translation:cb:failures:{$this->name()}", 0);
+        $failures = (is_numeric($failuresVal) ? (int) $failuresVal : 0) + 1;
         Cache::put("translation:cb:failures:{$this->name()}", $failures, 3600);
 
         if ($failures >= $this->failureThreshold) {

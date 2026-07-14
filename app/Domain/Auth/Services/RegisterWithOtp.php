@@ -33,8 +33,11 @@ class RegisterWithOtp
         $this->verifyOtp->__invoke($identifier, $code, 'register', $guard);
 
         // 2. Resolve the model class for the guard
-        $provider = config("auth.guards.{$guard}.provider");
-        $modelClass = config("auth.providers.{$provider}.model") ?? User::class;
+        $providerVal = config("auth.guards.{$guard}.provider");
+        $provider = is_string($providerVal) ? $providerVal : 'users';
+        $modelClassVal = config("auth.providers.{$provider}.model");
+        /** @var class-string<Model> $modelClass */
+        $modelClass = is_string($modelClassVal) && class_exists($modelClassVal) ? $modelClassVal : User::class;
 
         // 3. Create the account inside a transaction
         return DB::transaction(function () use ($data, $identifier, $modelClass, $guard, $deviceName, $tenantId) {
@@ -66,7 +69,9 @@ class RegisterWithOtp
                     : $user->getPermissionsViaRoles()->pluck('name')->toArray();
             }
 
-            $token = $user->createToken($deviceName, $abilities)->plainTextToken;
+            $token = method_exists($user, 'createToken')
+                ? $user->createToken($deviceName, $abilities)->plainTextToken
+                : '';
 
             // Fire events
             $this->events->publish(new UserRegisteredByOtp($user, $guard));

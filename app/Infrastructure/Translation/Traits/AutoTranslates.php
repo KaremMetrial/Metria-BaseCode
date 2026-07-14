@@ -25,9 +25,9 @@ trait AutoTranslates
 
             // Identify dirty translatable fields
             $dirtyFields = [];
-            $translatableFields = property_exists($model, 'translatable') ? $model->translatable : [];
+            $translatableFields = property_exists($model, 'translatable') && is_array($model->translatable) ? $model->translatable : [];
             foreach ($translatableFields as $field) {
-                if ($model->isDirty($field)) {
+                if (is_string($field) && $model->isDirty($field)) {
                     $dirtyFields[] = $field;
                 }
             }
@@ -36,7 +36,8 @@ trait AutoTranslates
                 return;
             }
 
-            $supportedLocales = config('localization.supported', ['en', 'ar']);
+            $locales = config('localization.supported', ['en', 'ar']);
+            $supportedLocales = is_array($locales) ? array_filter($locales, 'is_string') : ['en', 'ar'];
 
             foreach ($supportedLocales as $targetLocale) {
                 $fieldsToTranslate = [];
@@ -61,13 +62,16 @@ trait AutoTranslates
                 }
 
                 if (! empty($fieldsToTranslate) && $resolvedSourceLocale !== null) {
-                    TranslateModelJob::dispatch(
-                        static::class,
-                        $model->getKey(),
-                        $fieldsToTranslate,
-                        $resolvedSourceLocale,
-                        $targetLocale
-                    )->afterCommit();
+                    $modelId = $model->getKey();
+                    if (is_int($modelId) || is_string($modelId)) {
+                        TranslateModelJob::dispatch(
+                            static::class,
+                            $modelId,
+                            $fieldsToTranslate,
+                            $resolvedSourceLocale,
+                            $targetLocale
+                        )->afterCommit();
+                    }
                 }
             }
         });
@@ -81,14 +85,18 @@ trait AutoTranslates
     public function queueTranslations(?array $fields = null, ?string $sourceLocale = null): void
     {
         /** @phpstan-ignore-next-line */
-        $fields = $fields ?? (property_exists($this, 'translatable') ? $this->translatable : []);
-        $supportedLocales = config('localization.supported', ['en', 'ar']);
+        $fields = $fields ?? (property_exists($this, 'translatable') && is_array($this->translatable) ? $this->translatable : []);
+        $locales = config('localization.supported', ['en', 'ar']);
+        $supportedLocales = is_array($locales) ? array_filter($locales, 'is_string') : ['en', 'ar'];
 
         foreach ($supportedLocales as $targetLocale) {
             $fieldsToTranslate = [];
             $resolvedSourceLocale = null;
 
             foreach ($fields as $field) {
+                if (! is_string($field)) {
+                    continue;
+                }
                 $resolved = $sourceLocale ?? $this->resolveSourceLocale($field);
                 if ($resolved === $targetLocale || $resolved === null) {
                     continue;
@@ -107,13 +115,16 @@ trait AutoTranslates
             }
 
             if (! empty($fieldsToTranslate) && $resolvedSourceLocale !== null) {
-                TranslateModelJob::dispatch(
-                    static::class,
-                    $this->getKey(),
-                    $fieldsToTranslate,
-                    $resolvedSourceLocale,
-                    $targetLocale
-                )->afterCommit();
+                $modelId = $this->getKey();
+                if (is_int($modelId) || is_string($modelId)) {
+                    TranslateModelJob::dispatch(
+                        static::class,
+                        $modelId,
+                        $fieldsToTranslate,
+                        $resolvedSourceLocale,
+                        $targetLocale
+                    )->afterCommit();
+                }
             }
         }
     }
@@ -149,6 +160,7 @@ trait AutoTranslates
         }
 
         // 5. System fallback locale
-        return config('localization.fallback', 'en');
+        $fallback = config('localization.fallback', 'en');
+        return is_string($fallback) ? $fallback : 'en';
     }
 }

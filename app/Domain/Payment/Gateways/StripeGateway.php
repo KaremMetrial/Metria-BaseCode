@@ -43,18 +43,28 @@ class StripeGateway implements PaymentGateway
         ]);
 
         if ($response->failed()) {
+            $errVal = $response->json('error.message');
+            $errMsg = is_scalar($errVal) ? (string) $errVal : null;
             throw new PaymentException(
-                $response->json('error.message', __('payments.gateway_creation_failed', ['gateway' => 'stripe'])),
+                $errMsg ?? __('payments.gateway_creation_failed', ['gateway' => 'stripe']),
                 context: ['gateway' => 'stripe', 'status' => $response->status()],
             );
         }
 
+        $idVal = $response->json('id');
+        $id = is_scalar($idVal) ? (string) $idVal : '';
+
+        $clientSecretVal = $response->json('client_secret');
+        $clientSecret = is_scalar($clientSecretVal) ? (string) $clientSecretVal : '';
+
+        $rawResponse = $response->json();
+
         return new PaymentResult(
             success: true,
             status: PaymentStatus::Processing,
-            gatewayReference: $response->json('id'),
-            clientSecret: $response->json('client_secret'),
-            raw: $response->json() ?? [],
+            gatewayReference: $id,
+            clientSecret: $clientSecret,
+            raw: is_array($rawResponse) ? $rawResponse : [],
         );
     }
 
@@ -105,8 +115,11 @@ class StripeGateway implements PaymentGateway
 
     public function parseWebhook(Request $request): WebhookResult
     {
-        $event = $request->json()->all();
-        $object = $event['data']['object'] ?? [];
+        $eventVal = $request->json()->all();
+        $event = is_array($eventVal) ? $eventVal : [];
+        $dataVal = $event['data'] ?? [];
+        $dataArr = is_array($dataVal) ? $dataVal : [];
+        $objectVal = isset($dataArr['object']) && is_array($dataArr['object']) ? $dataArr['object'] : [];
 
         $status = match ($event['type'] ?? '') {
             'payment_intent.succeeded' => PaymentStatus::Succeeded,
@@ -116,10 +129,16 @@ class StripeGateway implements PaymentGateway
             default => PaymentStatus::Processing,
         };
 
+        $gatewayRefVal = $objectVal['payment_intent'] ?? $objectVal['id'] ?? '';
+        $gatewayRef = is_scalar($gatewayRefVal) ? (string) $gatewayRefVal : '';
+
+        $latestChargeVal = $objectVal['latest_charge'] ?? null;
+        $latestCharge = is_scalar($latestChargeVal) ? (string) $latestChargeVal : null;
+
         return new WebhookResult(
-            gatewayReference: (string) ($object['payment_intent'] ?? $object['id'] ?? ''),
+            gatewayReference: $gatewayRef,
             status: $status,
-            extra: ['latest_charge' => $object['latest_charge'] ?? null],
+            extra: ['latest_charge' => $latestCharge],
             raw: $event,
         );
     }
@@ -135,26 +154,39 @@ class StripeGateway implements PaymentGateway
         $response = $this->http()->asForm()->post('/refunds', $body);
 
         if ($response->failed()) {
+            $errVal = $response->json('error.message');
+            $errMsg = is_scalar($errVal) ? (string) $errVal : null;
             throw new PaymentException(
-                $response->json('error.message', __('payments.gateway_refund_failed', ['gateway' => 'stripe'])),
+                $errMsg ?? __('payments.gateway_refund_failed', ['gateway' => 'stripe']),
                 context: ['gateway' => 'stripe', 'status' => $response->status()],
             );
         }
+
+        $idVal = $response->json('id');
+        $id = is_scalar($idVal) ? (string) $idVal : '';
+
+        $rawResponse = $response->json();
 
         return new PaymentResult(
             success: true,
             status: $amount !== null && $amount->amount < $payment->amount
                 ? PaymentStatus::PartiallyRefunded
                 : PaymentStatus::Refunded,
-            gatewayReference: $response->json('id'),
-            raw: $response->json() ?? [],
+            gatewayReference: $id,
+            raw: is_array($rawResponse) ? $rawResponse : [],
         );
     }
 
     private function http(): PendingRequest
     {
-        return Http::baseUrl($this->config['base_url'] ?? 'https://api.stripe.com/v1')
+        $baseUrlVal = $this->config['base_url'] ?? 'https://api.stripe.com/v1';
+        $baseUrl = is_string($baseUrlVal) ? $baseUrlVal : 'https://api.stripe.com/v1';
+
+        $timeoutVal = config('integrations.http.timeout', 15);
+        $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+
+        return Http::baseUrl($baseUrl)
             ->withToken((string) ($this->config['secret_key'] ?? ''))
-            ->timeout((int) config('integrations.http.timeout', 15));
+            ->timeout($timeout);
     }
 }

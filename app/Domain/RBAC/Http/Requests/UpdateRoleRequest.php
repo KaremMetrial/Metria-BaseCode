@@ -16,7 +16,7 @@ class UpdateRoleRequest extends FormRequest
     public function rules(): array
     {
         $role = $this->route('role');
-        $roleId = (is_object($role) && property_exists($role, 'id')) ? $role->id : ($role ?? '');
+        $roleId = ($role instanceof \Illuminate\Database\Eloquent\Model) ? (string) $role->getKey() : (is_scalar($role) ? (string) $role : '');
 
         return [
             'name' => ['sometimes', 'string', 'max:255', 'unique:roles,name,'.$roleId],

@@ -26,7 +26,9 @@ final readonly class Money implements JsonSerializable, Stringable
 
     public static function of(int $minorUnits, ?string $currency = null): self
     {
-        return new self($minorUnits, strtoupper($currency ?? config('payments.currency', 'EGP')));
+        $cfgCurrency = config('payments.currency', 'EGP');
+        $currencyStr = is_string($cfgCurrency) ? $cfgCurrency : 'EGP';
+        return new self($minorUnits, strtoupper($currency ?? $currencyStr));
     }
 
     /**
@@ -34,7 +36,9 @@ final readonly class Money implements JsonSerializable, Stringable
      */
     public static function fromDecimal(float|string $decimal, ?string $currency = null): self
     {
-        $currency = strtoupper($currency ?? config('payments.currency', 'EGP'));
+        $cfgCurrency = config('payments.currency', 'EGP');
+        $currencyStr = is_string($cfgCurrency) ? $cfgCurrency : 'EGP';
+        $currency = strtoupper($currency ?? $currencyStr);
         $units = self::minorUnitsFor($currency);
 
         $minor = (int) round(((float) $decimal) * (10 ** $units));
@@ -54,7 +58,8 @@ final readonly class Money implements JsonSerializable, Stringable
             // Fallback during early bootstrap or tests without container
         }
 
-        return (int) (config('payments.minor_units.'.$currency) ?? 2);
+        $minorUnits = config('payments.minor_units.'.$currency);
+        return is_numeric($minorUnits) ? (int) $minorUnits : 2;
     }
 
     public function add(self $other): self

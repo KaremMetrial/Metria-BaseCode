@@ -15,7 +15,8 @@ class ClassificationPrompt implements PromptInterface
 
     public function render(array $context = []): string
     {
-        $text = (string) ($context['text'] ?? '');
+        $textVal = $context['text'] ?? '';
+        $text = is_scalar($textVal) ? (string) $textVal : '';
         $categoriesList = implode(', ', $this->categories);
 
         return sprintf(

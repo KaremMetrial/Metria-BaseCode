@@ -74,7 +74,7 @@ trait ApiResponses
         return [
             'request_id' => request()->headers->get('X-Request-Id', (string) Str::uuid()),
             'locale' => app()->getLocale(),
-            'direction' => in_array(app()->getLocale(), config('localization.rtl', []), true) ? 'rtl' : 'ltr',
+            'direction' => in_array(app()->getLocale(), is_array($rtl = config('localization.rtl')) ? $rtl : [], true) ? 'rtl' : 'ltr',
         ];
     }
 

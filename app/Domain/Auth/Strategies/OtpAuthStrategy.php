@@ -28,8 +28,11 @@ class OtpAuthStrategy implements AuthStrategyInterface
 
         $this->verifyOtp->__invoke($identifier, $code, 'login', $guard);
 
-        $provider = config("auth.guards.{$guard}.provider");
-        $modelClass = config("auth.providers.{$provider}.model") ?? User::class;
+        $providerVal = config("auth.guards.{$guard}.provider");
+        $provider = is_string($providerVal) ? $providerVal : 'users';
+        $modelClassVal = config("auth.providers.{$provider}.model");
+        /** @var class-string<User> $modelClass */
+        $modelClass = is_string($modelClassVal) && class_exists($modelClassVal) ? $modelClassVal : User::class;
 
         /** @var User|null $user */
         $user = $modelClass::query()

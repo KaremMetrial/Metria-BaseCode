@@ -14,7 +14,8 @@ class ModerationPrompt implements PromptInterface
 
     public function render(array $context = []): string
     {
-        $text = (string) ($context['text'] ?? '');
+        $textVal = $context['text'] ?? '';
+        $text = is_scalar($textVal) ? (string) $textVal : '';
         return sprintf(
             "Analyze the following text for safety violations, hate speech, harassment, explicit content, or dangerous instructions.\nReturn JSON strictly: {\"safe\": boolean, \"reason\": \"string or null\"}.\n\nText: %s",
             $text

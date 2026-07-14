@@ -19,14 +19,17 @@ class TranslationManager extends Manager
 {
     public function getDefaultDriver(): string
     {
-        return $this->config->get('translation.default', 'gemini');
+        $defaultVal = $this->config->get('translation.default', 'gemini');
+        return is_string($defaultVal) ? $defaultVal : 'gemini';
     }
 
     protected function createGeminiDriver(): TranslationProviderInterface
     {
+        $key = $this->config->get('translation.providers.gemini.key');
+        $model = $this->config->get('translation.providers.gemini.model', 'gemini-1.5-flash');
         return new GeminiTranslationProvider(
-            $this->config->get('translation.providers.gemini.key'),
-            $this->config->get('translation.providers.gemini.model', 'gemini-1.5-flash')
+            is_string($key) ? $key : null,
+            is_string($model) ? $model : 'gemini-1.5-flash'
         );
     }
 
@@ -48,11 +51,18 @@ class TranslationManager extends Manager
      */
     public function driver($driver = null)
     {
-        $provider = parent::driver($driver);
+        $driverStr = is_string($driver) ? $driver : null;
+        $provider = parent::driver($driverStr);
+
+        if (! $provider instanceof TranslationProviderInterface) {
+            throw new \RuntimeException('Translation driver must implement TranslationProviderInterface.');
+        }
 
         if (! $provider instanceof \App\Infrastructure\Translation\Providers\CircuitBreakerProvider) {
-            $threshold = (int) $this->config->get('translation.circuit_breaker.failure_threshold', 5);
-            $cooldown = (int) $this->config->get('translation.circuit_breaker.cooldown_seconds', 60);
+            $thresholdVal = $this->config->get('translation.circuit_breaker.failure_threshold', 5);
+            $threshold = is_numeric($thresholdVal) ? (int) $thresholdVal : 5;
+            $cooldownVal = $this->config->get('translation.circuit_breaker.cooldown_seconds', 60);
+            $cooldown = is_numeric($cooldownVal) ? (int) $cooldownVal : 60;
             $provider = new \App\Infrastructure\Translation\Providers\CircuitBreakerProvider($provider, $threshold, $cooldown);
         }
 
@@ -89,7 +99,7 @@ class TranslationManager extends Manager
     /**
      * Core translation orchestrator. Handles caching, Unicode normalization, and fallback chains.
      *
-     * @param  array<string, string>  $values
+     * @param  array<string, mixed>  $values
      * @return array<string, string>
      */
     public function executeTranslation(
@@ -99,7 +109,11 @@ class TranslationManager extends Manager
         string $targetLocale
     ): array {
         if (! $this->config->get('translation.enabled', true)) {
-            return $values;
+            $result = [];
+            foreach ($values as $key => $val) {
+                $result[(string) $key] = is_scalar($val) ? (string) $val : '';
+            }
+            return $result;
         }
 
         if (empty($values)) {
@@ -110,28 +124,31 @@ class TranslationManager extends Manager
         $missing = [];
 
         foreach ($values as $key => $value) {
-            if ($value === null || trim((string) $value) === '') {
+            $strValue = is_scalar($value) ? (string) $value : '';
+            if (trim($strValue) === '') {
                 $translated[$key] = '';
 
                 continue;
             }
 
             // Canonical Unicode & Whitespace Normalization
-            $normalizedValue = normalizer_normalize((string) $value, \Normalizer::FORM_C);
+            $normalizedValue = normalizer_normalize($strValue, \Normalizer::FORM_C);
             if ($normalizedValue === false) {
-                $normalizedValue = (string) $value;
+                $normalizedValue = $strValue;
             }
-            $normalizedValue = trim((string) preg_replace('/\s+/', ' ', $normalizedValue));
+            $preg = preg_replace('/\s+/', ' ', $normalizedValue);
+            $normalizedValue = trim(is_string($preg) ? $preg : $normalizedValue);
             $hash = hash('sha256', $normalizedValue);
 
-            $promptVersion = $this->config->get("translation.providers.{$provider->name()}.prompt_version", 'v1');
+            $promptVersionVal = $this->config->get("translation.providers.{$provider->name()}.prompt_version", 'v1');
+            $promptVersion = is_string($promptVersionVal) ? $promptVersionVal : 'v1';
             $cacheKey = "translation:{$provider->name()}:{$sourceLocale}:{$targetLocale}:{$promptVersion}:{$hash}";
 
             $cached = Cache::get($cacheKey);
             if ($cached !== null) {
-                $translated[$key] = $cached;
+                $translated[$key] = is_scalar($cached) ? (string) $cached : '';
             } else {
-                $missing[$key] = (string) $value;
+                $missing[$key] = $strValue;
             }
         }
 
@@ -149,15 +166,19 @@ class TranslationManager extends Manager
             if ($normalizedValue === false) {
                 $normalizedValue = $originalValue;
             }
-            $normalizedValue = trim((string) preg_replace('/\s+/', ' ', $normalizedValue));
+            $preg = preg_replace('/\s+/', ' ', $normalizedValue);
+            $normalizedValue = trim(is_string($preg) ? $preg : $normalizedValue);
             $hash = hash('sha256', $normalizedValue);
 
-            $promptVersion = $this->config->get("translation.providers.{$provider->name()}.prompt_version", 'v1');
+            $promptVersionVal = $this->config->get("translation.providers.{$provider->name()}.prompt_version", 'v1');
+            $promptVersion = is_string($promptVersionVal) ? $promptVersionVal : 'v1';
             $cacheKey = "translation:{$provider->name()}:{$sourceLocale}:{$targetLocale}:{$promptVersion}:{$hash}";
 
-            Cache::put($cacheKey, $translatedValue, $this->config->get('translation.cache_ttl', 2592000));
+            $ttlVal = $this->config->get('translation.cache_ttl', 2592000);
+            $ttl = is_numeric($ttlVal) ? (int) $ttlVal : 2592000;
+            Cache::put($cacheKey, $translatedValue, $ttl);
 
-            $translated[$key] = $translatedValue;
+            $translated[$key] = (string) $translatedValue;
         }
 
         return $translated;
@@ -165,6 +186,9 @@ class TranslationManager extends Manager
 
     /**
      * Attempt translation with fallback provider chaining.
+     *
+     * @param  array<string, string>  $values
+     * @return array<string, string>
      */
     private function translateWithFallback(
         TranslationProviderInterface $provider,
@@ -177,7 +201,8 @@ class TranslationManager extends Manager
         } catch (RateLimitedException|ProviderUnavailableException $e) {
             // Check fallback providers from configuration
             $fallbacks = $this->config->get('translation.fallbacks', []);
-            foreach ($fallbacks as $fallbackName) {
+            $fallbacksArray = is_array($fallbacks) ? array_filter($fallbacks, 'is_string') : [];
+            foreach ($fallbacksArray as $fallbackName) {
                 if ($fallbackName === $provider->name()) {
                     continue;
                 }

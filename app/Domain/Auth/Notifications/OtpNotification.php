@@ -41,7 +41,8 @@ class OtpNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $appName = config('app.name', 'Enterprise Base');
+        $cfgApp = config('app.name', 'Enterprise Base');
+        $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return (new MailMessage)
             ->subject(__(':app OTP Verification Code', ['app' => $appName]))

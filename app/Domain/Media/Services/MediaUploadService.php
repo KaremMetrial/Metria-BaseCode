@@ -33,12 +33,14 @@ class MediaUploadService
         string $purpose = 'attachment',
         array $options = []
     ): array {
-        $maxSize = config('media.max_file_size_bytes', 500 * 1024 * 1024);
+        $maxSizeVal = config('media.max_file_size_bytes', 500 * 1024 * 1024);
+        $maxSize = is_numeric($maxSizeVal) ? (int) $maxSizeVal : 500 * 1024 * 1024;
         if ($size > $maxSize) {
             throw new DomainException(__('media.file_too_large'), errorCode: 'file_too_large');
         }
 
-        $allowedMimes = config('media.allowed_mimes', []);
+        $allowedMimesConfig = config('media.allowed_mimes', []);
+        $allowedMimes = is_array($allowedMimesConfig) ? $allowedMimesConfig : [];
         if (! in_array($mimeType, $allowedMimes, true)) {
             throw new DomainException(__('media.disallowed_mime_type', ['mime' => $mimeType]), errorCode: 'disallowed_mime_type');
         }
@@ -53,7 +55,12 @@ class MediaUploadService
         // Sanitize filename to prevent directory traversal
         $sanitizedName = (string) preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($filename));
         $extension = pathinfo($sanitizedName, PATHINFO_EXTENSION);
-        $diskName = $isPublic ? config('media.default_disk', 'public') : config('media.private_disk', 'local');
+
+        $defaultDiskVal = config('media.default_disk', 'public');
+        $privateDiskVal = config('media.private_disk', 'local');
+        $defaultDisk = is_string($defaultDiskVal) ? $defaultDiskVal : 'public';
+        $privateDisk = is_string($privateDiskVal) ? $privateDiskVal : 'local';
+        $diskName = $isPublic ? $defaultDisk : $privateDisk;
 
         // Storage path layout: tenants/{tenant_id}/{media_type}/{uuid}.{ext}
         $storagePath = sprintf('tenants/%s/%s/%s.%s', $tenantId ?? 'global', $mediaType->value, $mediaId, $extension ?: 'bin');
@@ -82,7 +89,12 @@ class MediaUploadService
             try {
                 if (method_exists($disk->getAdapter(), 'temporaryUploadUrl')) {
                     $urlResult = $disk->temporaryUploadUrl($storagePath, now()->addMinutes(60));
-                    $presignedUrl = is_array($urlResult) ? (string) reset($urlResult) : (string) $urlResult;
+                    if (is_array($urlResult)) {
+                        $first = reset($urlResult);
+                        $presignedUrl = is_scalar($first) ? (string) $first : '';
+                    } else {
+                        $presignedUrl = is_scalar($urlResult) ? (string) $urlResult : '';
+                    }
                 } else {
                     // Fallback to local API upload endpoint
                     $presignedUrl = (string) route('media.confirm', ['media' => $mediaId]);
@@ -232,12 +244,14 @@ class MediaUploadService
         ?string $mediableType = null,
         ?string $mediableId = null
     ): Media {
-        $maxSize = config('media.max_file_size_bytes', 500 * 1024 * 1024);
+        $maxSizeVal = config('media.max_file_size_bytes', 500 * 1024 * 1024);
+        $maxSize = is_numeric($maxSizeVal) ? (int) $maxSizeVal : 500 * 1024 * 1024;
         if ($file->getSize() > $maxSize) {
             throw new DomainException(__('media.file_too_large'), errorCode: 'file_too_large');
         }
 
-        $allowedMimes = config('media.allowed_mimes', []);
+        $allowedMimesConfig = config('media.allowed_mimes', []);
+        $allowedMimes = is_array($allowedMimesConfig) ? $allowedMimesConfig : [];
         $mimeType = (string) $file->getMimeType();
         if (! in_array($mimeType, $allowedMimes, true)) {
             throw new DomainException(__('media.disallowed_mime_type', ['mime' => $mimeType]), errorCode: 'disallowed_mime_type');
@@ -248,7 +262,13 @@ class MediaUploadService
 
         $sanitizedName = (string) preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($file->getClientOriginalName()));
         $extension = pathinfo($sanitizedName, PATHINFO_EXTENSION);
-        $diskName = $isPublic ? config('media.default_disk', 'public') : config('media.private_disk', 'local');
+
+        $defaultDiskVal = config('media.default_disk', 'public');
+        $privateDiskVal = config('media.private_disk', 'local');
+        $defaultDisk = is_string($defaultDiskVal) ? $defaultDiskVal : 'public';
+        $privateDisk = is_string($privateDiskVal) ? $privateDiskVal : 'local';
+        $diskName = $isPublic ? $defaultDisk : $privateDisk;
+
         $storagePath = sprintf('tenants/%s/%s/%s.%s', $tenantId ?? 'global', $mediaType->value, $mediaId, $extension ?: 'bin');
 
         $disk = Storage::disk($diskName);

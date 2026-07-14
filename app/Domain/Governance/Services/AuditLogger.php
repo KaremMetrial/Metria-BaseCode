@@ -57,7 +57,8 @@ class AuditLogger
 
     private function mask(array $values): array
     {
-        $masked = config('governance.audit.masked_attributes', []);
+        $maskedConfig = config('governance.audit.masked_attributes', []);
+        $masked = is_array($maskedConfig) ? $maskedConfig : [];
 
         foreach ($values as $key => $value) {
             if (in_array($key, $masked, true)) {

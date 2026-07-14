@@ -40,7 +40,8 @@ class AuthController extends ApiController
 
         // Tenant ID comes from the validated request body only — never from a raw
         // client-controlled header, which would allow registering into any tenant.
-        $tenantId = $request->input('tenant_id') ?: null;
+        $tenantIdVal = $request->input('tenant_id');
+        $tenantId = is_string($tenantIdVal) ? $tenantIdVal : null;
         $user = $register($request->validated(), $tenantId);
 
         ['token' => $token] = $issueToken($user->email, $request->string('password')->value());

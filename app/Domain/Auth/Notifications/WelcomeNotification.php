@@ -37,7 +37,8 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $appName = config('app.name', 'Enterprise Base');
+        $cfgApp = config('app.name', 'Enterprise Base');
+        $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return (new MailMessage)
             ->subject(__('Welcome to :app!', ['app' => $appName]))
@@ -51,7 +52,8 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     public function toSms(object $notifiable): string
     {
-        $appName = config('app.name', 'Enterprise Base');
+        $cfgApp = config('app.name', 'Enterprise Base');
+        $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return __('Welcome to :app, :name! Your account is active.', [
             'app' => $appName,
@@ -61,7 +63,8 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     public function toFcm(object $notifiable): array
     {
-        $appName = config('app.name', 'Enterprise Base');
+        $cfgApp = config('app.name', 'Enterprise Base');
+        $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return [
             'title' => __('Welcome to :app!', ['app' => $appName]),

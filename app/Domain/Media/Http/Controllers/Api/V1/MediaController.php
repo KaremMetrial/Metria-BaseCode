@@ -18,11 +18,14 @@ class MediaController extends ApiController
 {
     public function presign(GeneratePresignedUrlRequest $request, MediaUploadService $uploadService): JsonResponse
     {
+        $sizeVal = $request->input('size');
+        $size = is_numeric($sizeVal) ? (int) $sizeVal : 0;
+
         $result = $uploadService->initiateUpload(
             user: $this->getAuthenticatedUser($request),
             filename: $request->string('filename')->value(),
             mimeType: $request->string('mime_type')->value(),
-            size: (int) $request->input('size'),
+            size: $size,
             isPublic: (bool) $request->input('is_public', false),
             purpose: $request->string('purpose', 'attachment')->value()
         );

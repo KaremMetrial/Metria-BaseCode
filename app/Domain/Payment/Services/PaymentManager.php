@@ -28,26 +28,31 @@ class PaymentManager extends Manager
 {
     public function getDefaultDriver(): string
     {
-        return $this->config->get('payments.default', 'stripe');
+        $default = $this->config->get('payments.default', 'stripe');
+        return is_string($default) ? $default : 'stripe';
     }
 
     protected function createStripeDriver(): PaymentGateway
     {
-        return new StripeGateway($this->config->get('payments.gateways.stripe', []));
+        $config = $this->config->get('payments.gateways.stripe', []);
+        return new StripeGateway(is_array($config) ? $config : []);
     }
 
     protected function createPaymobDriver(): PaymentGateway
     {
-        return new PaymobGateway($this->config->get('payments.gateways.paymob', []));
+        $config = $this->config->get('payments.gateways.paymob', []);
+        return new PaymobGateway(is_array($config) ? $config : []);
     }
 
     protected function createFawryDriver(): PaymentGateway
     {
-        return new FawryGateway($this->config->get('payments.gateways.fawry', []));
+        $config = $this->config->get('payments.gateways.fawry', []);
+        return new FawryGateway(is_array($config) ? $config : []);
     }
 
     protected function createPaytabsDriver(): PaymentGateway
     {
-        return new PaytabsGateway($this->config->get('payments.gateways.paytabs', []));
+        $config = $this->config->get('payments.gateways.paytabs', []);
+        return new PaytabsGateway(is_array($config) ? $config : []);
     }
 }

@@ -67,7 +67,8 @@ class PaymobGateway implements PaymentGateway
             ]);
         }
 
-        $orderId = (string) $order->json('id');
+        $orderIdVal = $order->json('id');
+        $orderId = is_scalar($orderIdVal) ? (string) $orderIdVal : '';
 
         // Step 3: payment key bound to the order + integration.
         $billing = $options['billing_data'] ?? [];
@@ -98,11 +99,18 @@ class PaymobGateway implements PaymentGateway
             ]);
         }
 
+        $baseUrlVal = $this->config['base_url'] ?? '';
+        $baseUrl = is_string($baseUrlVal) ? $baseUrlVal : '';
+        $iframeIdVal = $this->config['iframe_id'] ?? '';
+        $iframeId = is_scalar($iframeIdVal) ? (string) $iframeIdVal : '';
+        $tokenVal = $key->json('token');
+        $tokenStr = is_scalar($tokenVal) ? (string) $tokenVal : '';
+
         $iframeUrl = sprintf(
             '%s/acceptance/iframes/%s?payment_token=%s',
-            rtrim((string) ($this->config['base_url'] ?? ''), '/'),
-            $this->config['iframe_id'] ?? '',
-            $key->json('token'),
+            rtrim($baseUrl, '/'),
+            $iframeId,
+            $tokenStr,
         );
 
         return new PaymentResult(
@@ -121,13 +129,17 @@ class PaymobGateway implements PaymentGateway
     public function verifyWebhook(Request $request): bool
     {
         $secret = (string) ($this->config['hmac_secret'] ?? '');
-        $provided = (string) ($request->query('hmac') ?: $request->input('hmac', ''));
+        $providedQuery = $request->query('hmac');
+        $providedInput = $request->input('hmac', '');
+        $providedVal = is_string($providedQuery) && $providedQuery !== '' ? $providedQuery : $providedInput;
+        $provided = is_scalar($providedVal) ? (string) $providedVal : '';
 
         if ($secret === '' || $provided === '') {
             return false;
         }
 
-        $obj = $request->input('obj', []);
+        $objVal = $request->input('obj', []);
+        $obj = is_array($objVal) ? $objVal : [];
 
         $concatenated = '';
         foreach (self::HMAC_FIELDS as $field) {
@@ -137,7 +149,7 @@ class PaymobGateway implements PaymentGateway
                 $value = $value ? 'true' : 'false';
             }
 
-            $concatenated .= (string) ($value ?? '');
+            $concatenated .= is_scalar($value) ? (string) $value : '';
         }
 
         return hash_equals(hash_hmac('sha512', $concatenated, $secret), $provided);
@@ -145,11 +157,15 @@ class PaymobGateway implements PaymentGateway
 
     public function parseWebhook(Request $request): WebhookResult
     {
-        $obj = $request->input('obj', []);
+        $objVal = $request->input('obj', []);
+        $obj = is_array($objVal) ? $objVal : [];
 
-        $success = filter_var($obj['success'] ?? false, FILTER_VALIDATE_BOOL);
-        $pending = filter_var($obj['pending'] ?? false, FILTER_VALIDATE_BOOL);
-        $refunded = filter_var($obj['is_refunded'] ?? false, FILTER_VALIDATE_BOOL);
+        $successVal = $obj['success'] ?? false;
+        $success = filter_var(is_scalar($successVal) ? $successVal : false, FILTER_VALIDATE_BOOL);
+        $pendingVal = $obj['pending'] ?? false;
+        $pending = filter_var(is_scalar($pendingVal) ? $pendingVal : false, FILTER_VALIDATE_BOOL);
+        $refundedVal = $obj['is_refunded'] ?? false;
+        $refunded = filter_var(is_scalar($refundedVal) ? $refundedVal : false, FILTER_VALIDATE_BOOL);
 
         $status = match (true) {
             $refunded => PaymentStatus::Refunded,
@@ -158,20 +174,27 @@ class PaymobGateway implements PaymentGateway
             default => PaymentStatus::Failed,
         };
 
+        $orderIdVal = data_get($obj, 'order.id', '');
+        $orderId = is_scalar($orderIdVal) ? (string) $orderIdVal : '';
+
+        $transactionIdVal = $obj['id'] ?? null;
+        $transactionId = is_scalar($transactionIdVal) ? (string) $transactionIdVal : null;
+
         return new WebhookResult(
-            gatewayReference: (string) data_get($obj, 'order.id', ''),
+            gatewayReference: $orderId,
             status: $status,
             // Transaction id is required later for refunds.
-            extra: ['transaction_id' => $obj['id'] ?? null],
+            extra: ['transaction_id' => $transactionId],
             raw: $request->all(),
         );
     }
 
     public function refund(Payment $payment, ?Money $amount = null): PaymentResult
     {
-        $transactionId = data_get($payment->metadata, 'transaction_id');
+        $transactionIdVal = data_get($payment->metadata, 'transaction_id');
+        $transactionId = is_scalar($transactionIdVal) ? (string) $transactionIdVal : '';
 
-        if (! $transactionId) {
+        if ($transactionId === '') {
             throw new PaymentException(
                 __('payments.missing_transaction_id'),
                 errorCode: 'refund_unavailable',
@@ -190,13 +213,17 @@ class PaymobGateway implements PaymentGateway
             ]);
         }
 
+        $idVal = $response->json('id');
+        $id = is_scalar($idVal) ? (string) $idVal : '';
+        $rawResponse = $response->json();
+
         return new PaymentResult(
             success: true,
             status: $amount !== null && $amount->amount < $payment->amount
                 ? PaymentStatus::PartiallyRefunded
                 : PaymentStatus::Refunded,
-            gatewayReference: (string) $response->json('id'),
-            raw: $response->json() ?? [],
+            gatewayReference: $id,
+            raw: is_array($rawResponse) ? $rawResponse : [],
         );
     }
 
@@ -213,14 +240,18 @@ class PaymobGateway implements PaymentGateway
                 ]);
             }
 
-            return (string) $response->json('token');
+            $tokenVal = $response->json('token');
+            return is_scalar($tokenVal) ? (string) $tokenVal : '';
         });
     }
 
     private function http(): PendingRequest
     {
+        $timeoutVal = config('integrations.http.timeout', 15);
+        $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+
         return Http::baseUrl((string) ($this->config['base_url'] ?? 'https://accept.paymob.com/api'))
             ->acceptJson()
-            ->timeout((int) config('integrations.http.timeout', 15));
+            ->timeout($timeout);
     }
 }

@@ -15,7 +15,8 @@ class SummarizationPrompt implements PromptInterface
 
     public function render(array $context = []): string
     {
-        $text = (string) ($context['text'] ?? '');
+        $textVal = $context['text'] ?? '';
+        $text = is_scalar($textVal) ? (string) $textVal : '';
         return sprintf(
             "Summarize the following text concisely in at most %d words:\n\n%s",
             $this->maxWords,

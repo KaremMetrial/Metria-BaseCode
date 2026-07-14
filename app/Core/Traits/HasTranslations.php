@@ -57,7 +57,8 @@ trait HasTranslations
         }
 
         if ($useFallback) {
-            $fallback = config('localization.fallback', 'en');
+            $fallbackVal = config('localization.fallback', 'en');
+            $fallback = is_string($fallbackVal) ? $fallbackVal : 'en';
 
             return $translations[$fallback] ?? array_values($translations)[0] ?? null;
         }
@@ -70,7 +71,8 @@ trait HasTranslations
         $raw = $this->attributes[$key] ?? null;
 
         if (is_string($raw)) {
-            return json_decode($raw, true) ?: [];
+            $decoded = json_decode($raw, true);
+            return is_array($decoded) ? $decoded : [];
         }
 
         return is_array($raw) ? $raw : [];

@@ -18,7 +18,8 @@ class CreatePaymentRequest extends FormRequest
 
     public function rules(): array
     {
-        $gateways = array_keys(config('payments.gateways', []));
+        $gatewaysConfig = config('payments.gateways', []);
+        $gateways = array_keys(is_array($gatewaysConfig) ? $gatewaysConfig : []);
 
         return [
             'amount' => ['required', 'numeric', 'min:0.01'], // decimal, e.g. 150.50

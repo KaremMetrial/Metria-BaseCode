@@ -32,7 +32,9 @@ class SettingsController extends ApiController
     public function update(UpdateSettingRequest $request, string $key): JsonResponse
     {
         Gate::authorize('update', Setting::class);
-        $this->settings->set($key, $request->validated('value'), $request->validated('description'));
+        $descVal = $request->validated('description');
+        $description = is_string($descVal) ? $descVal : null;
+        $this->settings->set($key, $request->validated('value'), $description);
 
         return $this->respond(['key' => $key, 'value' => $this->settings->get($key)], __('api.updated'));
     }

@@ -26,8 +26,13 @@ class DualBroadcaster extends Broadcaster
     protected function resolvePrimaryDriver(): BroadcasterContract
     {
         $primary = $this->drivers[0] ?? 'log';
+        $connection = app(BroadcastManager::class)->connection($primary);
 
-        return app(BroadcastManager::class)->connection($primary);
+        if (! $connection instanceof BroadcasterContract) {
+            throw new \RuntimeException('Primary broadcast driver must implement Broadcaster contract.');
+        }
+
+        return $connection;
     }
 
     /**
@@ -65,7 +70,10 @@ class DualBroadcaster extends Broadcaster
         $manager = app(BroadcastManager::class);
 
         foreach ($this->drivers as $driverName) {
-            $manager->connection($driverName)->broadcast($channels, $event, $payload);
+            $connection = $manager->connection($driverName);
+            if ($connection instanceof BroadcasterContract) {
+                $connection->broadcast($channels, $event, $payload);
+            }
         }
     }
 }

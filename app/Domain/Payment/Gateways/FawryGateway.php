@@ -64,21 +64,28 @@ class FawryGateway implements PaymentGateway
             'signature' => $signature,
         ]);
 
-        $statusCode = (string) $response->json('statusCode', '');
+        $statusCodeVal = $response->json('statusCode', '');
+        $statusCode = is_scalar($statusCodeVal) ? (string) $statusCodeVal : '';
 
         if ($response->failed() || ($statusCode !== '' && $statusCode !== '200')) {
+            $statusDescVal = $response->json('statusDescription');
+            $statusDesc = is_scalar($statusDescVal) ? (string) $statusDescVal : null;
             throw new PaymentException(
-                (string) $response->json('statusDescription', __('payments.gateway_creation_failed', ['gateway' => 'fawry'])),
+                $statusDesc ?? __('payments.gateway_creation_failed', ['gateway' => 'fawry']),
                 context: ['gateway' => 'fawry', 'status' => $response->status(), 'body' => $response->json()],
             );
         }
+
+        $refNumVal = $response->json('referenceNumber');
+        $referenceCode = is_scalar($refNumVal) ? (string) $refNumVal : null;
+        $rawResponse = $response->json();
 
         return new PaymentResult(
             success: true,
             status: PaymentStatus::Pending, // waits for cash payment at a Fawry point
             gatewayReference: $payment->id, // Fawry echoes merchantRefNumber in callbacks
-            referenceCode: (string) $response->json('referenceNumber'),
-            raw: $response->json() ?? [],
+            referenceCode: $referenceCode,
+            raw: is_array($rawResponse) ? $rawResponse : [],
         );
     }
 
@@ -91,7 +98,8 @@ class FawryGateway implements PaymentGateway
     public function verifyWebhook(Request $request): bool
     {
         $secureKey = (string) ($this->config['secure_key'] ?? '');
-        $provided = (string) $request->input('messageSignature', '');
+        $providedVal = $request->input('messageSignature', '');
+        $provided = is_scalar($providedVal) ? (string) $providedVal : '';
 
         if ($secureKey === '' || $provided === '') {
             return false;
@@ -99,13 +107,21 @@ class FawryGateway implements PaymentGateway
 
         $twoDp = fn ($v): string => number_format((float) $v, 2, '.', '');
 
-        $concatenated = $request->input('fawryRefNumber', '')
-            .$request->input('merchantRefNumber', '')
-            .$twoDp($request->input('paymentAmount', 0))
-            .$twoDp($request->input('orderAmount', 0))
-            .$request->input('orderStatus', '')
-            .$request->input('paymentMethod', '')
-            .($request->input('paymentRefrenceNumber') ?? '') // sic — Fawry field spelling
+        $fawryRefNumber = $request->input('fawryRefNumber');
+        $merchantRefNumber = $request->input('merchantRefNumber');
+        $paymentAmount = $request->input('paymentAmount', 0);
+        $orderAmount = $request->input('orderAmount', 0);
+        $orderStatus = $request->input('orderStatus');
+        $paymentMethod = $request->input('paymentMethod');
+        $paymentRefrenceNumber = $request->input('paymentRefrenceNumber');
+
+        $concatenated = (is_scalar($fawryRefNumber) ? (string) $fawryRefNumber : '')
+            .(is_scalar($merchantRefNumber) ? (string) $merchantRefNumber : '')
+            .$twoDp(is_numeric($paymentAmount) ? $paymentAmount : 0)
+            .$twoDp(is_numeric($orderAmount) ? $orderAmount : 0)
+            .(is_scalar($orderStatus) ? (string) $orderStatus : '')
+            .(is_scalar($paymentMethod) ? (string) $paymentMethod : '')
+            .(is_scalar($paymentRefrenceNumber) ? (string) $paymentRefrenceNumber : '')
             .$secureKey;
 
         return hash_equals(hash('sha256', $concatenated), $provided);
@@ -113,7 +129,10 @@ class FawryGateway implements PaymentGateway
 
     public function parseWebhook(Request $request): WebhookResult
     {
-        $status = match (strtoupper((string) $request->input('orderStatus', ''))) {
+        $orderStatusVal = $request->input('orderStatus', '');
+        $orderStatusStr = is_scalar($orderStatusVal) ? (string) $orderStatusVal : '';
+
+        $status = match (strtoupper($orderStatusStr)) {
             'PAID' => PaymentStatus::Succeeded,
             'NEW', 'UNPAID' => PaymentStatus::Pending,
             'REFUNDED' => PaymentStatus::Refunded,
@@ -123,10 +142,14 @@ class FawryGateway implements PaymentGateway
             default => PaymentStatus::Processing,
         };
 
+        $merchantRefVal = $request->input('merchantRefNumber', '');
+        $merchantRef = is_scalar($merchantRefVal) ? (string) $merchantRefVal : '';
+        $fawryRefNumberVal = $request->input('fawryRefNumber');
+
         return new WebhookResult(
-            gatewayReference: (string) $request->input('merchantRefNumber', ''),
+            gatewayReference: $merchantRef,
             status: $status,
-            extra: ['fawry_ref_number' => $request->input('fawryRefNumber')],
+            extra: ['fawry_ref_number' => is_scalar($fawryRefNumberVal) ? (string) $fawryRefNumberVal : null],
             raw: $request->all(),
         );
     }
@@ -135,7 +158,8 @@ class FawryGateway implements PaymentGateway
     {
         $merchantCode = (string) ($this->config['merchant_code'] ?? '');
         $secureKey = (string) ($this->config['secure_key'] ?? '');
-        $fawryRef = (string) data_get($payment->metadata, 'fawry_ref_number', '');
+        $fawryRefVal = data_get($payment->metadata, 'fawry_ref_number', '');
+        $fawryRef = is_scalar($fawryRefVal) ? (string) $fawryRefVal : '';
 
         if ($fawryRef === '') {
             throw new PaymentException(
@@ -157,14 +181,19 @@ class FawryGateway implements PaymentGateway
             'signature' => $signature,
         ]);
 
-        $statusCode = (string) $response->json('statusCode', '');
+        $statusCodeVal = $response->json('statusCode', '');
+        $statusCode = is_scalar($statusCodeVal) ? (string) $statusCodeVal : '';
 
         if ($response->failed() || ($statusCode !== '' && $statusCode !== '200')) {
+            $statusDescVal = $response->json('statusDescription');
+            $statusDesc = is_scalar($statusDescVal) ? (string) $statusDescVal : null;
             throw new PaymentException(
-                (string) $response->json('statusDescription', __('payments.gateway_refund_failed', ['gateway' => 'fawry'])),
+                $statusDesc ?? __('payments.gateway_refund_failed', ['gateway' => 'fawry']),
                 context: ['gateway' => 'fawry', 'status' => $response->status(), 'body' => $response->json()],
             );
         }
+
+        $rawResponse = $response->json();
 
         return new PaymentResult(
             success: true,
@@ -172,14 +201,17 @@ class FawryGateway implements PaymentGateway
                 ? PaymentStatus::PartiallyRefunded
                 : PaymentStatus::Refunded,
             gatewayReference: $fawryRef,
-            raw: $response->json() ?? [],
+            raw: is_array($rawResponse) ? $rawResponse : [],
         );
     }
 
     private function http(): PendingRequest
     {
+        $timeoutVal = config('integrations.http.timeout', 15);
+        $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+
         return Http::baseUrl((string) ($this->config['base_url'] ?? 'https://atfawry.fawrystaging.com'))
             ->acceptJson()
-            ->timeout((int) config('integrations.http.timeout', 15));
+            ->timeout($timeout);
     }
 }

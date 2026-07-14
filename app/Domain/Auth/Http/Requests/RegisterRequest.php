@@ -19,12 +19,15 @@ class RegisterRequest extends FormRequest
 
     public function rules(): array
     {
+        $supportedVal = config('localization.supported', ['en', 'ar']);
+        $supported = is_array($supportedVal) ? array_filter($supportedVal, 'is_string') : ['en', 'ar'];
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:32'],
             'password' => ['required', 'string', Password::min(8), 'confirmed'],
-            'locale' => ['nullable', 'string', 'in:'.implode(',', config('localization.supported', ['en', 'ar']))],
+            'locale' => ['nullable', 'string', 'in:'.implode(',', $supported)],
             'tenant_id' => ['nullable', 'uuid', 'exists:tenants,id'],
             'device_token' => ['nullable', 'string', 'max:1000'],
             'device_id' => ['nullable', 'string', 'max:255'],

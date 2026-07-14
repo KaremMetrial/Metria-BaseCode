@@ -18,7 +18,8 @@ class FluentTranslator implements TranslationProviderInterface
         private readonly TranslationManager $manager
     ) {
         $this->fromLocale = app()->getLocale();
-        $this->toLocale = config('localization.fallback', 'en');
+        $fallback = config('localization.fallback', 'en');
+        $this->toLocale = is_string($fallback) ? $fallback : 'en';
     }
 
     /**

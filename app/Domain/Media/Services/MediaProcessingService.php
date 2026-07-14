@@ -131,15 +131,21 @@ class MediaProcessingService
         ]);
 
         // 2. Generate Variants (Thumbnail, Medium, Webp)
-        $variants = config('media.image_variants', []);
+        $variantsVal = config('media.image_variants', []);
+        $variants = is_array($variantsVal) ? $variantsVal : [];
 
         foreach ($variants as $name => $specs) {
+            $nameStr = (string) $name;
+            if ($nameStr === '' || ! is_array($specs)) {
+                continue;
+            }
+
             // Safely build the variant path by replacing only the final extension,
             // preventing corruption of paths that contain multiple dots.
             $blobPath = $blob->path;
             $ext = pathinfo($blobPath, PATHINFO_EXTENSION);
             $base = $ext !== '' ? substr($blobPath, 0, -(strlen($ext) + 1)) : $blobPath;
-            $variantPath = "{$base}_{$name}.{$ext}";
+            $variantPath = "{$base}_{$nameStr}.{$ext}";
 
             // Upload the EXIF-stripped/modified local file stream to the variant path
             $variantStart = microtime(true);
@@ -153,17 +159,22 @@ class MediaProcessingService
 
             $processingTime = (int) ((microtime(true) - $variantStart) * 1000);
 
+            $widthVal = $specs['width'] ?? null;
+            $heightVal = $specs['height'] ?? null;
+            $width = is_numeric($widthVal) ? (int) $widthVal : 0;
+            $height = is_numeric($heightVal) ? (int) $heightVal : 0;
+
             MediaVariant::query()->create([
                 'media_id' => $media->id,
-                'variant' => MediaVariantType::from($name),
+                'variant' => MediaVariantType::from($nameStr),
                 'path' => $variantPath,
                 'mime_type' => $blob->mime_type,
                 'checksum' => $media->checksum,
                 'disk' => $blob->disk,
                 'is_generated' => true,
                 'processing_time_ms' => $processingTime,
-                'width' => $specs['width'],
-                'height' => $specs['height'],
+                'width' => $width,
+                'height' => $height,
                 'size' => $blob->size, // Simulating size
             ]);
         }
@@ -181,8 +192,11 @@ class MediaProcessingService
         exec('ffprobe -v quiet -print_format json -show_format -show_streams '.escapeshellarg($filePath), $output, $resultCode);
         if ($resultCode === 0 && ! empty($output)) {
             $json = json_decode(implode('', $output), true);
-            if ($json && is_array($json)) {
-                $duration = isset($json['format']['duration']) ? (float) $json['format']['duration'] : null;
+            if (is_array($json)) {
+                $format = isset($json['format']) && is_array($json['format']) ? $json['format'] : [];
+                $durationVal = $format['duration'] ?? null;
+                $duration = is_numeric($durationVal) ? (float) $durationVal : null;
+
                 $streams = isset($json['streams']) && is_array($json['streams']) ? $json['streams'] : [];
                 $videoStream = null;
                 foreach ($streams as $s) {

@@ -16,11 +16,16 @@ class PruneGovernanceData extends Command
 
     public function handle(): int
     {
-        $auditDays = (int) config('governance.audit.retention_days', 365);
-        $idempotencyHours = (int) config('governance.idempotency.ttl_hours', 24);
+        $auditDaysVal = config('governance.audit.retention_days', 365);
+        $auditDays = is_numeric($auditDaysVal) ? (int) $auditDaysVal : 365;
 
-        $audits = AuditLog::query()->where('created_at', '<', now()->subDays($auditDays))->delete();
-        $keys = IdempotencyKey::query()->where('created_at', '<', now()->subHours($idempotencyHours))->delete();
+        $idempotencyHoursVal = config('governance.idempotency.ttl_hours', 24);
+        $idempotencyHours = is_numeric($idempotencyHoursVal) ? (int) $idempotencyHoursVal : 24;
+
+        $auditsVal = AuditLog::query()->where('created_at', '<', now()->subDays($auditDays))->delete();
+        $audits = is_numeric($auditsVal) ? (int) $auditsVal : 0;
+        $keysVal = IdempotencyKey::query()->where('created_at', '<', now()->subHours($idempotencyHours))->delete();
+        $keys = is_numeric($keysVal) ? (int) $keysVal : 0;
 
         $this->info("Pruned {$audits} audit log(s) and {$keys} idempotency key(s).");
 

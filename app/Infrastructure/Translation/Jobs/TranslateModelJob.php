@@ -41,7 +41,8 @@ class TranslateModelJob implements ShouldBeUnique, ShouldQueue
         public readonly string $sourceLocale,
         public readonly string $toLocale
     ) {
-        $this->queue = config('translation.queue', 'translations');
+        $queueVal = config('translation.queue', 'translations');
+        $this->queue = is_string($queueVal) ? $queueVal : 'translations';
     }
 
     /**
@@ -115,8 +116,10 @@ class TranslateModelJob implements ShouldBeUnique, ShouldQueue
 
         $correlationId = (string) Str::uuid();
         $startTime = microtime(true);
-        $providerName = config('translation.default', 'gemini');
-        $promptVersion = config("translation.providers.{$providerName}.prompt_version", 'v1');
+        $providerNameVal = config('translation.default', 'gemini');
+        $providerName = is_string($providerNameVal) ? $providerNameVal : 'gemini';
+        $promptVersionVal = config("translation.providers.{$providerName}.prompt_version", 'v1');
+        $promptVersion = is_string($promptVersionVal) ? $promptVersionVal : 'v1';
 
         \Illuminate\Support\Facades\DB::table('translation_jobs')
             ->where('model_type', $this->modelClass)

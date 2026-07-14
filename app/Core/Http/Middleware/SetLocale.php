@@ -19,15 +19,23 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $supported = config('localization.supported', ['en']);
+        $supportedConfig = config('localization.supported', ['en']);
+        /** @var array<string> $supported */
+        $supported = is_array($supportedConfig) ? array_filter($supportedConfig, 'is_string') : ['en'];
 
-        $locale = $request->query('lang')
-            ?? $request->user()->locale
-            ?? $request->getPreferredLanguage($supported)
-            ?? config('localization.fallback', 'en');
+        $langQuery = $request->query('lang');
+        $user = $request->user();
+        $userLocale = ($user !== null && is_string($loc = $user->getAttribute('locale'))) ? $loc : null;
 
-        if (! in_array($locale, $supported, true)) {
-            $locale = config('localization.fallback', 'en');
+        $preferred = $request->getPreferredLanguage($supported);
+
+        $fallbackConfig = config('localization.fallback', 'en');
+        $fallback = is_string($fallbackConfig) ? $fallbackConfig : 'en';
+
+        $locale = (is_string($langQuery) && $langQuery !== '') ? $langQuery : ($userLocale ?? $preferred ?? $fallback);
+
+        if (! is_string($locale) || ! in_array($locale, $supported, true)) {
+            $locale = $fallback;
         }
 
         app()->setLocale($locale);

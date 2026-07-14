@@ -28,9 +28,12 @@ class SocialProviderStrategy implements AuthStrategyInterface
             return $driver->stateless()->redirect()->getTargetUrl();
         } catch (\Throwable) {
             // In testing environments or if socialite driver is unconfigured, return standard OAuth URL
-            $config = config("services.{$provider}");
-            $clientId = $config['client_id'] ?? '';
-            $redirectUri = urlencode((string) ($config['redirect'] ?? ''));
+            $configVal = config("services.{$provider}");
+            $config = is_array($configVal) ? $configVal : [];
+            $clientIdVal = $config['client_id'] ?? '';
+            $clientId = is_scalar($clientIdVal) ? (string) $clientIdVal : '';
+            $redirectVal = $config['redirect'] ?? '';
+            $redirectUri = urlencode(is_scalar($redirectVal) ? (string) $redirectVal : '');
 
             return match ($provider) {
                 'google' => "https://accounts.google.com/o/oauth2/v2/auth?client_id={$clientId}&redirect_uri={$redirectUri}&response_type=code&scope=email%20profile",
@@ -81,8 +84,9 @@ class SocialProviderStrategy implements AuthStrategyInterface
         // Validate OIDC claims if provided
         $claims = (array) ($socialUser['claims'] ?? []);
         if (! empty($claims)) {
-            $clientId = config("services.{$provider}.client_id");
-            if (isset($claims['aud']) && (string) $claims['aud'] !== (string) $clientId) {
+            $clientIdVal = config("services.{$provider}.client_id");
+            $clientId = is_scalar($clientIdVal) ? (string) $clientIdVal : '';
+            if (isset($claims['aud']) && is_scalar($claims['aud']) && (string) $claims['aud'] !== $clientId) {
                 throw new DomainException(__('auth.social.invalid_audience', ['default' => 'Token audience mismatch.']), 'social_token_invalid_aud');
             }
             if (isset($claims['exp']) && ((int) $claims['exp']) < time()) {

@@ -31,8 +31,9 @@ class MediaDownloadService
         }
 
         // Apply CDN mapping if configured
-        $cdnUrl = config('media.cdn_url');
-        if ($cdnUrl) {
+        $cdnUrlVal = config('media.cdn_url');
+        $cdnUrl = is_string($cdnUrlVal) ? $cdnUrlVal : '';
+        if ($cdnUrl !== '') {
             $url = str_replace(url('/'), rtrim($cdnUrl, '/'), $url);
         }
 

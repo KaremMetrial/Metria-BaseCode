@@ -24,10 +24,19 @@ class PaymentController extends ApiController
     public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Payment::class);
+
+        $cfgPerPage = config('core.api.per_page', 20);
+        $perPageDefault = is_numeric($cfgPerPage) ? (int) $cfgPerPage : 20;
+        $cfgMaxPerPage = config('core.api.max_per_page', 100);
+        $maxPerPage = is_numeric($cfgMaxPerPage) ? (int) $cfgMaxPerPage : 100;
+
+        $reqPerPageQuery = $request->query('per_page');
+        $reqPerPage = is_numeric($reqPerPageQuery) ? (int) $reqPerPageQuery : $perPageDefault;
+
         $payments = Payment::query()
             ->where('user_id', $this->getAuthenticatedUser($request)->id)
             ->latest()
-            ->paginate(min((int) $request->query('per_page', (string) config('core.api.per_page', 20)), (int) config('core.api.max_per_page', 100)));
+            ->paginate(min($reqPerPage, $maxPerPage));
 
         return $this->respond(PaymentResource::collection($payments));
     }
@@ -38,21 +47,39 @@ class PaymentController extends ApiController
      */
     public function store(CreatePaymentRequest $request): JsonResponse
     {
-        $money = Money::fromDecimal(
-            $request->validated('amount'),
-            $request->validated('currency'),
-        );
+        $amountVal = $request->validated('amount');
+        $currencyVal = $request->validated('currency');
+
+        $amount = is_numeric($amountVal) ? (string) $amountVal : '0.00';
+        $currency = is_string($currencyVal) ? $currencyVal : null;
+
+        $money = Money::fromDecimal($amount, $currency);
+
+        $gatewayVal = $request->validated('gateway');
+        $gateway = is_string($gatewayVal) ? $gatewayVal : null;
+
+        $returnUrlVal = $request->validated('return_url');
+        $returnUrl = is_string($returnUrlVal) ? $returnUrlVal : null;
+
+        $paymentMethodVal = $request->validated('payment_method');
+        $paymentMethod = is_string($paymentMethodVal) ? $paymentMethodVal : null;
+
+        $metadataVal = $request->validated('metadata');
+        $metadata = is_array($metadataVal) ? $metadataVal : [];
+
+        $descriptionVal = $request->validated('description');
+        $description = is_string($descriptionVal) ? $descriptionVal : null;
 
         ['payment' => $payment, 'result' => $result] = $this->payments->create(
             user: $this->getAuthenticatedUser($request),
             money: $money,
-            gateway: $request->validated('gateway'),
+            gateway: $gateway,
             options: [
-                'return_url' => $request->validated('return_url'),
-                'payment_method' => $request->validated('payment_method'),
-                'metadata' => $request->validated('metadata', []),
+                'return_url' => $returnUrl,
+                'payment_method' => $paymentMethod,
+                'metadata' => $metadata,
             ],
-            description: $request->validated('description'),
+            description: $description,
         );
 
         return $this->respondCreated([
@@ -76,11 +103,16 @@ class PaymentController extends ApiController
     public function refund(RefundPaymentRequest $request, Payment $payment): JsonResponse
     {
         Gate::authorize('refund', $payment);
-        $amount = $request->validated('amount') !== null
-            ? Money::fromDecimal($request->validated('amount'), $payment->currency)
+
+        $amountVal = $request->validated('amount');
+        $amount = $amountVal !== null && is_numeric($amountVal)
+            ? Money::fromDecimal((string) $amountVal, $payment->currency)
             : null;
 
-        $outcome = $this->payments->requestRefund($payment, $amount, $this->getAuthenticatedUser($request), $request->validated('reason'));
+        $reasonVal = $request->validated('reason');
+        $reason = is_string($reasonVal) ? $reasonVal : null;
+
+        $outcome = $this->payments->requestRefund($payment, $amount, $this->getAuthenticatedUser($request), $reason);
 
         if ($outcome instanceof ApprovalRequest) {
             return $this->respond(

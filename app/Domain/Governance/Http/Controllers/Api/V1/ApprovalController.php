@@ -20,11 +20,14 @@ class ApprovalController extends ApiController
     public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', ApprovalRequest::class);
+        $cfgPerPage = config('core.api.per_page', 20);
+        $perPage = is_numeric($cfgPerPage) ? (int) $cfgPerPage : 20;
+
         $requests = ApprovalRequest::query()
             ->with(['requester', 'approver'])
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', ApprovalStatus::from(is_array($status) ? (string) reset($status) : (string) $status)))
             ->latest()
-            ->paginate((int) config('core.api.per_page', 20));
+            ->paginate($perPage);
 
         return $this->respond(ApprovalRequestResource::collection($requests));
     }

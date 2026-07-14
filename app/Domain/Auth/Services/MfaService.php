@@ -34,7 +34,8 @@ class MfaService
         $user->two_factor_confirmed_at = null; // Needs confirmation
         $user->save();
 
-        $appName = urlencode((string) config('app.name', 'Laravel'));
+        $cfgApp = config('app.name', 'Laravel');
+        $appName = urlencode(is_string($cfgApp) ? $cfgApp : 'Laravel');
         $userEmail = urlencode($user->email);
         $qrUrl = "otpauth://totp/{$appName}:{$userEmail}?secret={$secret}&issuer={$appName}";
 
@@ -133,13 +134,15 @@ class MfaService
 
     private function consumeRecoveryCode(User $user, string $code): bool
     {
-        if (empty($user->two_factor_recovery_codes)) {
+        $rawCodesJson = $user->two_factor_recovery_codes;
+        if (! is_string($rawCodesJson) || empty($rawCodesJson)) {
             return false;
         }
 
-        $hashedCodes = json_decode((string) $user->two_factor_recovery_codes, true) ?? [];
+        $decoded = json_decode($rawCodesJson, true);
+        $hashedCodes = is_array($decoded) ? $decoded : [];
         foreach ($hashedCodes as $index => $hash) {
-            if (Hash::check($code, $hash)) {
+            if (is_string($hash) && Hash::check($code, $hash)) {
                 unset($hashedCodes[$index]);
                 $user->two_factor_recovery_codes = json_encode(array_values($hashedCodes)) ?: null;
                 $user->save();

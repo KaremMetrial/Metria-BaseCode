@@ -23,16 +23,29 @@ class ResolveTenant
         }
 
         $user = $request->user();
-        $userTenantId = $user ? ($user->getAttributes()['tenant_id'] ?? null) : null;
+        $userTenantId = null;
+        if ($user !== null) {
+            $attr = $user->getAttributes();
+            if (isset($attr['tenant_id']) && is_scalar($attr['tenant_id'])) {
+                $userTenantId = (string) $attr['tenant_id'];
+            }
+        }
 
-        $headerName = config('tenancy.header', 'X-Tenant-ID');
-        $tenantId = $request->header($headerName)
-            ?? $request->header('X-Tenant-ID')
-            ?? $request->header('X-Tenant')
-            ?? $userTenantId;
+        $headerName = (string) config('tenancy.header', 'X-Tenant-ID');
+        $h1 = $request->header($headerName);
+        $headerVal = is_array($h1) ? reset($h1) : $h1;
+
+        $h2 = $request->header('X-Tenant-ID');
+        $h2Val = is_array($h2) ? reset($h2) : $h2;
+
+        $h3 = $request->header('X-Tenant');
+        $h3Val = is_array($h3) ? reset($h3) : $h3;
+
+        $tenantIdRaw = ($headerVal !== '' && $headerVal !== null) ? $headerVal : (($h2Val !== '' && $h2Val !== null) ? $h2Val : (($h3Val !== '' && $h3Val !== null) ? $h3Val : $userTenantId));
+        $tenantId = is_scalar($tenantIdRaw) ? (string) $tenantIdRaw : null;
 
         if ($user && $tenantId !== null) {
-            if ($userTenantId !== null && (string) $userTenantId !== (string) $tenantId && ! $user->can('admin.super')) {
+            if ($userTenantId !== null && $userTenantId !== $tenantId && ! $user->can('admin.super')) {
                 $tenantId = $userTenantId;
             }
         }

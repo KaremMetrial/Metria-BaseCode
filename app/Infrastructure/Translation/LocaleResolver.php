@@ -25,7 +25,8 @@ class LocaleResolver
             }
         }
 
-        return (string) config('app.locale', 'en');
+        $cfgLocale = config('app.locale', 'en');
+        return is_string($cfgLocale) ? $cfgLocale : 'en';
     }
 
     /**
@@ -33,6 +34,7 @@ class LocaleResolver
      */
     public function resolveSourceLocale(?Model $model = null): string
     {
-        return (string) config('app.fallback_locale', 'en');
+        $cfgFallback = config('app.fallback_locale', 'en');
+        return is_string($cfgFallback) ? $cfgFallback : 'en';
     }
 }

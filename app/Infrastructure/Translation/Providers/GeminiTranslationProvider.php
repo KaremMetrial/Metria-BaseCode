@@ -29,11 +29,14 @@ class GeminiTranslationProvider implements TranslationProviderInterface
             throw new ProviderUnavailableException('Gemini API key is not configured.');
         }
 
-        $version = config('translation.providers.gemini.prompt_version', 'v1');
+        $versionVal = config('translation.providers.gemini.prompt_version', 'v1');
+        $version = is_string($versionVal) ? $versionVal : 'v1';
         $prompt = TranslationPrompt::make($version, array_keys($values), $sourceLocale, $targetLocale);
 
         try {
-            $response = Http::timeout(config('translation.timeout', 60))
+            $timeoutVal = config('translation.timeout', 60);
+            $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 60;
+            $response = Http::timeout($timeout)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->key}", [
                     'contents' => [
@@ -69,6 +72,7 @@ class GeminiTranslationProvider implements TranslationProviderInterface
             throw new InvalidTranslationResponseException('Response text could not be decoded as valid JSON.');
         }
 
+        $result = [];
         foreach (array_keys($values) as $key) {
             if (! array_key_exists($key, $decoded)) {
                 throw new TranslationValidationFailedException("Missing translated key: {$key}");
@@ -86,9 +90,11 @@ class GeminiTranslationProvider implements TranslationProviderInterface
             if (! mb_check_encoding($val, 'UTF-8')) {
                 throw new TranslationValidationFailedException("Translated key '{$key}' value is not valid UTF-8.");
             }
+
+            $result[(string) $key] = $val;
         }
 
-        return $decoded;
+        return $result;
     }
 
     public function supports(string $sourceLocale, string $targetLocale): bool

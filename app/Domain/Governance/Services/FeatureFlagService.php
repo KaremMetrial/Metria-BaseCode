@@ -41,7 +41,9 @@ class FeatureFlagService
                 return false;
             }
 
-            $bucket = crc32($name.'|'.$user->getAuthIdentifier()) % 100;
+            $authIdVal = $user->getAuthIdentifier();
+            $authId = is_scalar($authIdVal) ? (string) $authIdVal : '';
+            $bucket = crc32($name.'|'.$authId) % 100;
 
             return $bucket < $flag->percentage;
         }

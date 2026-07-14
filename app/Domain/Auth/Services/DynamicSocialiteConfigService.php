@@ -30,7 +30,7 @@ class DynamicSocialiteConfigService
 
         // Check if fallback exists in static services config
         $staticConfig = Config::get("services.{$provider}");
-        if (! $staticConfig || empty($staticConfig['client_id'])) {
+        if (! is_array($staticConfig) || empty($staticConfig['client_id'])) {
             throw new DomainException(
                 __('auth.social.provider_disabled', ['provider' => $provider]),
                 errorCode: 'oauth_provider_disabled'

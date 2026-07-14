@@ -26,8 +26,11 @@ class LoginWithOtp
         $this->verifyOtp->__invoke($identifier, $code, 'login', $guard);
 
         // 2. Resolve the model class for the guard
-        $provider = config("auth.guards.{$guard}.provider");
-        $modelClass = config("auth.providers.{$provider}.model") ?? User::class;
+        $providerVal = config("auth.guards.{$guard}.provider");
+        $provider = is_string($providerVal) ? $providerVal : 'users';
+        $modelClassVal = config("auth.providers.{$provider}.model");
+        /** @var class-string<Model> $modelClass */
+        $modelClass = is_string($modelClassVal) && class_exists($modelClassVal) ? $modelClassVal : User::class;
 
         // 3. Find the user by phone or email (scoped correctly within tenant bounds)
         $user = $modelClass::query()
@@ -49,7 +52,9 @@ class LoginWithOtp
                 : $user->getPermissionsViaRoles()->pluck('name')->toArray();
         }
 
-        $token = $user->createToken($deviceName, $abilities)->plainTextToken;
+        $token = method_exists($user, 'createToken')
+            ? $user->createToken($deviceName, $abilities)->plainTextToken
+            : '';
 
         // 5. Fire Login event
         $this->events->publish(new UserLoggedInByOtp($user, $guard));
