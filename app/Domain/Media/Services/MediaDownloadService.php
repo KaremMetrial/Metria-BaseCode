@@ -13,8 +13,9 @@ class MediaDownloadService
     {
         $blob = $media->blob;
         if (! $blob) {
-            throw new \RuntimeException('No file blob is attached to this media.');
+            throw new \RuntimeException(__('media.missing_blob'));
         }
+
 
         $disk = Storage::disk($blob->disk);
 

@@ -22,6 +22,7 @@ class ForceJsonResponse
             return $response;
         }
 
-        throw new \UnexpectedValueException('Expected Response instance.');
+        throw new \UnexpectedValueException(__('core.expected_response_instance'));
     }
+
 }

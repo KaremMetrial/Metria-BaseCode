@@ -113,8 +113,9 @@ class DeliverWebhook implements ShouldQueue
         }
 
         // Throwing hands the retry (with backoff) to the queue worker.
-        throw new RuntimeException("Webhook delivery {$delivery->id} got HTTP {$response->status()} from {$endpoint->url}");
+        throw new RuntimeException(__('webhooks.delivery_failed', ['id' => $delivery->id, 'status' => $response->status(), 'url' => $endpoint->url]));
     }
+
 
     public function failed(Throwable $exception): void
     {

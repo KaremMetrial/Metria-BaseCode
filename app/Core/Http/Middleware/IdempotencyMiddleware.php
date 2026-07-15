@@ -34,8 +34,9 @@ class IdempotencyMiddleware
             if ($response instanceof Response) {
                 return $response;
             }
-            throw new \UnexpectedValueException('Expected Response instance.');
+            throw new \UnexpectedValueException(__('core.expected_response_instance'));
         }
+
 
         $userId = $request->user()?->getAuthIdentifier();
         $scope = hash('sha256', implode('|', [

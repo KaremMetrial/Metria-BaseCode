@@ -71,8 +71,9 @@ class CurrencyExchangeApiProvider implements ExchangeRateProviderInterface
         $rate = data_get($data, "data.{$targetCurrency}.value");
 
         if ($rate === null || ! is_numeric($rate)) {
-            throw new Exception("CurrencyExchangeAPI payload missing or invalid numeric rate for {$targetCurrency}.");
+            throw new Exception(__('currency.invalid_api_payload', ['currency' => $targetCurrency]));
         }
+
 
         // Format to exactly 14 decimal places as a string to preserve BCMath precision
         $rateString = number_format((float) $rate, 14, '.', '');

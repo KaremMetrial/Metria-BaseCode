@@ -26,7 +26,7 @@ class GeminiTranslationProvider implements TranslationProviderInterface
     public function translate(array $values, string $sourceLocale, string $targetLocale): array
     {
         if (empty($this->key)) {
-            throw new ProviderUnavailableException('Gemini API key is not configured.');
+            throw new ProviderUnavailableException(__('translations.gemini_missing_key'));
         }
 
         $versionVal = config('translation.providers.gemini.prompt_version', 'v1');
@@ -51,44 +51,44 @@ class GeminiTranslationProvider implements TranslationProviderInterface
                     ],
                 ]);
         } catch (\Throwable $e) {
-            throw new ProviderUnavailableException('Network error contacting Gemini: '.$e->getMessage(), 0, $e);
+            throw new ProviderUnavailableException(__('translations.gemini_network_error', ['error' => $e->getMessage()]), 0, $e);
         }
 
         if ($response->failed()) {
             if ($response->status() === 429) {
                 $retryAfter = now()->addSeconds(60);
-                throw new RateLimitedException('Gemini rate limit exceeded.', 429, null, $retryAfter);
+                throw new RateLimitedException(__('translations.gemini_rate_limited'), 429, null, $retryAfter);
             }
-            throw new ProviderUnavailableException('Gemini API returned error code '.$response->status());
+            throw new ProviderUnavailableException(__('translations.gemini_error_code', ['status' => $response->status()]));
         }
 
         $text = $response->json('candidates.0.content.parts.0.text');
         if (! is_string($text)) {
-            throw new InvalidTranslationResponseException('Response content is missing or not a string.');
+            throw new InvalidTranslationResponseException(__('translations.missing_content'));
         }
 
         $decoded = json_decode($text, true);
         if (! is_array($decoded)) {
-            throw new InvalidTranslationResponseException('Response text could not be decoded as valid JSON.');
+            throw new InvalidTranslationResponseException(__('translations.invalid_json'));
         }
 
         $result = [];
         foreach (array_keys($values) as $key) {
             if (! array_key_exists($key, $decoded)) {
-                throw new TranslationValidationFailedException("Missing translated key: {$key}");
+                throw new TranslationValidationFailedException(__('translations.missing_key', ['key' => $key]));
             }
 
             $val = $decoded[$key];
             if (! is_string($val)) {
-                throw new TranslationValidationFailedException("Translated key '{$key}' value is not a string.");
+                throw new TranslationValidationFailedException(__('translations.value_not_string', ['key' => $key]));
             }
 
             if (trim($val) === '') {
-                throw new TranslationValidationFailedException("Translated key '{$key}' value is empty.");
+                throw new TranslationValidationFailedException(__('translations.value_empty', ['key' => $key]));
             }
 
             if (! mb_check_encoding($val, 'UTF-8')) {
-                throw new TranslationValidationFailedException("Translated key '{$key}' value is not valid UTF-8.");
+                throw new TranslationValidationFailedException(__('translations.value_not_utf8', ['key' => $key]));
             }
 
             $result[(string) $key] = $val;
@@ -107,7 +107,7 @@ class GeminiTranslationProvider implements TranslationProviderInterface
         if (empty($this->key)) {
             return new ProviderHealth(
                 ProviderState::Offline,
-                'Gemini API key is unconfigured.'
+                __('translations.gemini_missing_key')
             );
         }
 

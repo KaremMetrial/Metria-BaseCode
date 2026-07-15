@@ -55,6 +55,7 @@ class ExchangeRateProviderChain
             }
         }
 
-        throw new Exception("All exchange rate providers failed to fetch rate for {$currencyCode}. Trace: ".json_encode($errors));
+        throw new Exception(__('currency.all_providers_failed', ['currency' => $currencyCode, 'trace' => json_encode($errors)]));
     }
 }
+

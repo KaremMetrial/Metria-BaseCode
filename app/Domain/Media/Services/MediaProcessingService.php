@@ -36,16 +36,16 @@ class MediaProcessingService
         } catch (\Throwable) {
             $tempPath = tempnam(sys_get_temp_dir(), 'media_process_');
             if ($tempPath === false) {
-                throw new \RuntimeException('Failed to create temporary file.');
+                throw new \RuntimeException(__('media.temp_file_failed'));
             }
             $source = $disk->readStream($blob->path);
             if (! $source) {
-                throw new \RuntimeException("Failed to open read stream for path: {$blob->path}");
+                throw new \RuntimeException(__('media.stream_read_failed', ['path' => $blob->path]));
             }
             $target = fopen($tempPath, 'wb');
             if (! $target) {
                 fclose($source);
-                throw new \RuntimeException("Failed to open write stream for path: {$tempPath}");
+                throw new \RuntimeException(__('media.stream_write_failed', ['path' => $tempPath]));
             }
             stream_copy_to_stream($source, $target);
             fclose($source);
@@ -154,7 +154,7 @@ class MediaProcessingService
                 $disk->put($variantPath, $fh);
                 fclose($fh);
             } else {
-                throw new \RuntimeException("Failed to open local path {$filePath} for reading variant.");
+                throw new \RuntimeException(__('media.variant_read_failed', ['path' => $filePath]));
             }
 
             $processingTime = (int) ((microtime(true) - $variantStart) * 1000);

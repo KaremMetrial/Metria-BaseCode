@@ -77,8 +77,9 @@ class TerritoryController extends ApiController
         );
 
         if ($zone === null) {
-            return $this->respondError('No operational zone found for given coordinates.', 404, 'zone_not_found');
+            return $this->respondError(__('territories.zone_not_found'), 404, 'zone_not_found');
         }
+
 
         return $this->respond(new ZoneResource($zone));
     }

@@ -13,4 +13,6 @@ return [
     'idempotency_in_flight' => 'يوجد طلب قيد المعالجة بنفس مفتاح Idempotency.',
     'enum_not_found' => 'لم يتم العثور على التعداد المفهرس بالرمز: [:key].',
     'no_content' => 'لا يوجد محتوى.',
+    'http_error' => 'حدث خطأ HTTP برمز :status.',
 ];
+

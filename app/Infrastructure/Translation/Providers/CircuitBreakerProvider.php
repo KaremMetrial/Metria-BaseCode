@@ -27,8 +27,9 @@ class CircuitBreakerProvider implements TranslationProviderInterface
     {
         $state = $this->getCircuitState();
         if ($state === 'open') {
-            throw new ProviderUnavailableException("Circuit breaker is OPEN for provider [{$this->name()}]. Calls blocked.");
+            throw new ProviderUnavailableException(__('translations.circuit_open', ['provider' => $this->name()]));
         }
+
 
         try {
             $result = $this->inner->translate($values, $sourceLocale, $targetLocale);

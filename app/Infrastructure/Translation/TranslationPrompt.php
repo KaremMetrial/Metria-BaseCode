@@ -42,8 +42,9 @@ class TranslationPrompt implements PromptInterface
                 $sourceLocale,
                 $targetLocale
             ),
-            default => throw new InvalidArgumentException("Unknown translation prompt version: {$version}"),
+            default => throw new InvalidArgumentException(__('translations.unknown_prompt_version', ['version' => $version])),
         };
+
 
         return new self($version, $systemPrompt, $expectedKeys);
     }

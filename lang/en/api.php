@@ -13,4 +13,6 @@ return [
     'idempotency_in_flight' => 'A request with this idempotency key is already being processed.',
     'enum_not_found' => 'Enum not found for key: [:key].',
     'no_content' => 'No content found.',
+    'http_error' => 'HTTP Error :status encountered.',
 ];
+

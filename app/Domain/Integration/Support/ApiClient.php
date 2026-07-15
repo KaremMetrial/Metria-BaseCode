@@ -72,8 +72,9 @@ abstract class ApiClient
         });
 
         if (! $response instanceof Response) {
-            throw new IntegrationException('Invalid response class returned from circuit breaker call.', provider: $this->service());
+            throw new IntegrationException(__('integrations.invalid_response_class'), provider: $this->service());
         }
+
 
         return $response;
     }

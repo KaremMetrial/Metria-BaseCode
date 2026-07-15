@@ -29,8 +29,9 @@ class DualBroadcaster extends Broadcaster
         $connection = app(BroadcastManager::class)->connection($primary);
 
         if (! $connection instanceof BroadcasterContract) {
-            throw new \RuntimeException('Primary broadcast driver must implement Broadcaster contract.');
+            throw new \RuntimeException(__('core.broadcaster_contract_required'));
         }
+
 
         return $connection;
     }

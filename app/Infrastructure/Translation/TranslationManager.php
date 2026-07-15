@@ -55,8 +55,9 @@ class TranslationManager extends Manager
         $provider = parent::driver($driverStr);
 
         if (! $provider instanceof TranslationProviderInterface) {
-            throw new \RuntimeException('Translation driver must implement TranslationProviderInterface.');
+            throw new \RuntimeException(__('translations.driver_interface_required'));
         }
+
 
         if (! $provider instanceof \App\Infrastructure\Translation\Providers\CircuitBreakerProvider) {
             $thresholdVal = $this->config->get('translation.circuit_breaker.failure_threshold', 5);

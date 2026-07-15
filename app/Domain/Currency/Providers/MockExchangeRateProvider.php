@@ -41,14 +41,15 @@ class MockExchangeRateProvider implements ExchangeRateProviderInterface
     public function fetchRate(string $currencyCode): array
     {
         if ($this->shouldFail) {
-            throw new Exception('Mock provider failed connection timeout.');
+            throw new Exception(__('currency.mock_connection_timeout'));
         }
 
         $currencyCode = strtoupper($currencyCode);
 
         if (! isset($this->rates[$currencyCode])) {
-            throw new Exception("No mock rate configured for {$currencyCode}.");
+            throw new Exception(__('currency.mock_rate_missing', ['currency' => $currencyCode]));
         }
+
 
         $rate = $this->rates[$currencyCode];
         $payload = json_encode(['rate' => $rate, 'currency' => $currencyCode, 'timestamp' => time()]) ?: '';

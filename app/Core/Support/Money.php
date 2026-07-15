@@ -20,7 +20,7 @@ final readonly class Money implements JsonSerializable, Stringable
         public string $currency, // ISO-4217, e.g. EGP, AED, USD
     ) {
         if ($amount < 0) {
-            throw new InvalidArgumentException('Money amount cannot be negative.');
+            throw new InvalidArgumentException(__('currency.money_negative'));
         }
     }
 
@@ -74,7 +74,7 @@ final readonly class Money implements JsonSerializable, Stringable
         $this->assertSameCurrency($other);
 
         if ($other->amount > $this->amount) {
-            throw new InvalidArgumentException('Resulting money amount would be negative.');
+            throw new InvalidArgumentException(__('currency.money_negative_result'));
         }
 
         return new self($this->amount - $other->amount, $this->currency);
@@ -110,7 +110,7 @@ final readonly class Money implements JsonSerializable, Stringable
     private function assertSameCurrency(self $other): void
     {
         if ($this->currency !== $other->currency) {
-            throw new InvalidArgumentException("Currency mismatch: {$this->currency} vs {$other->currency}");
+            throw new InvalidArgumentException(__('currency.currency_mismatch', ['current' => $this->currency, 'other' => $other->currency]));
         }
     }
 
