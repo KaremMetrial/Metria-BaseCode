@@ -12,10 +12,13 @@ class AuditSecurityEvent
 
     public function handle(object $event): void
     {
-        $eventName = method_exists($event, 'eventName') ? $event->eventName() : get_class($event);
-        $payload = method_exists($event, 'payload') ? $event->payload() : [];
+        $eventNameVal = method_exists($event, 'eventName') ? $event->eventName() : get_class($event);
+        $eventName = is_scalar($eventNameVal) ? (string) $eventNameVal : get_class($event);
+        $payloadVal = method_exists($event, 'payload') ? $event->payload() : [];
+        $payload = is_array($payloadVal) ? $payloadVal : [];
 
-        $user = $event->user ?? null;
+        $userVal = property_exists($event, 'user') ? $event->user : null;
+        $user = $userVal instanceof \Illuminate\Database\Eloquent\Model ? $userVal : null;
 
         $this->audit->log("security.{$eventName}", $user, $payload);
     }

@@ -8,6 +8,9 @@ use App\Core\Abstracts\BaseRepository;
 use App\Domain\Territory\Models\Governorate;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @extends BaseRepository<Governorate>
+ */
 class GovernorateRepository extends BaseRepository
 {
     public function __construct(Governorate $model)

@@ -71,8 +71,11 @@ class PaymobGateway implements PaymentGateway
         $orderId = is_scalar($orderIdVal) ? (string) $orderIdVal : '';
 
         // Step 3: payment key bound to the order + integration.
-        $billing = $options['billing_data'] ?? [];
+        $billingVal = $options['billing_data'] ?? [];
+        $billing = is_array($billingVal) ? $billingVal : [];
         $user = $payment->user;
+        $integrationIdVal = $this->config['integration_id'] ?? 0;
+        $integrationId = is_numeric($integrationIdVal) ? (int) $integrationIdVal : 0;
 
         $key = $this->http()->post('/acceptance/payment_keys', [
             'auth_token' => $token,
@@ -80,7 +83,7 @@ class PaymobGateway implements PaymentGateway
             'expiration' => 3600,
             'order_id' => $orderId,
             'currency' => $payment->currency,
-            'integration_id' => (int) ($this->config['integration_id'] ?? 0),
+            'integration_id' => $integrationId,
             // Paymob requires every billing field; "NA" is its documented placeholder.
             'billing_data' => array_merge([
                 'first_name' => $user !== null ? $user->name : 'NA',
@@ -128,7 +131,8 @@ class PaymobGateway implements PaymentGateway
      */
     public function verifyWebhook(Request $request): bool
     {
-        $secret = (string) ($this->config['hmac_secret'] ?? '');
+        $secretVal = $this->config['hmac_secret'] ?? '';
+        $secret = is_scalar($secretVal) ? (string) $secretVal : '';
         $providedQuery = $request->query('hmac');
         $providedInput = $request->input('hmac', '');
         $providedVal = is_string($providedQuery) && $providedQuery !== '' ? $providedQuery : $providedInput;
@@ -230,8 +234,10 @@ class PaymobGateway implements PaymentGateway
     private function authToken(): string
     {
         return Cache::remember('paymob_auth_token', 3300, function () {
+            $apiKeyVal = $this->config['api_key'] ?? '';
+            $apiKey = is_scalar($apiKeyVal) ? (string) $apiKeyVal : '';
             $response = $this->http()->post('/auth/tokens', [
-                'api_key' => (string) ($this->config['api_key'] ?? ''),
+                'api_key' => $apiKey,
             ]);
 
             if ($response->failed() || ! $response->json('token')) {
@@ -249,8 +255,10 @@ class PaymobGateway implements PaymentGateway
     {
         $timeoutVal = config('integrations.http.timeout', 15);
         $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+        $baseUrlVal = $this->config['base_url'] ?? 'https://accept.paymob.com/api';
+        $baseUrl = is_scalar($baseUrlVal) ? (string) $baseUrlVal : 'https://accept.paymob.com/api';
 
-        return Http::baseUrl((string) ($this->config['base_url'] ?? 'https://accept.paymob.com/api'))
+        return Http::baseUrl($baseUrl)
             ->acceptJson()
             ->timeout($timeout);
     }

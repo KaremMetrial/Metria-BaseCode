@@ -21,8 +21,11 @@ trait Auditable
 
     public function auditExcluded(): array
     {
+        $excludedVal = property_exists($this, 'auditExclude') ? $this->auditExclude : [];
+        $excluded = is_array($excludedVal) ? $excludedVal : [];
+
         return array_merge(
-            property_exists($this, 'auditExclude') ? $this->auditExclude : [],
+            $excluded,
             ['updated_at', 'created_at', 'remember_token'],
         );
     }

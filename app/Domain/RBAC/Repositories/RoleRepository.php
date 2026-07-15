@@ -9,6 +9,9 @@ use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
 use App\Domain\RBAC\Models\Role;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @extends BaseRepository<Role>
+ */
 class RoleRepository extends BaseRepository implements RoleRepositoryInterface
 {
     public function __construct(Role $model)

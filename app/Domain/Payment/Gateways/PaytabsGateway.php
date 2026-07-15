@@ -35,8 +35,11 @@ class PaytabsGateway implements PaymentGateway
 
     public function createPayment(Payment $payment, array $options = []): PaymentResult
     {
+        $profileIdVal = $this->config['profile_id'] ?? 0;
+        $profileId = is_numeric($profileIdVal) ? (int) $profileIdVal : 0;
+
         $response = $this->http()->post('/payment/request', [
-            'profile_id' => (int) ($this->config['profile_id'] ?? 0),
+            'profile_id' => $profileId,
             'tran_type' => 'sale',
             'tran_class' => 'ecom',
             'cart_id' => $payment->id,
@@ -79,7 +82,8 @@ class PaytabsGateway implements PaymentGateway
 
     public function verifyWebhook(Request $request): bool
     {
-        $serverKey = (string) ($this->config['server_key'] ?? '');
+        $serverKeyVal = $this->config['server_key'] ?? '';
+        $serverKey = is_scalar($serverKeyVal) ? (string) $serverKeyVal : '';
         $signature = (string) $request->header('Signature', '');
 
         if ($serverKey === '' || $signature === '') {
@@ -95,8 +99,11 @@ class PaytabsGateway implements PaymentGateway
         $tranRef = is_scalar($tranRefVal) ? (string) $tranRefVal : '';
 
         // Defence in depth: trust the queried state, not the pushed payload.
+        $profileIdVal = $this->config['profile_id'] ?? 0;
+        $profileId = is_numeric($profileIdVal) ? (int) $profileIdVal : 0;
+
         $query = $this->http()->post('/payment/query', [
-            'profile_id' => (int) ($this->config['profile_id'] ?? 0),
+            'profile_id' => $profileId,
             'tran_ref' => $tranRef,
         ]);
 
@@ -127,8 +134,11 @@ class PaytabsGateway implements PaymentGateway
     {
         $refund = $amount ?? $payment->remainingRefundable();
 
+        $profileIdVal = $this->config['profile_id'] ?? 0;
+        $profileId = is_numeric($profileIdVal) ? (int) $profileIdVal : 0;
+
         $response = $this->http()->post('/payment/request', [
-            'profile_id' => (int) ($this->config['profile_id'] ?? 0),
+            'profile_id' => $profileId,
             'tran_type' => 'refund',
             'tran_class' => 'ecom',
             'tran_ref' => $payment->gateway_reference,
@@ -171,9 +181,13 @@ class PaytabsGateway implements PaymentGateway
     {
         $timeoutVal = config('integrations.http.timeout', 15);
         $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+        $baseUrlVal = $this->config['base_url'] ?? 'https://secure-egypt.paytabs.com';
+        $baseUrl = is_scalar($baseUrlVal) ? (string) $baseUrlVal : 'https://secure-egypt.paytabs.com';
+        $serverKeyVal = $this->config['server_key'] ?? '';
+        $serverKey = is_scalar($serverKeyVal) ? (string) $serverKeyVal : '';
 
-        return Http::baseUrl((string) ($this->config['base_url'] ?? 'https://secure-egypt.paytabs.com'))
-            ->withHeaders(['authorization' => (string) ($this->config['server_key'] ?? '')])
+        return Http::baseUrl($baseUrl)
+            ->withHeaders(['authorization' => $serverKey])
             ->acceptJson()
             ->timeout($timeout);
     }

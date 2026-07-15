@@ -74,7 +74,8 @@ class StripeGateway implements PaymentGateway
      */
     public function verifyWebhook(Request $request): bool
     {
-        $secret = (string) ($this->config['webhook_secret'] ?? '');
+        $secretVal = $this->config['webhook_secret'] ?? '';
+        $secret = is_scalar($secretVal) ? (string) $secretVal : '';
         $header = (string) $request->header('Stripe-Signature', '');
 
         if ($secret === '' || $header === '') {
@@ -185,8 +186,11 @@ class StripeGateway implements PaymentGateway
         $timeoutVal = config('integrations.http.timeout', 15);
         $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
 
+        $secretKeyVal = $this->config['secret_key'] ?? '';
+        $secretKey = is_scalar($secretKeyVal) ? (string) $secretKeyVal : '';
+
         return Http::baseUrl($baseUrl)
-            ->withToken((string) ($this->config['secret_key'] ?? ''))
+            ->withToken($secretKey)
             ->timeout($timeout);
     }
 }

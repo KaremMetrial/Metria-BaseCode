@@ -15,9 +15,12 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Broadcast::extend('dual', function ($app, $config) {
+        Broadcast::extend('dual', function ($app, array $config) {
+            $drivers = is_array($config['drivers'] ?? null) ? $config['drivers'] : ['reverb', 'redis'];
+            $validDrivers = array_values(array_filter($drivers, 'is_string'));
+
             return new DualBroadcaster(
-                $config['drivers'] ?? ['reverb', 'redis']
+                $validDrivers !== [] ? $validDrivers : ['reverb', 'redis']
             );
         });
 

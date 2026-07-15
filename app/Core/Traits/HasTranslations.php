@@ -15,6 +15,7 @@ namespace App\Core\Traits;
  * Writing $model->name = 'x' sets the current-locale value.
  * Use setTranslation()/getTranslations() for explicit locale access.
  */
+/** @phpstan-ignore trait.unused */
 trait HasTranslations
 {
     public function getAttribute($key)
@@ -90,9 +91,12 @@ trait HasTranslations
 
     public function translationsToArray(): array
     {
-        /** @phpstan-ignore-next-line */
-        return collect(property_exists($this, 'translatable') ? $this->translatable : [])
-            ->mapWithKeys(fn (string $key) => [$key => $this->getTranslations($key)])
+        $translatable = property_exists($this, 'translatable') && is_array($this->translatable) ? $this->translatable : [];
+        return collect($translatable)
+            ->mapWithKeys(function ($key) {
+                $keyStr = is_scalar($key) ? (string) $key : '';
+                return $keyStr !== '' ? [$keyStr => $this->getTranslations($keyStr)] : [];
+            })
             ->all();
     }
 }

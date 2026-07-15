@@ -25,7 +25,12 @@ class ApprovalController extends ApiController
 
         $requests = ApprovalRequest::query()
             ->with(['requester', 'approver'])
-            ->when($request->query('status'), fn ($q, $status) => $q->where('status', ApprovalStatus::from(is_array($status) ? (string) reset($status) : (string) $status)))
+            ->when($request->query('status'), function ($q, $status) {
+                $val = is_array($status) ? reset($status) : $status;
+                $str = is_scalar($val) ? (string) $val : '';
+
+                return $str !== '' ? $q->where('status', ApprovalStatus::from($str)) : $q;
+            })
             ->latest()
             ->paginate($perPage);
 

@@ -16,7 +16,7 @@ class TranslationServiceProvider extends ServiceProvider
         $this->app->singleton(LocaleResolver::class);
         $this->app->singleton(TranslationRegistry::class);
 
-        $this->app->singleton('translation', function ($app) {
+        $this->app->singleton('translation', function (\Illuminate\Contracts\Container\Container $app) {
             return new TranslationManager($app);
         });
 

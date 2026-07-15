@@ -25,12 +25,19 @@ class VonageDriver implements SmsProvider
             $appNameVal = config('app.name');
             $appName = is_string($appNameVal) ? $appNameVal : 'Laravel';
 
+            $keyVal = $this->config['key'] ?? '';
+            $key = is_scalar($keyVal) ? (string) $keyVal : '';
+            $secretVal = $this->config['secret'] ?? '';
+            $secret = is_scalar($secretVal) ? (string) $secretVal : '';
+            $fromVal = $this->config['from'] ?? $appName;
+            $from = is_scalar($fromVal) ? (string) $fromVal : $appName;
+
             $response = Http::asForm()
                 ->timeout($timeout)
                 ->post('https://rest.nexmo.com/sms/json', [
-                    'api_key' => (string) ($this->config['key'] ?? ''),
-                    'api_secret' => (string) ($this->config['secret'] ?? ''),
-                    'from' => (string) ($this->config['from'] ?? $appName),
+                    'api_key' => $key,
+                    'api_secret' => $secret,
+                    'from' => $from,
                     'to' => ltrim($to, '+'),
                     'text' => $message,
                     'type' => 'unicode', // Arabic-safe

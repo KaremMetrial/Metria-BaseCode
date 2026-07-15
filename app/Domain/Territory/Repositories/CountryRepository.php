@@ -8,6 +8,9 @@ use App\Core\Abstracts\BaseRepository;
 use App\Domain\Territory\Models\Country;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @extends BaseRepository<Country>
+ */
 class CountryRepository extends BaseRepository
 {
     public function __construct(Country $model)

@@ -21,16 +21,24 @@ class OtpNotification extends Notification implements ShouldQueue
         $channels = [];
 
         // Check if notifiable has email or a mail route
-        $hasEmail = (isset($notifiable->email) && str_contains($notifiable->email, '@'))
-            || method_exists($notifiable, 'routeNotificationFor') && $notifiable->routeNotificationFor('mail') !== null;
+        $email = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+            ? $notifiable->getAttribute('email')
+            : (property_exists($notifiable, 'email') ? $notifiable->email : null);
+
+        $hasEmail = (is_string($email) && str_contains($email, '@'))
+            || (method_exists($notifiable, 'routeNotificationFor') && $notifiable->routeNotificationFor('mail') !== null);
 
         if ($hasEmail) {
             $channels[] = 'mail';
         }
 
         // Check if notifiable has phone or an SMS route
-        $hasPhone = (isset($notifiable->phone) && ! empty($notifiable->phone))
-            || method_exists($notifiable, 'routeNotificationFor') && $notifiable->routeNotificationFor('sms') !== null;
+        $phone = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+            ? $notifiable->getAttribute('phone')
+            : (property_exists($notifiable, 'phone') ? $notifiable->phone : null);
+
+        $hasPhone = (is_scalar($phone) && ! empty($phone))
+            || (method_exists($notifiable, 'routeNotificationFor') && $notifiable->routeNotificationFor('sms') !== null);
 
         if ($hasPhone) {
             $channels[] = SmsChannel::class;

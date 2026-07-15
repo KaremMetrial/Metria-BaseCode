@@ -14,7 +14,7 @@ class PaymentServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(PaymentManager::class, fn ($app) => new PaymentManager($app));
+        $this->app->singleton(PaymentManager::class, fn (\Illuminate\Contracts\Container\Container $app) => new PaymentManager($app));
     }
 
     public function boot(): void

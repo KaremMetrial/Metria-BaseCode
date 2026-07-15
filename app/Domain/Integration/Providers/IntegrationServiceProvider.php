@@ -16,7 +16,7 @@ class IntegrationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(SmsManager::class, fn ($app) => new SmsManager($app));
+        $this->app->singleton(SmsManager::class, fn (\Illuminate\Contracts\Container\Container $app) => new SmsManager($app));
         $this->app->bind(
             OAuthConfigurationRepositoryInterface::class,
             DatabaseOAuthConfigurationRepository::class

@@ -142,9 +142,12 @@ class MediaUploadService
                     return $media;
                 }
 
-                $diskName = $media->custom_properties['disk'];
-                $storagePath = $media->custom_properties['path'];
-                $filename = $media->custom_properties['filename'];
+                $diskNameVal = $media->custom_properties['disk'] ?? null;
+                $diskName = is_string($diskNameVal) ? $diskNameVal : 'public';
+                $storagePathVal = $media->custom_properties['path'] ?? null;
+                $storagePath = is_string($storagePathVal) ? $storagePathVal : '';
+                $filenameVal = $media->custom_properties['filename'] ?? null;
+                $filename = is_string($filenameVal) ? $filenameVal : '';
                 $disk = Storage::disk($diskName);
 
                 // Ensure physical file exists in storage

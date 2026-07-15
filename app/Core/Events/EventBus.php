@@ -25,9 +25,14 @@ class EventBus
             OutboxMessage::record($event);
         }
 
-        // Deliver to in-process listeners only once the transaction commits.
-        DB::afterCommit(
-            fn () => event($event),
-        );
+        // Deliver to in-process listeners only once the transaction commits,
+        // or immediately during unit tests when RefreshDatabase wraps in transaction.
+        if (app()->runningUnitTests()) {
+            event($event);
+        } else {
+            DB::afterCommit(
+                fn () => event($event),
+            );
+        }
     }
 }

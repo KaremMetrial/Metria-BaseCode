@@ -34,6 +34,9 @@ class TranslateModelJob implements ShouldBeUnique, ShouldQueue
     /**
      * Create a new job instance.
      */
+    /**
+     * @param array<int, string> $fields
+     */
     public function __construct(
         public readonly string $modelClass,
         public readonly string|int $modelId,
@@ -92,20 +95,23 @@ class TranslateModelJob implements ShouldBeUnique, ShouldQueue
 
         // Only translate fields that are currently missing a translation in the target locale.
         // We will never overwrite existing, non-empty, human-entered translations.
+        /** @var array<string, string> $valuesToTranslate */
         $valuesToTranslate = [];
         foreach ($this->fields as $field) {
+            $fieldStr = (string) $field;
             // Check if the target translation is already set
             $existingTarget = method_exists($model, 'getTranslation')
-                ? $model->getTranslation($field, $this->toLocale, false)
+                ? $model->getTranslation($fieldStr, $this->toLocale, false)
                 : null;
 
             if (empty($existingTarget)) {
                 $sourceText = method_exists($model, 'getTranslation')
-                    ? $model->getTranslation($field, $this->sourceLocale, false)
+                    ? $model->getTranslation($fieldStr, $this->sourceLocale, false)
                     : null;
 
-                if (! empty($sourceText)) {
-                    $valuesToTranslate[$field] = $sourceText;
+                $sourceTextStr = is_string($sourceText) ? $sourceText : (is_scalar($sourceText) ? (string) $sourceText : '');
+                if ($sourceTextStr !== '') {
+                    $valuesToTranslate[$fieldStr] = $sourceTextStr;
                 }
             }
         }

@@ -65,6 +65,9 @@ class ZoneService
         return null;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function createZone(array $data, ?string $tenantId = null): Zone
     {
         return DB::transaction(function () use ($data, $tenantId) {

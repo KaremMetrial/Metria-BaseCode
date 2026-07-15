@@ -9,6 +9,9 @@ use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
 use App\Domain\Currency\Models\CurrencyExchangeRate;
 use DateTimeInterface;
 
+/**
+ * @extends BaseRepository<CurrencyExchangeRate>
+ */
 class ExchangeRateRepository extends BaseRepository implements ExchangeRateRepositoryInterface
 {
     public function __construct(CurrencyExchangeRate $model)
@@ -26,6 +29,9 @@ class ExchangeRateRepository extends BaseRepository implements ExchangeRateRepos
             ->first();
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function store(array $data): CurrencyExchangeRate
     {
         /** @var CurrencyExchangeRate */

@@ -8,6 +8,9 @@ use App\Infrastructure\Translation\Contracts\PromptInterface;
 
 class ClassificationPrompt implements PromptInterface
 {
+    /**
+     * @param array<int, string> $categories
+     */
     public function __construct(
         public readonly array $categories = ['support', 'billing', 'general', 'spam'],
         public readonly string $version = 'v1'

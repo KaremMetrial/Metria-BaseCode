@@ -6,6 +6,7 @@ namespace App\Infrastructure\Translation\Traits;
 
 use App\Infrastructure\Translation\Jobs\TranslateModelJob;
 
+/** @phpstan-ignore trait.unused */
 trait AutoTranslates
 {
     /**
@@ -61,7 +62,7 @@ trait AutoTranslates
                     }
                 }
 
-                if (! empty($fieldsToTranslate) && $resolvedSourceLocale !== null) {
+                if (! empty($fieldsToTranslate) && is_string($resolvedSourceLocale) && $resolvedSourceLocale !== '') {
                     $modelId = $model->getKey();
                     if (is_int($modelId) || is_string($modelId)) {
                         TranslateModelJob::dispatch(
@@ -114,7 +115,7 @@ trait AutoTranslates
                 }
             }
 
-            if (! empty($fieldsToTranslate) && $resolvedSourceLocale !== null) {
+            if (! empty($fieldsToTranslate) && is_string($resolvedSourceLocale) && $resolvedSourceLocale !== '') {
                 $modelId = $this->getKey();
                 if (is_int($modelId) || is_string($modelId)) {
                     TranslateModelJob::dispatch(
@@ -135,19 +136,26 @@ trait AutoTranslates
     public function resolveSourceLocale(string $field): ?string
     {
         // 1. Explicit property on model
-        if (property_exists($this, 'translationSourceLocale') && $this->translationSourceLocale !== null) {
-            return $this->translationSourceLocale;
+        if (property_exists($this, 'translationSourceLocale')) {
+            $val = $this->translationSourceLocale;
+            if (is_string($val) && $val !== '') {
+                return (string) $val;
+            }
         }
 
         // 2. Model default locale property
-        if (property_exists($this, 'defaultLocale') && $this->defaultLocale !== null) {
-            return $this->defaultLocale;
+        if (property_exists($this, 'defaultLocale')) {
+            $val = $this->defaultLocale;
+            if (is_string($val) && $val !== '') {
+                return (string) $val;
+            }
         }
 
         // 3. Current app locale if it has a translation populated
-        $appLocale = app()->getLocale();
-        /** @phpstan-ignore-next-line */
-        $translations = method_exists($this, 'getTranslations') ? $this->getTranslations($field) : [];
+        $appLocaleVal = app()->getLocale();
+        $appLocale = is_string($appLocaleVal) ? $appLocaleVal : 'en';
+        $translationsVal = method_exists($this, 'getTranslations') ? $this->getTranslations($field) : [];
+        $translations = is_array($translationsVal) ? $translationsVal : [];
         if (! empty($translations[$appLocale])) {
             return $appLocale;
         }
@@ -161,6 +169,6 @@ trait AutoTranslates
 
         // 5. System fallback locale
         $fallback = config('localization.fallback', 'en');
-        return is_string($fallback) ? $fallback : 'en';
+        return is_string($fallback) ? (string) $fallback : 'en';
     }
 }

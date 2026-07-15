@@ -31,7 +31,8 @@ class AuditLogger
             return null;
         }
 
-        $auditableTenant = ($auditable !== null && property_exists($auditable, 'tenant_id')) ? (string) $auditable->tenant_id : null;
+        $auditableTenantVal = ($auditable !== null && property_exists($auditable, 'tenant_id')) ? $auditable->tenant_id : null;
+        $auditableTenant = is_scalar($auditableTenantVal) ? (string) $auditableTenantVal : null;
         $resolvedTenantId = $tenantId ?? $auditableTenant ?? app(TenantManager::class)->id();
 
         // Resolve actor: explicit > authenticated user > null (not 'unknown', so
@@ -40,6 +41,8 @@ class AuditLogger
 
         // Guard: request() throws outside HTTP context in some Laravel versions.
         $req = app()->runningInConsole() ? null : request();
+        $userAgentVal = $req?->userAgent();
+        $userAgent = is_scalar($userAgentVal) ? (string) $userAgentVal : '';
 
         return AuditLog::query()->create([
             'tenant_id' => $resolvedTenantId,
@@ -50,7 +53,7 @@ class AuditLogger
             'old_values' => $this->mask($oldValues),
             'new_values' => $this->mask($newValues),
             'ip_address' => $req?->ip(),
-            'user_agent' => mb_substr((string) $req?->userAgent(), 0, 255),
+            'user_agent' => mb_substr($userAgent, 0, 255),
             'context' => $context,
         ]);
     }

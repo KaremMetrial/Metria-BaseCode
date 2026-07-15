@@ -66,10 +66,16 @@ class ApprovalService
                     'decided_at' => now(),
                 ])->save();
 
-                $tenantId = $lr->tenant_id ?? ($lr->payload['tenant_id'] ?? null);
+                $tenantIdVal = $lr->tenant_id ?? ($lr->payload['tenant_id'] ?? null);
+                $tenantId = is_scalar($tenantIdVal) ? (is_int($tenantIdVal) ? $tenantIdVal : (string) $tenantIdVal) : null;
                 app(\App\Core\Tenancy\TenantManager::class)->runInContext($tenantId, function () use ($lr) {
-                    $handler = app($this->handlerFor($lr->action));
-                    $handler($lr->payload, $lr);
+                    $handlerClass = $this->handlerFor($lr->action);
+                    if ($handlerClass !== '' && class_exists($handlerClass)) {
+                        $handler = app($handlerClass);
+                        if (is_callable($handler)) {
+                            $handler($lr->payload, $lr);
+                        }
+                    }
                 });
 
                 $lr->forceFill(['status' => ApprovalStatus::Executed])->save();

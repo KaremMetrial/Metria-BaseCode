@@ -19,16 +19,21 @@ class TwilioDriver implements SmsProvider
     public function send(string $to, string $message): string
     {
         $result = CircuitBreaker::make()->call('twilio', function () use ($to, $message) {
-            $sid = (string) ($this->config['sid'] ?? '');
+            $sidVal = $this->config['sid'] ?? '';
+            $sid = is_scalar($sidVal) ? (string) $sidVal : '';
             $timeoutVal = config('integrations.http.timeout', 15);
             $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+            $tokenVal = $this->config['token'] ?? '';
+            $token = is_scalar($tokenVal) ? (string) $tokenVal : '';
+            $fromVal = $this->config['from'] ?? '';
+            $from = is_scalar($fromVal) ? (string) $fromVal : '';
 
-            $response = Http::withBasicAuth($sid, (string) ($this->config['token'] ?? ''))
+            $response = Http::withBasicAuth($sid, $token)
                 ->asForm()
                 ->timeout($timeout)
                 ->post("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json", [
                     'To' => $to,
-                    'From' => (string) ($this->config['from'] ?? ''),
+                    'From' => $from,
                     'Body' => $message,
                 ]);
 

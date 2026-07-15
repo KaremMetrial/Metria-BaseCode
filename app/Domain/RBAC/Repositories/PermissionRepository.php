@@ -9,6 +9,9 @@ use App\Domain\RBAC\Contracts\PermissionRepositoryInterface;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 
+/**
+ * @extends BaseRepository<Permission>
+ */
 class PermissionRepository extends BaseRepository implements PermissionRepositoryInterface
 {
     public function __construct(Permission $model)

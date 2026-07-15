@@ -54,8 +54,10 @@ class AuditableObserver
 
     private function clean(Model $model, array $attributes): array
     {
-        $excluded = method_exists($model, 'auditExcluded') ? $model->auditExcluded() : [];
+        $excludedVal = method_exists($model, 'auditExcluded') ? $model->auditExcluded() : [];
+        $excluded = is_array($excludedVal) ? $excludedVal : [];
+        $validExcluded = array_filter($excluded, fn ($item) => is_int($item) || is_string($item));
 
-        return array_diff_key($attributes, array_flip($excluded));
+        return array_diff_key($attributes, array_flip($validExcluded));
     }
 }

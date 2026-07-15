@@ -13,13 +13,22 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Thin Eloquent repository. Use repositories to keep complex query logic
  * out of controllers/services — not to hide Eloquent from yourself.
+ *
+ * @template TModel of Model
  */
 abstract class BaseRepository implements RepositoryInterface
 {
+    /**
+     * @param TModel $model
+     */
     public function __construct(protected Model $model) {}
 
+    /**
+     * @return Builder<TModel>
+     */
     public function query(?string $tenantId = null): Builder
     {
+        /** @var Builder<TModel> $query */
         $query = $this->model->newQuery();
 
         if ($tenantId !== null) {
@@ -29,11 +38,17 @@ abstract class BaseRepository implements RepositoryInterface
         return $query;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function find(int|string $id, ?string $tenantId = null): ?Model
     {
         return $this->query($tenantId)->find($id);
     }
 
+    /**
+     * @return TModel
+     */
     public function findOrFail(int|string $id, ?string $tenantId = null): Model
     {
         return $this->query($tenantId)->findOrFail($id);
@@ -41,11 +56,14 @@ abstract class BaseRepository implements RepositoryInterface
 
     /**
      * @param array<int, \Illuminate\Contracts\Database\Query\Expression|string> $columns
-     * @return Collection<int, Model>
+     * @return Collection<int, TModel>
      */
     public function all(array $columns = ['*'], ?string $tenantId = null): Collection
     {
-        return $this->query($tenantId)->get($columns);
+        /** @var Collection<int, TModel> $results */
+        $results = $this->query($tenantId)->get($columns);
+
+        return $results;
     }
 
     public function paginate(?int $perPage = null, ?string $tenantId = null): LengthAwarePaginator
@@ -79,6 +97,7 @@ abstract class BaseRepository implements RepositoryInterface
 
     /**
      * @param array<string, mixed> $attributes
+     * @return TModel
      */
     public function create(array $attributes, ?string $tenantId = null): Model
     {
@@ -90,7 +109,9 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * @param TModel $model
      * @param array<string, mixed> $attributes
+     * @return TModel
      */
     public function update(Model $model, array $attributes, ?string $tenantId = null): Model
     {

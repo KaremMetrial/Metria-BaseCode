@@ -19,13 +19,25 @@ class WelcomeNotification extends Notification implements ShouldQueue
     {
         $channels = [];
 
-        $email = property_exists($notifiable, 'email') ? $notifiable->email : null;
-        if (is_string($email) && str_contains($email, '@') && ! str_ends_with($email, '@otp.local')) {
+        $email = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+            ? $notifiable->getAttribute('email')
+            : (property_exists($notifiable, 'email') ? $notifiable->email : null);
+
+        $hasEmail = (is_string($email) && str_contains($email, '@') && ! str_ends_with($email, '@otp.local'))
+            || (method_exists($notifiable, 'routeNotificationFor') && $notifiable->routeNotificationFor('mail') !== null);
+
+        if ($hasEmail) {
             $channels[] = 'mail';
         }
 
-        $phone = property_exists($notifiable, 'phone') ? $notifiable->phone : null;
-        if (is_string($phone) && $phone !== '') {
+        $phone = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+            ? $notifiable->getAttribute('phone')
+            : (property_exists($notifiable, 'phone') ? $notifiable->phone : null);
+
+        $hasPhone = (is_string($phone) && $phone !== '')
+            || (method_exists($notifiable, 'routeNotificationFor') && $notifiable->routeNotificationFor('sms') !== null);
+
+        if ($hasPhone) {
             $channels[] = SmsChannel::class;
         }
 
@@ -80,7 +92,9 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     private function getName(object $notifiable): string
     {
-        $name = property_exists($notifiable, 'name') ? $notifiable->name : null;
+        $name = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+            ? $notifiable->getAttribute('name')
+            : (property_exists($notifiable, 'name') ? $notifiable->name : null);
         return is_string($name) ? $name : 'User';
     }
 }

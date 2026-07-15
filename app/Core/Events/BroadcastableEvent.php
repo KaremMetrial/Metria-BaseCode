@@ -11,6 +11,7 @@ namespace App\Core\Events;
  * Classes using this trait MUST implement ShouldBroadcastNow or ShouldBroadcast
  * and define broadcastOn().
  */
+/** @phpstan-ignore trait.unused */
 trait BroadcastableEvent
 {
     /**
@@ -29,9 +30,13 @@ trait BroadcastableEvent
      */
     public function broadcastWith(): array
     {
-        return array_merge($this->payload(), [
+        $payload = $this->payload();
+        /** @var array<string, mixed> $result */
+        $result = array_merge($payload, [
             'event_id' => $this->eventId,
             'occurred_at' => $this->occurredAt->toIso8601String(),
         ]);
+
+        return $result;
     }
 }

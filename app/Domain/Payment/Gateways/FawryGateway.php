@@ -35,10 +35,14 @@ class FawryGateway implements PaymentGateway
 
     public function createPayment(Payment $payment, array $options = []): PaymentResult
     {
-        $merchantCode = (string) ($this->config['merchant_code'] ?? '');
-        $secureKey = (string) ($this->config['secure_key'] ?? '');
-        $method = strtoupper((string) ($options['payment_method'] ?? 'PAYATFAWRY'));
-        $customerProfileId = (string) ($options['customer_profile_id'] ?? $payment->user_id);
+        $merchantCodeVal = $this->config['merchant_code'] ?? '';
+        $merchantCode = is_scalar($merchantCodeVal) ? (string) $merchantCodeVal : '';
+        $secureKeyVal = $this->config['secure_key'] ?? '';
+        $secureKey = is_scalar($secureKeyVal) ? (string) $secureKeyVal : '';
+        $methodVal = $options['payment_method'] ?? 'PAYATFAWRY';
+        $method = strtoupper(is_scalar($methodVal) ? (string) $methodVal : 'PAYATFAWRY');
+        $customerProfileIdVal = $options['customer_profile_id'] ?? $payment->user_id;
+        $customerProfileId = is_scalar($customerProfileIdVal) ? (string) $customerProfileIdVal : (string) $payment->user_id;
         $amount = $payment->money()->toDecimalString(); // "150.00"
 
         // signature = SHA256(merchantCode + merchantRefNum + customerProfileId
@@ -97,7 +101,8 @@ class FawryGateway implements PaymentGateway
      */
     public function verifyWebhook(Request $request): bool
     {
-        $secureKey = (string) ($this->config['secure_key'] ?? '');
+        $secureKeyVal = $this->config['secure_key'] ?? '';
+        $secureKey = is_scalar($secureKeyVal) ? (string) $secureKeyVal : '';
         $providedVal = $request->input('messageSignature', '');
         $provided = is_scalar($providedVal) ? (string) $providedVal : '';
 
@@ -105,7 +110,7 @@ class FawryGateway implements PaymentGateway
             return false;
         }
 
-        $twoDp = fn ($v): string => number_format((float) $v, 2, '.', '');
+        $twoDp = fn ($v): string => number_format(is_numeric($v) ? (float) $v : 0.0, 2, '.', '');
 
         $fawryRefNumber = $request->input('fawryRefNumber');
         $merchantRefNumber = $request->input('merchantRefNumber');
@@ -156,8 +161,10 @@ class FawryGateway implements PaymentGateway
 
     public function refund(Payment $payment, ?Money $amount = null): PaymentResult
     {
-        $merchantCode = (string) ($this->config['merchant_code'] ?? '');
-        $secureKey = (string) ($this->config['secure_key'] ?? '');
+        $merchantCodeVal = $this->config['merchant_code'] ?? '';
+        $merchantCode = is_scalar($merchantCodeVal) ? (string) $merchantCodeVal : '';
+        $secureKeyVal = $this->config['secure_key'] ?? '';
+        $secureKey = is_scalar($secureKeyVal) ? (string) $secureKeyVal : '';
         $fawryRefVal = data_get($payment->metadata, 'fawry_ref_number', '');
         $fawryRef = is_scalar($fawryRefVal) ? (string) $fawryRefVal : '';
 
@@ -209,8 +216,10 @@ class FawryGateway implements PaymentGateway
     {
         $timeoutVal = config('integrations.http.timeout', 15);
         $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
+        $baseUrlVal = $this->config['base_url'] ?? 'https://atfawry.fawrystaging.com';
+        $baseUrl = is_scalar($baseUrlVal) ? (string) $baseUrlVal : 'https://atfawry.fawrystaging.com';
 
-        return Http::baseUrl((string) ($this->config['base_url'] ?? 'https://atfawry.fawrystaging.com'))
+        return Http::baseUrl($baseUrl)
             ->acceptJson()
             ->timeout($timeout);
     }
