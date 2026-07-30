@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Exceptions;
 
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Application\Exceptions\DomainException;
 
 class PrivilegeEscalationException extends DomainException
 {

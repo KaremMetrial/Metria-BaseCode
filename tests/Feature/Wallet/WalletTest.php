@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Wallet;
 
-use App\Core\Exceptions\DomainException;
-use App\Core\Support\Money;
+use Modules\Shared\Application\Exceptions\DomainException;
+use Modules\Shared\Domain\Support\Money;
 use App\Domain\Auth\Models\User;
 use App\Domain\Wallet\Enums\WalletTransactionType;
 use App\Domain\Wallet\Services\WalletService;

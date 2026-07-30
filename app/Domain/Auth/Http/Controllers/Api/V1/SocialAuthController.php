@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Auth\Http\Resources\UserResource;
 use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Services\AuthMethodGovernanceService;
@@ -108,7 +108,7 @@ class SocialAuthController extends ApiController
     {
         $user = $request->user();
         if (! $user instanceof User) {
-            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
         }
 
         return $user;

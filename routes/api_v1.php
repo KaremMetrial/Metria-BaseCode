@@ -18,11 +18,8 @@ use App\Domain\RBAC\Http\Controllers\Api\V1\PermissionController;
 use App\Domain\RBAC\Http\Controllers\Api\V1\RoleController;
 use App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController;
 use App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController;
-use App\Domain\System\Http\Controllers\Api\V1\EnumController;
-use App\Domain\System\Http\Controllers\Api\V1\HealthController;
 use App\Domain\Territory\Http\Controllers\Api\V1\TerritoryController;
 use App\Domain\Wallet\Http\Controllers\Api\V1\WalletController;
-use App\Domain\Webhook\Http\Controllers\Api\V1\WebhookEndpointController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,14 +28,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// System Deep Health Check
-Route::get('/health', HealthController::class)->name('health');
-
-// System Enums (Frontend UI Support)
-Route::prefix('enums')->name('enums.')->group(function () {
-    Route::get('/', [EnumController::class, 'index'])->name('index');
-    Route::get('/{key}', [EnumController::class, 'show'])->name('show');
-});
+// Health and Enum routes moved to modules/Shared/Presentation/routes/api.php,
+// self-registered by Modules\Shared\Infrastructure\Providers\CoreServiceProvider.
 
 // Territories & Logistics Zones (Public but rate-limited)
 Route::prefix('territories')->middleware('throttle:60,1')->name('territories.')->group(function () {
@@ -193,15 +184,6 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
                 Route::delete('/', [UserRoleController::class, 'destroy'])->name('destroy');
             });
         });
-    });
-
-    // Outgoing Webhook Endpoints
-    Route::prefix('webhook-endpoints')->name('webhook-endpoints.')->middleware('permission:webhooks.manage')->group(function () {
-        Route::get('/', [WebhookEndpointController::class, 'index'])->name('index');
-        Route::post('/', [WebhookEndpointController::class, 'store'])->name('store');
-        Route::put('/{webhookEndpoint}', [WebhookEndpointController::class, 'update'])->name('update');
-        Route::delete('/{webhookEndpoint}', [WebhookEndpointController::class, 'destroy'])->name('destroy');
-        Route::post('/{webhookEndpoint}/rotate-secret', [WebhookEndpointController::class, 'rotateSecret'])->name('rotate');
     });
 
     // Media Upload & Download

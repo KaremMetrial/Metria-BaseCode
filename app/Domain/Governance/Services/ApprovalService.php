@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Services;
 
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Application\Exceptions\DomainException;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Enums\ApprovalStatus;
 use App\Domain\Governance\Models\ApprovalRequest;
@@ -68,7 +68,7 @@ class ApprovalService
 
                 $tenantIdVal = $lr->tenant_id ?? ($lr->payload['tenant_id'] ?? null);
                 $tenantId = is_scalar($tenantIdVal) ? (is_int($tenantIdVal) ? $tenantIdVal : (string) $tenantIdVal) : null;
-                app(\App\Core\Tenancy\TenantManager::class)->runInContext($tenantId, function () use ($lr) {
+                app(\Modules\Shared\Infrastructure\Tenancy\TenantManager::class)->runInContext($tenantId, function () use ($lr) {
                     $handlerClass = $this->handlerFor($lr->action);
                     if ($handlerClass !== '' && class_exists($handlerClass)) {
                         $handler = app($handlerClass);
@@ -97,7 +97,7 @@ class ApprovalService
                 return $lr;
             });
 
-            if ($e instanceof DomainException || $e instanceof \App\Core\Exceptions\ApiException) {
+            if ($e instanceof DomainException || $e instanceof \Modules\Shared\Application\Exceptions\ApiException) {
                 throw $e;
             }
         }

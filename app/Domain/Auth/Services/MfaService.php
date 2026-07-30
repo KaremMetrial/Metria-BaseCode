@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Application\Exceptions\DomainException;
 use App\Domain\Auth\Events\MfaDisabled;
 use App\Domain\Auth\Events\MfaEnabled;
 use App\Domain\Auth\Events\MfaVerified;

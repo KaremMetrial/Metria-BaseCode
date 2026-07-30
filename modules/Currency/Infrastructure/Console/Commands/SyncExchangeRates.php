@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Console\Commands;
+namespace Modules\Currency\Infrastructure\Console\Commands;
 
-use App\Domain\Currency\Models\Currency;
-use App\Domain\Currency\Providers\ExchangeRateProviderChain;
-use App\Domain\Currency\Services\ExchangeRateService;
+use Modules\Currency\Domain\Models\Currency;
+use Modules\Currency\Infrastructure\Providers\ExchangeRateProviderChain;
+use Modules\Currency\Infrastructure\Services\ExchangeRateService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +24,8 @@ class SyncExchangeRates extends Command
     ): int {
         $this->info('Starting exchange rate synchronization...');
 
+        // payments.currency fallback: still-unmigrated Payment domain's config
+        // (TODO: update when Payment module lands).
         $baseCurrency = config('currencies.base_currency', config('payments.currency', 'EGP'));
         $activeCurrencies = Currency::where('is_active', true)
             ->where('code', '!=', $baseCurrency)

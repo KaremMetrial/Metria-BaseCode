@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Events;
 
-use App\Core\Events\DomainEvent;
+use Modules\Shared\Domain\Events\DomainEvent;
 use App\Domain\RBAC\Models\Role;
 
 class RolePermissionsUpdated extends DomainEvent

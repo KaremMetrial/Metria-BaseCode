@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Security;
 
-use App\Core\Support\Money;
-use App\Core\Tenancy\TenantManager;
+use Modules\Shared\Domain\Support\Money;
+use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 use App\Domain\Auth\Http\Requests\ConfirmMfaRequest;
 use App\Domain\Auth\Http\Requests\DisableMfaRequest;
 use App\Domain\Auth\Http\Requests\UpdateFcmTokenRequest;
 use App\Domain\Auth\Models\User;
-use App\Domain\Currency\Models\Currency;
+use Modules\Currency\Domain\Models\Currency;
 use App\Domain\Governance\Enums\ApprovalStatus;
 use App\Domain\Governance\Http\Requests\UpdateSettingRequest;
 use App\Domain\Governance\Models\FeatureFlag;
@@ -22,7 +22,7 @@ use App\Domain\Payment\Models\Payment;
 use App\Domain\Territory\Models\Country;
 use App\Domain\Wallet\Models\Wallet;
 use App\Domain\Wallet\Services\WalletService;
-use App\Domain\Webhook\Models\WebhookEndpoint;
+use Modules\Webhook\Domain\Models\WebhookEndpoint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;

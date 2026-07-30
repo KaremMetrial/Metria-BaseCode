@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Repositories;
 
-use App\Core\Abstracts\BaseRepository;
+use Modules\Shared\Infrastructure\Persistence\BaseRepository;
 use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
 use App\Domain\RBAC\Models\Role;
 use Illuminate\Database\Eloquent\Model;

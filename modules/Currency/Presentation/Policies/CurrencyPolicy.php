@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Policies;
+namespace Modules\Currency\Presentation\Policies;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Currency\Models\Currency;
+use Modules\Currency\Domain\Models\Currency;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CurrencyPolicy

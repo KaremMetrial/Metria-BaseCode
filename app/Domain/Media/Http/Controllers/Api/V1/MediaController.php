@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Media\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Media\Http\Requests\ConfirmUploadRequest;
 use App\Domain\Media\Http\Requests\GeneratePresignedUrlRequest;
 use App\Domain\Media\Http\Resources\MediaResource;
@@ -62,7 +62,7 @@ class MediaController extends ApiController
     {
         $user = $request->user();
         if (! $user instanceof \App\Domain\Auth\Models\User) {
-            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
         }
 
         return $user;

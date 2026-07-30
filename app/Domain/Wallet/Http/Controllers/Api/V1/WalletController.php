@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Wallet\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Wallet\Http\Resources\WalletResource;
 use App\Domain\Wallet\Http\Resources\WalletTransactionResource;
 use App\Domain\Wallet\Services\WalletService;
@@ -46,7 +46,7 @@ class WalletController extends ApiController
     {
         $user = $request->user();
         if (! $user instanceof \App\Domain\Auth\Models\User) {
-            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
         }
 
         return $user;

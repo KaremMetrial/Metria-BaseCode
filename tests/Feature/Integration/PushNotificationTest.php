@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Integration;
 
-use App\Core\Exceptions\IntegrationException;
+use Modules\Shared\Application\Exceptions\IntegrationException;
 use App\Domain\Integration\Push\FcmPushProvider;
 use Illuminate\Support\Facades\Cache;
 use Kreait\Firebase\Contract\Messaging;

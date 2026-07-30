@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Payment\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
-use App\Core\Support\Money;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
+use Modules\Shared\Domain\Support\Money;
 use App\Domain\Governance\Http\Resources\ApprovalRequestResource;
 use App\Domain\Governance\Models\ApprovalRequest;
 use App\Domain\Payment\Http\Requests\CreatePaymentRequest;
@@ -129,7 +129,7 @@ class PaymentController extends ApiController
     {
         $user = $request->user();
         if (! $user instanceof \App\Domain\Auth\Models\User) {
-            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
         }
 
         return $user;

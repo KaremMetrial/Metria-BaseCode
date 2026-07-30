@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Events;
 
-use App\Core\Events\DomainEvent;
-use App\Core\Events\StoredInOutbox;
+use Modules\Shared\Domain\Events\DomainEvent;
+use Modules\Shared\Domain\Events\StoredInOutbox;
 use Illuminate\Database\Eloquent\Model;
 
 class UserLoggedInByOtp extends DomainEvent implements StoredInOutbox

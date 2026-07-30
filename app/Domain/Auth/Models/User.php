@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Models;
 
-use App\Core\Tenancy\BelongsToTenant;
-use App\Core\Traits\HasUuid;
+use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
+use Modules\Shared\Infrastructure\Traits\HasUuid;
 use App\Domain\Governance\Traits\Auditable;
 use App\Domain\Media\Models\Media;
 use App\Domain\Wallet\Models\Wallet;

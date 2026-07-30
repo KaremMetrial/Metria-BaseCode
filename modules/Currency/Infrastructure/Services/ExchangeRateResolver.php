@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Services;
+namespace Modules\Currency\Infrastructure\Services;
 
-use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
-use App\Domain\Currency\Models\CurrencyExchangeRate;
+use Modules\Currency\Domain\Repositories\ExchangeRateRepositoryInterface;
+use Modules\Currency\Domain\Models\CurrencyExchangeRate;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Cache;
 

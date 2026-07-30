@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Territory\Services;
 
-use App\Core\Events\EventBus;
+use Modules\Shared\Infrastructure\Events\EventBus;
 use App\Domain\Governance\Services\AuditLogger;
 use App\Domain\Territory\Events\ZoneStatusChanged;
 use App\Domain\Territory\Filters\TerritoryFilter;

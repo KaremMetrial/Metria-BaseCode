@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Console\Commands;
 
-use App\Core\Models\IdempotencyKey;
+use Modules\Shared\Infrastructure\Persistence\Models\IdempotencyKey;
 use App\Domain\Governance\Models\AuditLog;
 use Illuminate\Console\Command;
 
@@ -19,7 +19,7 @@ class PruneGovernanceData extends Command
         $auditDaysVal = config('governance.audit.retention_days', 365);
         $auditDays = is_numeric($auditDaysVal) ? (int) $auditDaysVal : 365;
 
-        $idempotencyHoursVal = config('governance.idempotency.ttl_hours', 24);
+        $idempotencyHoursVal = config('core.idempotency.ttl_hours', 24);
         $idempotencyHours = is_numeric($idempotencyHoursVal) ? (int) $idempotencyHoursVal : 24;
 
         $auditsVal = AuditLog::query()->where('created_at', '<', now()->subDays($auditDays))->delete();

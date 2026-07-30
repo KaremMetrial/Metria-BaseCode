@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Territory\Repositories;
 
-use App\Core\Abstracts\BaseRepository;
+use Modules\Shared\Infrastructure\Persistence\BaseRepository;
 use App\Domain\Territory\Models\District;
 use Illuminate\Database\Eloquent\Collection;
 

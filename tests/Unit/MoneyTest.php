@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Core\Support\Money;
+use Modules\Shared\Domain\Support\Money;
 use InvalidArgumentException;
 use Tests\TestCase;
 

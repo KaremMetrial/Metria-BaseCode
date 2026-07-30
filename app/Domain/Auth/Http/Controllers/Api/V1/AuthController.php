@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Http\Controllers\Api\V1;
 
-use App\Core\Exceptions\ApiException;
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Application\Exceptions\ApiException;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Auth\Http\Requests\ConfirmMfaRequest;
 use App\Domain\Auth\Http\Requests\DisableMfaRequest;
 use App\Domain\Auth\Http\Requests\ForgotPasswordRequest;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Payment\Services;
 
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Application\Exceptions\DomainException;
 use App\Domain\Governance\Models\ApprovalRequest;
 use App\Domain\Payment\Models\Payment;
 

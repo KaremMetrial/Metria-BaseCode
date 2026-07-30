@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Events;
 
-use App\Core\Events\DomainEvent;
-use App\Core\Events\StoredInOutbox;
+use Modules\Shared\Domain\Events\DomainEvent;
+use Modules\Shared\Domain\Events\StoredInOutbox;
 
 class AuthMethodBlocked extends DomainEvent implements StoredInOutbox
 {

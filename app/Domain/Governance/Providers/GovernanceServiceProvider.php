@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Governance\Providers;
 
 use App\Domain\Governance\Console\Commands\PruneGovernanceData;
+use App\Domain\Governance\Enums\ApprovalStatus;
 use App\Domain\Governance\Models\ApprovalRequest;
 use App\Domain\Governance\Models\AuditLog;
 use App\Domain\Governance\Models\FeatureFlag;
@@ -15,6 +16,7 @@ use App\Domain\Governance\Policies\FeatureFlagPolicy;
 use App\Domain\Governance\Policies\SettingPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Shared\Application\Support\EnumRegistry;
 
 class GovernanceServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,8 @@ class GovernanceServiceProvider extends ServiceProvider
         Gate::policy(FeatureFlag::class, FeatureFlagPolicy::class);
         Gate::policy(AuditLog::class, AuditLogPolicy::class);
         Gate::policy(ApprovalRequest::class, ApprovalRequestPolicy::class);
+
+        EnumRegistry::register('approval_status', ApprovalStatus::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([

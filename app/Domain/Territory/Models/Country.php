@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domain\Territory\Models;
 
-use App\Core\Tenancy\BelongsToTenant;
-use App\Core\Traits\HasTranslations;
-use App\Core\Traits\HasUuid;
+use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
+use Modules\Shared\Infrastructure\Traits\HasTranslations;
+use Modules\Shared\Infrastructure\Traits\HasUuid;
 use App\Domain\Governance\Traits\Auditable;
-use App\Infrastructure\Translation\Traits\AutoTranslates;
+use Modules\Shared\Infrastructure\Translation\Traits\AutoTranslates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

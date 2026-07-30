@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
-use App\Core\Events\EventBus;
+use Modules\Shared\Infrastructure\Events\EventBus;
 use App\Domain\Auth\Events\UserRegisteredByOtp;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Services\AuditLogger;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Models;
+namespace Modules\Currency\Domain\Models;
 
 use DomainException;
 use Illuminate\Database\Eloquent\Model;

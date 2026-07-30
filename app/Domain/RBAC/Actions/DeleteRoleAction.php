@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Actions;
 
-use App\Core\Events\EventBus;
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Infrastructure\Events\EventBus;
+use Modules\Shared\Application\Exceptions\DomainException;
 use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
 use App\Domain\RBAC\Events\RoleDeleted;
 use App\Domain\RBAC\Models\Role;

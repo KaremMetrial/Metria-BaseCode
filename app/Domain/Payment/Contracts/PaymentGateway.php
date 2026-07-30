@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Payment\Contracts;
 
-use App\Core\Support\Money;
+use Modules\Shared\Domain\Support\Money;
 use App\Domain\Payment\DTOs\PaymentResult;
 use App\Domain\Payment\DTOs\WebhookResult;
 use App\Domain\Payment\Models\Payment;

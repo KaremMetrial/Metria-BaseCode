@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
-use App\Core\Exceptions\ApiException;
+use Modules\Shared\Application\Exceptions\ApiException;
 use App\Domain\Auth\Events\UserLoggedIn;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Services\AuditLogger;

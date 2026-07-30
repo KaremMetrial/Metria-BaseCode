@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Webhook;
 
-use App\Domain\Webhook\Jobs\DeliverWebhook;
-use App\Domain\Webhook\Models\WebhookDelivery;
-use App\Domain\Webhook\Models\WebhookEndpoint;
+use Modules\Webhook\Infrastructure\Jobs\DeliverWebhook;
+use Modules\Webhook\Domain\Models\WebhookDelivery;
+use Modules\Webhook\Domain\Models\WebhookEndpoint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;

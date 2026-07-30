@@ -1,14 +1,8 @@
 <?php
 
-use App\Core\Exceptions\ApiExceptionRenderer;
-use App\Core\Http\Middleware\ForceJsonResponse;
-use App\Core\Http\Middleware\IdempotencyMiddleware;
-use App\Core\Http\Middleware\SetLocale;
-use App\Core\Tenancy\ResolveTenant;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -16,6 +10,13 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
+// Module-owned middleware (aliases, `api`-group entries, priority ordering)
+// and exception rendering are no longer wired here — each module registers
+// its own from its Service Provider (see Modules\Shared\Infrastructure\
+// Providers\CoreServiceProvider). Only genuinely host/framework-level
+// wiring — the Spatie Permission middleware aliases (not auto-registered by
+// that package) and the base Sanctum/authorization priority order — belongs
+// in this file.
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         api: __DIR__.'/../routes/api.php',
@@ -23,29 +24,22 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->api(prepend: [
-            ForceJsonResponse::class,
-            SetLocale::class,
-        ]);
-
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
-            'idempotent' => IdempotencyMiddleware::class,
-            'tenant' => ResolveTenant::class,
         ]);
 
         $middleware->priority([
-            ForceJsonResponse::class,
-            SetLocale::class,
             Authenticate::class,
             EnsureFrontendRequestsAreStateful::class,
-            ResolveTenant::class,
             SubstituteBindings::class,
             Authorize::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        (new ApiExceptionRenderer)->register($exceptions);
-    })->create();
+    // withExceptions() with no callback still performs the framework's own
+    // ExceptionHandler::class -> Handler::class container binding (required
+    // for exception handling to work at all) without registering any
+    // host-specific renderers — those are added by CoreServiceProvider.
+    ->withExceptions()
+    ->create();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Integration\Sms;
 
-use App\Core\Exceptions\IntegrationException;
+use Modules\Shared\Application\Exceptions\IntegrationException;
 use App\Domain\Integration\Contracts\SmsProvider;
 use App\Domain\Integration\Support\CircuitBreaker;
 use Illuminate\Support\Facades\Http;

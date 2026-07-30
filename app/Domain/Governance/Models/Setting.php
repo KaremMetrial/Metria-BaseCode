@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Models;
 
-use App\Core\Tenancy\BelongsToTenant;
+use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 /**

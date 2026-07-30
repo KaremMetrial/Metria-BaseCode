@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
-use App\Core\Tenancy\TenantManager;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
+use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 use App\Domain\Auth\Models\User;
 use App\Domain\RBAC\Actions\SyncUserRolesAction;
 use App\Domain\RBAC\Http\Resources\RoleResource;

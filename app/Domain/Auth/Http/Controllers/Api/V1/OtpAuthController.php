@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Auth\Http\Requests\OtpLoginRequest;
 use App\Domain\Auth\Http\Requests\OtpRegisterRequest;
 use App\Domain\Auth\Http\Requests\SendOtpRequest;

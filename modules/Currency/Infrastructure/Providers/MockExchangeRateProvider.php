@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Providers;
+namespace Modules\Currency\Infrastructure\Providers;
 
-use App\Domain\Currency\Contracts\ExchangeRateProviderInterface;
+use Modules\Currency\Domain\Contracts\ExchangeRateProviderInterface;
 use Exception;
 
 class MockExchangeRateProvider implements ExchangeRateProviderInterface

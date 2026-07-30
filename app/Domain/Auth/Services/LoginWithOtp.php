@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
-use App\Core\Events\EventBus;
-use App\Core\Exceptions\ApiException;
+use Modules\Shared\Infrastructure\Events\EventBus;
+use Modules\Shared\Application\Exceptions\ApiException;
 use App\Domain\Auth\Events\UserLoggedInByOtp;
 use App\Domain\Auth\Models\User;
 use Illuminate\Database\Eloquent\Model;

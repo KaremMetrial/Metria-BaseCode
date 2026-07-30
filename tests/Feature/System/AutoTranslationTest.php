@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\System;
 
-use App\Core\Traits\HasTranslations;
-use App\Infrastructure\Translation\Enums\ProviderState;
-use App\Infrastructure\Translation\Events\TranslationCompleted;
-use App\Infrastructure\Translation\Events\TranslationRequested;
-use App\Infrastructure\Translation\Exceptions\ProviderUnavailableException;
-use App\Infrastructure\Translation\Facades\Translation;
-use App\Infrastructure\Translation\Jobs\TranslateModelJob;
-use App\Infrastructure\Translation\Traits\AutoTranslates;
+use Modules\Shared\Infrastructure\Traits\HasTranslations;
+use Modules\Shared\Infrastructure\Translation\Enums\ProviderState;
+use Modules\Shared\Infrastructure\Translation\Events\TranslationCompleted;
+use Modules\Shared\Infrastructure\Translation\Events\TranslationRequested;
+use Modules\Shared\Infrastructure\Translation\Exceptions\ProviderUnavailableException;
+use Modules\Shared\Infrastructure\Translation\Facades\Translation;
+use Modules\Shared\Infrastructure\Translation\Jobs\TranslateModelJob;
+use Modules\Shared\Infrastructure\Translation\Traits\AutoTranslates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;

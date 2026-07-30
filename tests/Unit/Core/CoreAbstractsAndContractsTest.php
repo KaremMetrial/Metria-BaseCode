@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core;
 
-use App\Core\Abstracts\BaseRepository;
-use App\Core\Abstracts\DataTransferObject;
-use App\Core\Contracts\CurrencyRegistryResolver;
-use App\Core\Contracts\RepositoryInterface;
-use App\Domain\Currency\Services\CurrencyRegistryResolverImpl;
+use Modules\Shared\Infrastructure\Persistence\BaseRepository;
+use Modules\Shared\Application\Abstracts\DataTransferObject;
+use Modules\Shared\Domain\Contracts\CurrencyRegistryResolver;
+use Modules\Shared\Domain\Contracts\RepositoryInterface;
+use Modules\Currency\Infrastructure\Services\CurrencyRegistryResolverImpl;
 use App\Domain\Payment\Enums\PaymentStatus;
 use App\Domain\Territory\Models\Country;
 use App\Domain\Territory\Repositories\CountryRepository;

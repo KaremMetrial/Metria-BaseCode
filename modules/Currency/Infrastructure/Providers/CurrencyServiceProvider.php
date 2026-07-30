@@ -2,24 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Providers;
+namespace Modules\Currency\Infrastructure\Providers;
 
-use App\Core\Contracts\CurrencyRegistryResolver;
-use App\Domain\Currency\Console\Commands\SyncExchangeRates;
-use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
-use App\Domain\Currency\Models\Currency;
-use App\Domain\Currency\Models\CurrencyExchangeRate;
-use App\Domain\Currency\Policies\CurrencyExchangeRatePolicy;
-use App\Domain\Currency\Policies\CurrencyPolicy;
-use App\Domain\Currency\Repositories\ExchangeRateRepository;
-use App\Domain\Currency\Services\CurrencyRegistryResolverImpl;
+use Modules\Shared\Domain\Contracts\CurrencyRegistryResolver;
+use Modules\Currency\Infrastructure\Console\Commands\SyncExchangeRates;
+use Modules\Currency\Domain\Repositories\ExchangeRateRepositoryInterface;
+use Modules\Currency\Domain\Models\Currency;
+use Modules\Currency\Domain\Models\CurrencyExchangeRate;
+use Modules\Currency\Presentation\Policies\CurrencyExchangeRatePolicy;
+use Modules\Currency\Presentation\Policies\CurrencyPolicy;
+use Modules\Currency\Infrastructure\Persistence\Repositories\ExchangeRateRepository;
+use Modules\Currency\Infrastructure\Services\CurrencyRegistryResolverImpl;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Shared\Infrastructure\Localization\LangPathRegistry;
 
 class CurrencyServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/currencies.php', 'currencies');
+
+        LangPathRegistry::register(__DIR__.'/../Resources/lang');
+
         $this->app->singleton(
             ExchangeRateRepositoryInterface::class,
             ExchangeRateRepository::class

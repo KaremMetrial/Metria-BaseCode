@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Media\Services;
 
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Application\Exceptions\DomainException;
 use App\Domain\Auth\Models\User;
 use App\Domain\Media\Enums\MediaStatus;
 use App\Domain\Media\Enums\MediaType;

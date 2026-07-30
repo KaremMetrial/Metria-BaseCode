@@ -51,14 +51,7 @@ return [
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Outgoing webhooks
-    |--------------------------------------------------------------------------
-    */
-    'webhooks' => [
-        'max_tries' => env('WEBHOOK_MAX_TRIES', 5),
-        'timeout' => env('WEBHOOK_TIMEOUT', 10),
-        'backoff' => [60, 300, 1800, 7200], // seconds between retries
-    ],
+    // Outgoing webhook delivery config moved to
+    // modules/Webhook/Infrastructure/config/webhook.php ('webhook.delivery.*')
+    // — the only consumer (DeliverWebhook) lives in the Webhook module.
 ];

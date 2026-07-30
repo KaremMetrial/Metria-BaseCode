@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\RBAC\Actions\CreateRoleAction;
 use App\Domain\RBAC\Actions\DeleteRoleAction;
 use App\Domain\RBAC\Actions\UpdateRoleAction;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Governance\Models\FeatureFlag;
 use App\Domain\Governance\Services\FeatureFlagService;
 use Illuminate\Http\JsonResponse;

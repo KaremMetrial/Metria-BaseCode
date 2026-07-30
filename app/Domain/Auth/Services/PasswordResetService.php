@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Services;
 
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Application\Exceptions\DomainException;
 use App\Domain\Auth\Events\AllSessionsRevoked;
 use App\Domain\Auth\Events\PasswordResetRequested;
 use App\Domain\Auth\Events\PasswordResetSuccessfully;

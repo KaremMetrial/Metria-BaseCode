@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Media\Models;
 
-use App\Core\Tenancy\BelongsToTenant;
-use App\Core\Traits\HasUuid;
+use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
+use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;

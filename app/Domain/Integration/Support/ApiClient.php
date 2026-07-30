@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Integration\Support;
 
-use App\Core\Exceptions\IntegrationException;
+use Modules\Shared\Application\Exceptions\IntegrationException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Currency;
 
-use App\Core\Support\Money;
+use Modules\Shared\Domain\Support\Money;
 use App\Domain\Auth\Models\User;
-use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
-use App\Domain\Currency\Models\Currency;
-use App\Domain\Currency\Providers\CurrencyExchangeApiProvider;
-use App\Domain\Currency\Providers\ExchangeRateProviderChain;
-use App\Domain\Currency\Providers\MockExchangeRateProvider;
-use App\Domain\Currency\Services\CurrencyConversionService;
-use App\Domain\Currency\Services\ExchangeRateService;
+use Modules\Currency\Domain\Repositories\ExchangeRateRepositoryInterface;
+use Modules\Currency\Domain\Models\Currency;
+use Modules\Currency\Infrastructure\Providers\CurrencyExchangeApiProvider;
+use Modules\Currency\Infrastructure\Providers\ExchangeRateProviderChain;
+use Modules\Currency\Infrastructure\Providers\MockExchangeRateProvider;
+use Modules\Currency\Application\Services\CurrencyConversionService;
+use Modules\Currency\Infrastructure\Services\ExchangeRateService;
 use App\Domain\Payment\Enums\PaymentStatus;
 use App\Domain\Payment\Models\Payment;
 use DomainException;

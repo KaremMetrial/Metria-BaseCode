@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Payment\Models;
 
-use App\Core\Support\Money;
-use App\Core\Tenancy\BelongsToTenant;
-use App\Core\Traits\HasUuid;
+use Modules\Shared\Domain\Support\Money;
+use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
+use Modules\Shared\Infrastructure\Traits\HasUuid;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Traits\Auditable;
 use App\Domain\Payment\Enums\PaymentStatus;

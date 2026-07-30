@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Territory\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Territory\Filters\TerritoryFilter;
 use App\Domain\Territory\Http\Resources\CityResource;
 use App\Domain\Territory\Http\Resources\CountryResource;

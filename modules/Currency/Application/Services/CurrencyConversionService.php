@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Services;
+namespace Modules\Currency\Application\Services;
 
-use App\Core\Contracts\CurrencyRegistryResolver;
-use App\Core\Support\Money;
+use Modules\Currency\Infrastructure\Services\ExchangeRateService;
+use Modules\Shared\Domain\Contracts\CurrencyRegistryResolver;
+use Modules\Shared\Domain\Support\Money;
 
 class CurrencyConversionService
 {
@@ -51,7 +52,10 @@ class CurrencyConversionService
             ];
         }
 
-        // Find default/base currency
+        // Find default/base currency. The payments.currency fallback reads
+        // the still-unmigrated Payment domain's config — accepted transitional
+        // coupling (TODO: update when Payment module lands), same category as
+        // the App\Domain\Auth\Models\User import in this module's policies.
         $baseCurrencyCode = config('currencies.base_currency', config('payments.currency', 'EGP'));
 
         // Fetch rates to base

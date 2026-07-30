@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Architecture;
 
-use App\Core\Exceptions\DomainException;
-use App\Core\Support\Money;
+use Modules\Shared\Application\Exceptions\DomainException;
+use Modules\Shared\Domain\Support\Money;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Enums\ApprovalStatus;
 use App\Domain\Governance\Models\ApprovalRequest;

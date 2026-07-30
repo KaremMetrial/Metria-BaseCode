@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Payment\Gateways;
 
-use App\Core\Exceptions\PaymentException;
-use App\Core\Support\Money;
+use Modules\Shared\Application\Exceptions\PaymentException;
+use Modules\Shared\Domain\Support\Money;
 use App\Domain\Payment\Contracts\PaymentGateway;
 use App\Domain\Payment\DTOs\PaymentResult;
 use App\Domain\Payment\DTOs\WebhookResult;

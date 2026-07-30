@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Services;
+namespace Modules\Currency\Infrastructure\Services;
 
-use App\Core\Contracts\CurrencyRegistryResolver;
-use App\Domain\Currency\Models\Currency;
+use Modules\Shared\Domain\Contracts\CurrencyRegistryResolver;
+use Modules\Currency\Domain\Models\Currency;
 use Illuminate\Support\Facades\Cache;
 
 class CurrencyRegistryResolverImpl implements CurrencyRegistryResolver
@@ -28,7 +28,10 @@ class CurrencyRegistryResolverImpl implements CurrencyRegistryResolver
                 // Fallback to configuration during transient database outages or early bootstrap
             }
 
-            // Fallback to configuration
+            // Fallback to configuration — payments.minor_units is the still-
+            // unmigrated Payment domain's config (TODO: update when Payment
+            // module lands). Accepted transitional coupling: this is a
+            // last-resort fallback behind the DB-backed lookup above.
             $minorUnitsVal = config("payments.minor_units.{$currency}");
             return is_numeric($minorUnitsVal) ? (int) $minorUnitsVal : 2;
         });

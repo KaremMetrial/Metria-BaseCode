@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Contracts;
+namespace Modules\Currency\Domain\Contracts;
 
 interface ExchangeRateProviderInterface
 {

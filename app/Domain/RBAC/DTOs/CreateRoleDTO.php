@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\DTOs;
 
-use App\Core\Abstracts\DataTransferObject;
+use Modules\Shared\Application\Abstracts\DataTransferObject;
 
 class CreateRoleDTO extends DataTransferObject
 {

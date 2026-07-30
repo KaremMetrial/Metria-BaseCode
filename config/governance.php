@@ -31,23 +31,11 @@ return [
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Idempotency
-    |--------------------------------------------------------------------------
-    */
-    'idempotency' => [
-        'ttl_hours' => env('IDEMPOTENCY_TTL_HOURS', 24),
-        'header' => 'Idempotency-Key',
-    ],
+    // Idempotency config moved to modules/Shared/Infrastructure/config/core.php
+    // ('core.idempotency.*') — owned by Shared since IdempotencyMiddleware and
+    // the IdempotencyKey model both live there.
 
-    /*
-    |--------------------------------------------------------------------------
-    | Outbox
-    |--------------------------------------------------------------------------
-    */
-    'outbox' => [
-        'batch_size' => 100,
-        'max_attempts' => 10,
-    ],
+    // Outbox config moved to modules/Webhook/Infrastructure/config/webhook.php
+    // ('webhook.outbox.*') — the only consumer (PublishOutboxMessages) lives
+    // in the Webhook module.
 ];

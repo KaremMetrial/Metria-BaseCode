@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Territory\Events;
 
-use App\Core\Events\BroadcastableEvent;
-use App\Core\Events\DomainEvent;
-use App\Core\Events\StoredInOutbox;
+use Modules\Shared\Domain\Events\BroadcastableEvent;
+use Modules\Shared\Domain\Events\DomainEvent;
+use Modules\Shared\Domain\Events\StoredInOutbox;
 use App\Domain\Territory\Models\Zone;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PresenceChannel;

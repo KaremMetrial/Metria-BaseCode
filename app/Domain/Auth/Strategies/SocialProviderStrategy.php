@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Strategies;
 
-use App\Core\Exceptions\DomainException;
+use Modules\Shared\Application\Exceptions\DomainException;
 use App\Domain\Auth\Contracts\AuthStrategyInterface;
 use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Services\SocialIdentityService;

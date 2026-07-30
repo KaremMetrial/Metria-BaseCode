@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\RBAC\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\RBAC\Actions\SyncRolePermissionsAction;
 use App\Domain\RBAC\Http\Resources\RoleResource;
 use App\Domain\RBAC\Models\Role;

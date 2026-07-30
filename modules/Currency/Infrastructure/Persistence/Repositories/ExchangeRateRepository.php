@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Repositories;
+namespace Modules\Currency\Infrastructure\Persistence\Repositories;
 
-use App\Core\Abstracts\BaseRepository;
-use App\Domain\Currency\Contracts\ExchangeRateRepositoryInterface;
-use App\Domain\Currency\Models\CurrencyExchangeRate;
+use Modules\Shared\Infrastructure\Persistence\BaseRepository;
+use Modules\Currency\Domain\Repositories\ExchangeRateRepositoryInterface;
+use Modules\Currency\Domain\Models\CurrencyExchangeRate;
 use DateTimeInterface;
 
 /**

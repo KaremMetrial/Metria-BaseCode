@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Core\Broadcasting\DualBroadcaster;
+use Modules\Shared\Infrastructure\Broadcasting\DualBroadcaster;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\ServiceProvider;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use App\Domain\Governance\Enums\ApprovalStatus;
 use App\Domain\Governance\Http\Resources\ApprovalRequestResource;
 use App\Domain\Governance\Models\ApprovalRequest;
@@ -59,7 +59,7 @@ class ApprovalController extends ApiController
     {
         $user = $request->user();
         if (! $user instanceof \App\Domain\Auth\Models\User) {
-            throw new \App\Core\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
+            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
         }
 
         return $user;

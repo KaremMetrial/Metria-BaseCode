@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Auth;
 
-use App\Core\Notifications\Channels\FcmChannel;
+use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
 use App\Domain\Auth\Models\OtpCode;
 use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Notifications\LoginAlertNotification;

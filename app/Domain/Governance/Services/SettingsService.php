@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Services;
 
-use App\Core\Tenancy\TenantManager;
+use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 use App\Domain\Governance\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 

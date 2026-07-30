@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Integration\Http\Controllers\Api\V1;
 
-use App\Core\Http\Controllers\ApiController;
-use App\Core\Tenancy\TenantManager;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
+use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 use App\Domain\Integration\Http\Requests\UpdateOAuthProviderRequest;
 use App\Domain\Integration\Models\OAuthProvider;
 use Illuminate\Http\JsonResponse;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Governance\Models;
 
-use App\Core\Tenancy\BelongsToTenant;
-use App\Core\Traits\HasUuid;
+use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
+use Modules\Shared\Infrastructure\Traits\HasUuid;
 use App\Domain\Auth\Models\User;
 use App\Domain\Governance\Enums\ApprovalStatus;
 use Illuminate\Database\Eloquent\Model;

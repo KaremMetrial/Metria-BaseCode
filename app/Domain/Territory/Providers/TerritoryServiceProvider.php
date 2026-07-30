@@ -16,6 +16,7 @@ use App\Domain\Territory\Policies\GovernoratePolicy;
 use App\Domain\Territory\Policies\ZonePolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Shared\Infrastructure\Translation\TranslationRegistry;
 
 class TerritoryServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,13 @@ class TerritoryServiceProvider extends ServiceProvider
         Gate::policy(City::class, CityPolicy::class);
         Gate::policy(District::class, DistrictPolicy::class);
         Gate::policy(Zone::class, ZonePolicy::class);
+
+        $translationRegistry = $this->app->make(TranslationRegistry::class);
+        $translationRegistry->register(Zone::class);
+        $translationRegistry->register(Country::class);
+        $translationRegistry->register(Governorate::class);
+        $translationRegistry->register(City::class);
+        $translationRegistry->register(District::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Wallet\Http\Resources;
 
-use App\Core\Support\Money;
+use Modules\Shared\Domain\Support\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

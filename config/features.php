@@ -15,8 +15,12 @@ return [
     */
 
     'payment_v2' => env('FEATURE_PAYMENT_V2', true),
-    'queue_context' => env('FEATURE_QUEUE_CONTEXT', true),
     'social_login_v2' => env('FEATURE_SOCIAL_LOGIN_V2', false),
-    'outbox_state_machine' => env('FEATURE_OUTBOX_STATE_MACHINE', true),
     'ai_translation_v2' => env('FEATURE_AI_TRANSLATION_V2', true),
+
+    // 'queue_context' moved to modules/Shared/Infrastructure/config/core.php
+    // ('core.queue_context_enabled') — its only consumer, QueueTenantProvider,
+    // lives in the Shared module.
+    // 'outbox_state_machine' moved to modules/Webhook/Infrastructure/config/webhook.php
+    // ('webhook.outbox.state_machine_enabled') — its only consumer lives in Webhook.
 ];

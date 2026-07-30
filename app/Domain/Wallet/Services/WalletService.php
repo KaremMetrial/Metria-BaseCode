@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Wallet\Services;
 
-use App\Core\Events\EventBus;
-use App\Core\Exceptions\DomainException;
-use App\Core\Support\Money;
+use Modules\Shared\Infrastructure\Events\EventBus;
+use Modules\Shared\Application\Exceptions\DomainException;
+use Modules\Shared\Domain\Support\Money;
 use App\Domain\Auth\Models\User;
 use App\Domain\Wallet\Enums\WalletTransactionType;
 use App\Domain\Wallet\Events\WalletCredited;

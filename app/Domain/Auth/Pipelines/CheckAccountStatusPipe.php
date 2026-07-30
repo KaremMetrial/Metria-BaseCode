@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Pipelines;
 
-use App\Core\Exceptions\ApiException;
+use Modules\Shared\Application\Exceptions\ApiException;
 use Closure;
 
 class CheckAccountStatusPipe

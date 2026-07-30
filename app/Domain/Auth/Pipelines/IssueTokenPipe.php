@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Pipelines;
 
-use App\Core\Events\EventBus;
+use Modules\Shared\Infrastructure\Events\EventBus;
 use App\Domain\Auth\Events\UserLoggedIn;
 use App\Domain\Auth\Events\UserLoggedInByOtp;
 use App\Domain\Auth\Http\Resources\UserResource;

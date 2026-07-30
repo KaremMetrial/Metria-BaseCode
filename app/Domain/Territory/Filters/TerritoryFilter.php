@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Territory\Filters;
 
-use App\Core\Abstracts\QueryFilter;
+use Modules\Shared\Domain\Specifications\QueryFilter;
 use Illuminate\Database\Eloquent\Builder;
 
 class TerritoryFilter extends QueryFilter

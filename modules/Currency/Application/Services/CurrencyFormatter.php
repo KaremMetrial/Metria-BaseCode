@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Currency\Services;
+namespace Modules\Currency\Application\Services;
 
-use App\Core\Contracts\CurrencyRegistryResolver;
-use App\Core\Support\Money;
+use Modules\Shared\Domain\Contracts\CurrencyRegistryResolver;
+use Modules\Shared\Domain\Support\Money;
 use NumberFormatter;
 
 class CurrencyFormatter
