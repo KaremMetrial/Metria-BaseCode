@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Domain\Territory\Models\City;
-use App\Domain\Territory\Models\Country;
-use App\Domain\Territory\Models\District;
-use App\Domain\Territory\Models\Governorate;
-use App\Domain\Territory\Models\Zone;
+use Modules\Territory\Domain\Models\City;
+use Modules\Territory\Domain\Models\Country;
+use Modules\Territory\Domain\Models\District;
+use Modules\Territory\Domain\Models\Governorate;
+use Modules\Territory\Domain\Models\Zone;
 use Illuminate\Database\Seeder;
 
 class TerritorySeeder extends Seeder

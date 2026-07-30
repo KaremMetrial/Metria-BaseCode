@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Console\Commands;
+namespace Modules\Territory\Infrastructure\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;

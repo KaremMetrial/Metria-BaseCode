@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Models;
+namespace Modules\Territory\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasTranslations;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
+// TODO: update when Governance module lands
 use App\Domain\Governance\Traits\Auditable;
 use Modules\Shared\Infrastructure\Translation\Traits\AutoTranslates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

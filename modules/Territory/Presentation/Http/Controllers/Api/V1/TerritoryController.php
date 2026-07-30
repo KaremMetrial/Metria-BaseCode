@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Http\Controllers\Api\V1;
+namespace Modules\Territory\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Territory\Filters\TerritoryFilter;
-use App\Domain\Territory\Http\Resources\CityResource;
-use App\Domain\Territory\Http\Resources\CountryResource;
-use App\Domain\Territory\Http\Resources\DistrictResource;
-use App\Domain\Territory\Http\Resources\GovernorateResource;
-use App\Domain\Territory\Http\Resources\ZoneResource;
-use App\Domain\Territory\Services\CityService;
-use App\Domain\Territory\Services\CountryService;
-use App\Domain\Territory\Services\DistrictService;
-use App\Domain\Territory\Services\GovernorateService;
-use App\Domain\Territory\Services\ZoneService;
+use Modules\Territory\Infrastructure\Persistence\Filters\TerritoryFilter;
+use Modules\Territory\Presentation\Http\Resources\CityResource;
+use Modules\Territory\Presentation\Http\Resources\CountryResource;
+use Modules\Territory\Presentation\Http\Resources\DistrictResource;
+use Modules\Territory\Presentation\Http\Resources\GovernorateResource;
+use Modules\Territory\Presentation\Http\Resources\ZoneResource;
+use Modules\Territory\Infrastructure\Services\CityService;
+use Modules\Territory\Infrastructure\Services\CountryService;
+use Modules\Territory\Infrastructure\Services\DistrictService;
+use Modules\Territory\Infrastructure\Services\GovernorateService;
+use Modules\Territory\Infrastructure\Services\ZoneService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Territory;
 
-use App\Domain\Territory\Events\ZoneStatusChanged;
-use App\Domain\Territory\Models\Country;
-use App\Domain\Territory\Services\CountryService;
-use App\Domain\Territory\Services\ZoneService;
+use Modules\Territory\Domain\Events\ZoneStatusChanged;
+use Modules\Territory\Domain\Models\Country;
+use Modules\Territory\Infrastructure\Services\CountryService;
+use Modules\Territory\Infrastructure\Services\ZoneService;
 use Database\Seeders\TerritorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;

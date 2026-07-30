@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Services;
+namespace Modules\Territory\Infrastructure\Services;
 
-use App\Domain\Territory\Filters\TerritoryFilter;
-use App\Domain\Territory\Repositories\DistrictRepository;
+use Modules\Territory\Infrastructure\Persistence\Filters\TerritoryFilter;
+use Modules\Territory\Infrastructure\Persistence\Repositories\DistrictRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 

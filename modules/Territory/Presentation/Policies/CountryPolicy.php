@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Policies;
+namespace Modules\Territory\Presentation\Policies;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Territory\Models\Country;
+use Modules\Territory\Domain\Models\Country;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CountryPolicy

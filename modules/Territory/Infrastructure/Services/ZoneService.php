@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Services;
+namespace Modules\Territory\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
+// TODO: update when Governance module lands
 use App\Domain\Governance\Services\AuditLogger;
-use App\Domain\Territory\Events\ZoneStatusChanged;
-use App\Domain\Territory\Filters\TerritoryFilter;
-use App\Domain\Territory\Models\Zone;
-use App\Domain\Territory\Repositories\ZoneRepository;
+use Modules\Territory\Domain\Events\ZoneStatusChanged;
+use Modules\Territory\Infrastructure\Persistence\Filters\TerritoryFilter;
+use Modules\Territory\Domain\Models\Zone;
+use Modules\Territory\Infrastructure\Persistence\Repositories\ZoneRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 

@@ -19,7 +19,7 @@ use App\Domain\Governance\Services\ApprovalService;
 use App\Domain\Integration\Models\OAuthProvider;
 use App\Domain\Media\Models\Media;
 use App\Domain\Payment\Models\Payment;
-use App\Domain\Territory\Models\Country;
+use Modules\Territory\Domain\Models\Country;
 use App\Domain\Wallet\Models\Wallet;
 use App\Domain\Wallet\Services\WalletService;
 use Modules\Webhook\Domain\Models\WebhookEndpoint;

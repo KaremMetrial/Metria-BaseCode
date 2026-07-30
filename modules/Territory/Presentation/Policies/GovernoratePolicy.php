@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Policies;
+namespace Modules\Territory\Presentation\Policies;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Territory\Models\Governorate;
+use Modules\Territory\Domain\Models\Governorate;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class GovernoratePolicy

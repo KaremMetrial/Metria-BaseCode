@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Providers;
+namespace Modules\Territory\Infrastructure\Providers;
 
-use App\Domain\Territory\Models\City;
-use App\Domain\Territory\Models\Country;
-use App\Domain\Territory\Models\District;
-use App\Domain\Territory\Models\Governorate;
-use App\Domain\Territory\Models\Zone;
-use App\Domain\Territory\Policies\CityPolicy;
-use App\Domain\Territory\Policies\CountryPolicy;
-use App\Domain\Territory\Policies\DistrictPolicy;
-use App\Domain\Territory\Policies\GovernoratePolicy;
-use App\Domain\Territory\Policies\ZonePolicy;
+use Modules\Territory\Domain\Models\City;
+use Modules\Territory\Domain\Models\Country;
+use Modules\Territory\Domain\Models\District;
+use Modules\Territory\Domain\Models\Governorate;
+use Modules\Territory\Domain\Models\Zone;
+use Modules\Territory\Presentation\Policies\CityPolicy;
+use Modules\Territory\Presentation\Policies\CountryPolicy;
+use Modules\Territory\Presentation\Policies\DistrictPolicy;
+use Modules\Territory\Presentation\Policies\GovernoratePolicy;
+use Modules\Territory\Presentation\Policies\ZonePolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Shared\Infrastructure\Translation\TranslationRegistry;
@@ -37,7 +37,7 @@ class TerritoryServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \App\Domain\Territory\Console\Commands\CheckDuplicatesCommand::class,
+                \Modules\Territory\Infrastructure\Console\Commands\CheckDuplicatesCommand::class,
             ]);
         }
     }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Repositories;
+namespace Modules\Territory\Infrastructure\Persistence\Repositories;
 
 use Modules\Shared\Infrastructure\Persistence\BaseRepository;
-use App\Domain\Territory\Models\District;
+use Modules\Territory\Domain\Models\District;
 use Illuminate\Database\Eloquent\Collection;
 
 /**

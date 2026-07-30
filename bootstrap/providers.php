@@ -8,7 +8,7 @@ use App\Domain\Media\Providers\MediaServiceProvider;
 use App\Domain\Payment\Providers\PaymentServiceProvider;
 use App\Domain\RBAC\Providers\RbacAuthServiceProvider;
 use App\Domain\RBAC\Providers\RbacServiceProvider;
-use App\Domain\Territory\Providers\TerritoryServiceProvider;
+use Modules\Territory\Infrastructure\Providers\TerritoryServiceProvider;
 use App\Domain\Wallet\Providers\WalletServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\BroadcastServiceProvider;

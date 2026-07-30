@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Http\Resources;
+namespace Modules\Territory\Presentation\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Domain\Territory\Models\District */
+/** @mixin \Modules\Territory\Domain\Models\District */
 class DistrictResource extends JsonResource
 {
     public function toArray(Request $request): array

@@ -18,7 +18,7 @@ use App\Domain\RBAC\Http\Controllers\Api\V1\PermissionController;
 use App\Domain\RBAC\Http\Controllers\Api\V1\RoleController;
 use App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController;
 use App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController;
-use App\Domain\Territory\Http\Controllers\Api\V1\TerritoryController;
+use Modules\Territory\Presentation\Http\Controllers\Api\V1\TerritoryController;
 use App\Domain\Wallet\Http\Controllers\Api\V1\WalletController;
 use Illuminate\Support\Facades\Route;
 

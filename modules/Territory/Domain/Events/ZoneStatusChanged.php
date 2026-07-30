@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Territory\Events;
+namespace Modules\Territory\Domain\Events;
 
 use Modules\Shared\Domain\Events\BroadcastableEvent;
 use Modules\Shared\Domain\Events\DomainEvent;
 use Modules\Shared\Domain\Events\StoredInOutbox;
-use App\Domain\Territory\Models\Zone;
+use Modules\Territory\Domain\Models\Zone;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
