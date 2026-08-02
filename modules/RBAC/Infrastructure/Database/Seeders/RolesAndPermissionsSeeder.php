@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders;
+namespace Modules\RBAC\Infrastructure\Database\Seeders;
 
 use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Database\Seeder;

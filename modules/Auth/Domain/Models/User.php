@@ -9,7 +9,7 @@ use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Modules\Governance\Infrastructure\Traits\Auditable;
 use Modules\Media\Domain\Models\Media;
 use Modules\Wallet\Domain\Models\Wallet;
-use Database\Factories\UserFactory;
+use Modules\Auth\Infrastructure\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;

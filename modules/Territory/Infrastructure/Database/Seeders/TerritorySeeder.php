@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders;
+namespace Modules\Territory\Infrastructure\Database\Seeders;
 
 use Modules\Territory\Domain\Models\City;
 use Modules\Territory\Domain\Models\Country;
