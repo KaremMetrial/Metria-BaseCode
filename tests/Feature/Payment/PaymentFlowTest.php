@@ -8,7 +8,7 @@ use Modules\Auth\Domain\Models\User;
 use Modules\Payment\Domain\Enums\PaymentStatus;
 use Modules\Payment\Domain\Models\Payment;
 use Modules\Payment\Infrastructure\Services\PaymentService;
-use Database\Seeders\RolesAndPermissionsSeeder;
+use Modules\RBAC\Infrastructure\Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;

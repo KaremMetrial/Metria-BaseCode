@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -16,6 +17,24 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->app->make(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    /**
+     * Force SQLite in-memory for all tests, regardless of host .env or shell environment.
+     * 
+     * This overrides database config at the config level to guarantee tests never
+     * accidentally connect to PostgreSQL/MySQL when the host .env values leak into
+     * the process environment (via exported shell vars or putenv).
+     */
+    protected function defineEnvironment(Application $app): void
+    {
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ]);
     }
 
     /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Territory;
 
-use Database\Seeders\TerritorySeeder;
+use Modules\Territory\Infrastructure\Database\Seeders\TerritorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

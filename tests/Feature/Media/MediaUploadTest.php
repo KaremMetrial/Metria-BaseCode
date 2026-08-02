@@ -12,7 +12,7 @@ use Modules\Media\Presentation\Http\Resources\MediaResource;
 use Modules\Media\Domain\Models\Media;
 use Modules\Media\Domain\Models\MediaBlob;
 use Modules\Media\Domain\Models\MediaVariant;
-use Database\Seeders\RolesAndPermissionsSeeder;
+use Modules\RBAC\Infrastructure\Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;

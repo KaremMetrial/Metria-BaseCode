@@ -8,7 +8,7 @@ use Modules\Territory\Domain\Events\ZoneStatusChanged;
 use Modules\Territory\Domain\Models\Country;
 use Modules\Territory\Infrastructure\Services\CountryService;
 use Modules\Territory\Infrastructure\Services\ZoneService;
-use Database\Seeders\TerritorySeeder;
+use Modules\Territory\Infrastructure\Database\Seeders\TerritorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
