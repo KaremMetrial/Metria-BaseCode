@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Pipelines;
+namespace Modules\Auth\Infrastructure\Pipelines;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
-use App\Domain\Auth\Events\UserLoggedIn;
-use App\Domain\Auth\Events\UserLoggedInByOtp;
-use App\Domain\Auth\Http\Resources\UserResource;
+use Modules\Auth\Domain\Events\UserLoggedIn;
+use Modules\Auth\Domain\Events\UserLoggedInByOtp;
+use Modules\Auth\Presentation\Http\Resources\UserResource;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Closure;
 

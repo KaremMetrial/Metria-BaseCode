@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Illuminate\Support\Str;
 
 trait CreatesUser

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Domain\Auth\Events\UserRegistered;
-use App\Domain\Auth\Listeners\ProvisionUserDefaults;
+use Modules\Auth\Domain\Events\UserRegistered;
+use Modules\Auth\Infrastructure\Listeners\ProvisionUserDefaults;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 /**

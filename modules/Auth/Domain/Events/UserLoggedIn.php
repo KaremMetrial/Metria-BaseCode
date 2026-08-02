@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Events;
+namespace Modules\Auth\Domain\Events;
 
 use Modules\Shared\Domain\Events\DomainEvent;
 use Modules\Shared\Domain\Events\StoredInOutbox;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 
 class UserLoggedIn extends DomainEvent implements StoredInOutbox
 {

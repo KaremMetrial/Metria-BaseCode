@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Policies;
+namespace Modules\Auth\Presentation\Policies;
 
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Models\UserSession;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Domain\Models\UserSession;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserSessionPolicy

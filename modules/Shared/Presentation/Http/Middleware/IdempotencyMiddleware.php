@@ -28,6 +28,9 @@ class IdempotencyMiddleware
         if (is_array($key)) {
             $key = reset($key);
         }
+        if (is_string($key)) {
+            $key = trim($key);
+        }
 
         if (! is_string($key) || $key === '' || ! in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
             $response = $next($request);

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\ApiException;
-use App\Domain\Auth\Events\OtpGenerated;
-use App\Domain\Auth\Models\OtpCode;
+use Modules\Auth\Domain\Events\OtpGenerated;
+use Modules\Auth\Domain\Models\OtpCode;
 use Illuminate\Support\Facades\DB;
 
 class SendOtp

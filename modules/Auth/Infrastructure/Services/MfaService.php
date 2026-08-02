@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Auth\Events\MfaDisabled;
-use App\Domain\Auth\Events\MfaEnabled;
-use App\Domain\Auth\Events\MfaVerified;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Events\MfaDisabled;
+use Modules\Auth\Domain\Events\MfaEnabled;
+use Modules\Auth\Domain\Events\MfaVerified;
+use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;

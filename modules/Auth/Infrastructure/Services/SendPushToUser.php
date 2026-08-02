@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Integration\Infrastructure\Push\FcmPushProvider;
 use Kreait\Firebase\Exception\Messaging\NotFound;
 use Throwable;
@@ -22,7 +22,7 @@ class SendPushToUser
     public function __invoke(User $user, string $title, string $body, array $data = []): array
     {
         $results = [];
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Domain\Auth\Models\FcmDeviceToken> $tokens */
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \Modules\Auth\Domain\Models\FcmDeviceToken> $tokens */
         $tokens = $user->fcmDeviceTokens()->get();
 
         foreach ($tokens as $tokenModel) {

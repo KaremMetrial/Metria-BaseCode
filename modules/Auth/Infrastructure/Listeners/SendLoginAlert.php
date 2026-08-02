@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Listeners;
+namespace Modules\Auth\Infrastructure\Listeners;
 
-use App\Domain\Auth\Notifications\LoginAlertNotification;
+use Modules\Auth\Infrastructure\Notifications\LoginAlertNotification;
 
 class SendLoginAlert
 {
@@ -14,7 +14,7 @@ class SendLoginAlert
             return;
         }
 
-        /** @var \App\Domain\Auth\Models\User|object|null $user */
+        /** @var \Modules\Auth\Domain\Models\User|object|null $user */
         $user = $event->user;
 
         if (is_object($user) && method_exists($user, 'notify')) {
@@ -22,7 +22,7 @@ class SendLoginAlert
             $agent = request()->userAgent() ?: 'Unknown Device';
             $time = now()->toDateTimeString();
 
-            /** @var \App\Domain\Auth\Models\User $user */
+            /** @var \Modules\Auth\Domain\Models\User $user */
             $user->notify(new LoginAlertNotification($ip, $agent, $time));
         }
     }

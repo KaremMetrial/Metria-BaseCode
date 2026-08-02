@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Listeners;
+namespace Modules\Auth\Infrastructure\Listeners;
 
-use App\Domain\Auth\Notifications\WelcomeNotification;
+use Modules\Auth\Infrastructure\Notifications\WelcomeNotification;
 use Modules\Wallet\Infrastructure\Services\WalletService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -41,7 +41,7 @@ class ProvisionUserDefaults implements ShouldQueue
 
     public function handle(object $event): void
     {
-        if (! property_exists($event, 'user') || ! ($event->user instanceof \App\Domain\Auth\Models\User)) {
+        if (! property_exists($event, 'user') || ! ($event->user instanceof \Modules\Auth\Domain\Models\User)) {
             return;
         }
 

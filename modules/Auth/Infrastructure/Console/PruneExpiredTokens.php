@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Console;
+namespace Modules\Auth\Infrastructure\Console;
 
 use Illuminate\Console\Command;
 use Laravel\Sanctum\PersonalAccessToken;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Models;
+namespace Modules\Auth\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;

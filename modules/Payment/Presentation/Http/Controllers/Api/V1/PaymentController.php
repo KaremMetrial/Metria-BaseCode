@@ -125,10 +125,10 @@ class PaymentController extends ApiController
         return $this->respond(new PaymentResource($outcome), __('payments.refunded'));
     }
 
-    private function getAuthenticatedUser(Request $request): \App\Domain\Auth\Models\User
+    private function getAuthenticatedUser(Request $request): \Modules\Auth\Domain\Models\User
     {
         $user = $request->user();
-        if (! $user instanceof \App\Domain\Auth\Models\User) {
+        if (! $user instanceof \Modules\Auth\Domain\Models\User) {
             throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
         }
 

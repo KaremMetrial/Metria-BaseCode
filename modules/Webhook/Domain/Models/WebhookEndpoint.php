@@ -6,7 +6,6 @@ namespace Modules\Webhook\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-// TODO: update when IAM module lands
 use Modules\Governance\Infrastructure\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

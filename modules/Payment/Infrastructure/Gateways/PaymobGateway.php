@@ -253,8 +253,6 @@ class PaymobGateway implements PaymentGateway
 
     private function http(): PendingRequest
     {
-        // integrations.http.timeout: still-unmigrated Integration domain's config
-        // (TODO: update when Integration module lands).
         $timeoutVal = config('integrations.http.timeout', 15);
         $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
         $baseUrlVal = $this->config['base_url'] ?? 'https://accept.paymob.com/api';

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Auth\Events\AllSessionsRevoked;
-use App\Domain\Auth\Events\PasswordResetRequested;
-use App\Domain\Auth\Events\PasswordResetSuccessfully;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Events\AllSessionsRevoked;
+use Modules\Auth\Domain\Events\PasswordResetRequested;
+use Modules\Auth\Domain\Events\PasswordResetSuccessfully;
+use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -57,7 +57,7 @@ class PasswordResetService
             throw new DomainException(__('auth.recovery.invalid_token'), errorCode: 'invalid_reset_token');
         }
 
-        /** @var \App\Domain\Auth\Models\User $user */
+        /** @var \Modules\Auth\Domain\Models\User $user */
         $user = User::query()->where('email', $email)->firstOrFail();
         $user->password = Hash::make($newPassword);
         $user->save();

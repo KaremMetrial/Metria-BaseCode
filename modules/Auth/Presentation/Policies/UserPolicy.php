@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Policies;
+namespace Modules\Auth\Presentation\Policies;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy

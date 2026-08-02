@@ -40,5 +40,7 @@ class TerritoryServiceProvider extends ServiceProvider
                 \Modules\Territory\Infrastructure\Console\Commands\CheckDuplicatesCommand::class,
             ]);
         }
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Auth;
 
-use App\Domain\Auth\Events\OtpFailed;
-use App\Domain\Auth\Events\OtpGenerated;
-use App\Domain\Auth\Events\OtpVerified;
-use App\Domain\Auth\Events\UserLoggedInByOtp;
-use App\Domain\Auth\Models\OtpCode;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Events\OtpFailed;
+use Modules\Auth\Domain\Events\OtpGenerated;
+use Modules\Auth\Domain\Events\OtpVerified;
+use Modules\Auth\Domain\Events\UserLoggedInByOtp;
+use Modules\Auth\Domain\Models\OtpCode;
+use Modules\Auth\Domain\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;

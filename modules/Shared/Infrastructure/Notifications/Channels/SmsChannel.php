@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Modules\Shared\Infrastructure\Notifications\Channels;
 
-// TODO(Integration migration): reverting an earlier attempt to depend on a
-// Shared SmsProvider contract instead of the concrete SmsManager — an
-// existing test (tests/Feature/Auth/NotificationFlowTest.php) mocks
-// Modules\Integration\Infrastructure\Sms\SmsManager in the container via Mockery's
-// `driver->send` demeter chaining, which does not satisfy an interface
-// type-hint (the resulting demeter mock doesn't implement it). Fixing that
-// cleanly means changing how that test mocks SMS delivery, which is
-// Integration-domain test surface out of scope for this session — deferred
-// to Integration's own migration rather than forced through here.
+// Known residual coupling: Shared depends on the concrete Integration module
+// here (Integration has since fully migrated into modules/, so this is no
+// longer blocked by namespace migration — it's a deliberate, disclosed
+// trade-off). An earlier attempt to depend on a Shared SmsProvider contract
+// instead was reverted: tests/Feature/Auth/NotificationFlowTest.php mocks
+// SmsManager in the container via Mockery's `driver->send` demeter chaining,
+// which doesn't satisfy an interface type-hint (the resulting demeter mock
+// doesn't implement it). Fixing that cleanly means changing how that test
+// mocks SMS delivery — a real test-authoring change, not something to force
+// as a side effect of a migration pass.
 use Modules\Integration\Infrastructure\Sms\SmsManager;
 use Illuminate\Notifications\Notification;
 

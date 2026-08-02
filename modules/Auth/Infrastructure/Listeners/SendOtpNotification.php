@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Listeners;
+namespace Modules\Auth\Infrastructure\Listeners;
 
-use App\Domain\Auth\Events\OtpGenerated;
-use App\Domain\Auth\Notifications\OtpNotification;
+use Modules\Auth\Domain\Events\OtpGenerated;
+use Modules\Auth\Infrastructure\Notifications\OtpNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Notification;
 

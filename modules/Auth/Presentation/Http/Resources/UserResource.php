@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Http\Resources;
+namespace Modules\Auth\Presentation\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Domain\Auth\Models\User */
+/** @mixin \Modules\Auth\Domain\Models\User */
 class UserResource extends JsonResource
 {
     public function toArray(Request $request): array

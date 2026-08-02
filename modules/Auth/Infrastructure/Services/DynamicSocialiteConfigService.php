@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Auth\Contracts\OAuthConfigurationRepositoryInterface;
+use Modules\Auth\Domain\Contracts\OAuthConfigurationRepositoryInterface;
 use Illuminate\Support\Facades\Config;
 
 class DynamicSocialiteConfigService

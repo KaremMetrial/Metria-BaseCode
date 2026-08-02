@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Notifications;
+namespace Modules\Auth\Infrastructure\Notifications;
 
 use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;

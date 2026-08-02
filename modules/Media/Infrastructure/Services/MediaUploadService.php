@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Modules\Media\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-// TODO: update when IAM module lands
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Media\Domain\Enums\MediaStatus;
 use Modules\Media\Domain\Enums\MediaType;
 use Modules\Media\Domain\Events\MediaUploaded;

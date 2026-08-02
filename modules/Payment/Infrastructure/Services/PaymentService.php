@@ -8,8 +8,7 @@ use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\ApiException;
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Shared\Domain\Support\Money;
-// TODO: update when IAM module lands
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Domain\Models\ApprovalRequest;
 use Modules\Governance\Infrastructure\Services\ApprovalService;
 use Modules\Governance\Infrastructure\Services\AuditLogger;

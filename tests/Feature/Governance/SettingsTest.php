@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Governance;
 
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Infrastructure\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;

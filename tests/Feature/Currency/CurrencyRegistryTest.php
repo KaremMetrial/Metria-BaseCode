@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Currency;
 
 use Modules\Shared\Domain\Support\Money;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Currency\Domain\Repositories\ExchangeRateRepositoryInterface;
 use Modules\Currency\Domain\Models\Currency;
 use Modules\Currency\Infrastructure\Providers\CurrencyExchangeApiProvider;

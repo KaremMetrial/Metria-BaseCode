@@ -18,5 +18,7 @@ class WalletServiceProvider extends ServiceProvider
         Gate::policy(Wallet::class, WalletPolicy::class);
 
         EnumRegistry::register('wallet_transaction_type', WalletTransactionType::class);
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

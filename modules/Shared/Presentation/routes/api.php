@@ -10,8 +10,8 @@ use Modules\Shared\Presentation\Http\Controllers\HealthController;
 // `api` middleware group that bootstrap/app.php's withRouting(api: ...)
 // applies automatically to routes/api.php — that must be repeated explicitly
 // here (same reasoning as modules/Webhook/Presentation/routes/api.php).
-// These two routes are public: they never sat behind auth/tenant/throttle in
-// routes/api_v1.php, so no further middleware is added here.
+// These two routes are public: they never sat behind auth/tenant/throttle,
+// so no further middleware is added here.
 Route::prefix('api/v1')
     ->middleware(['api'])
     ->group(function () {

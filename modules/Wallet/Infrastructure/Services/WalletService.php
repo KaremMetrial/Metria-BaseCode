@@ -7,8 +7,7 @@ namespace Modules\Wallet\Infrastructure\Services;
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Shared\Domain\Support\Money;
-// TODO: update when IAM module lands
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Wallet\Domain\Enums\WalletTransactionType;
 use Modules\Wallet\Domain\Events\WalletCredited;
 use Modules\Wallet\Domain\Events\WalletDebited;

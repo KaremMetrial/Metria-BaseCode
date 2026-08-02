@@ -7,8 +7,7 @@ use Modules\Webhook\Presentation\Http\Controllers\Api\V1\WebhookEndpointControll
 
 // Registered via loadRoutesFrom(), so this file is outside the `api` prefix +
 // `api` middleware group that bootstrap/app.php's withRouting(api: ...) applies
-// automatically to routes/api.php, and outside routes/api_v1.php's enclosing
-// Route::group() — all of that must be repeated explicitly here.
+// automatically to routes/api.php — that must be repeated explicitly here.
 Route::prefix('api/v1')
     ->middleware(['api', 'auth:sanctum', 'tenant', 'throttle:api'])
     ->group(function () {

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Http\Controllers\Api\V1;
+namespace Modules\Auth\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Auth\Http\Resources\UserResource;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Services\AuthMethodGovernanceService;
-use App\Domain\Auth\Services\DynamicSocialiteConfigService;
-use App\Domain\Auth\Services\SocialIdentityService;
-use App\Domain\Auth\Strategies\SocialProviderStrategy;
+use Modules\Auth\Presentation\Http\Resources\UserResource;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Infrastructure\Services\AuthMethodGovernanceService;
+use Modules\Auth\Infrastructure\Services\DynamicSocialiteConfigService;
+use Modules\Auth\Infrastructure\Services\SocialIdentityService;
+use Modules\Auth\Infrastructure\Strategies\SocialProviderStrategy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

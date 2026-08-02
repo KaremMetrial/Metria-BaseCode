@@ -1,6 +1,6 @@
 <?php
 
-use App\Domain\Auth\Providers\AuthServiceProvider;
+use Modules\Auth\Infrastructure\Providers\AuthServiceProvider;
 use Modules\Currency\Infrastructure\Providers\CurrencyServiceProvider;
 use Modules\Governance\Infrastructure\Providers\GovernanceServiceProvider;
 use Modules\Integration\Infrastructure\Providers\IntegrationServiceProvider;

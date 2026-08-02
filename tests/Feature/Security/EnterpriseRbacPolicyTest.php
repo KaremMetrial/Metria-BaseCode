@@ -6,10 +6,10 @@ namespace Tests\Feature\Security;
 
 use Modules\Shared\Domain\Support\Money;
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use App\Domain\Auth\Http\Requests\ConfirmMfaRequest;
-use App\Domain\Auth\Http\Requests\DisableMfaRequest;
-use App\Domain\Auth\Http\Requests\UpdateFcmTokenRequest;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Presentation\Http\Requests\ConfirmMfaRequest;
+use Modules\Auth\Presentation\Http\Requests\DisableMfaRequest;
+use Modules\Auth\Presentation\Http\Requests\UpdateFcmTokenRequest;
+use Modules\Auth\Domain\Models\User;
 use Modules\Currency\Domain\Models\Currency;
 use Modules\Governance\Domain\Enums\ApprovalStatus;
 use Modules\Governance\Presentation\Http\Requests\UpdateSettingRequest;

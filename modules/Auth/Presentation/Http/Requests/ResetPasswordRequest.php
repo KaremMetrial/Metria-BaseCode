@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Http\Requests;
+namespace Modules\Auth\Presentation\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;

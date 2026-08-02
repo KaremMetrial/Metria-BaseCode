@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Integration\Infrastructure\Repositories;
 
-use App\Domain\Auth\Contracts\OAuthConfigurationRepositoryInterface;
+use Modules\Auth\Domain\Contracts\OAuthConfigurationRepositoryInterface;
 use Modules\Integration\Domain\Models\OAuthProvider;
 
 class DatabaseOAuthConfigurationRepository implements OAuthConfigurationRepositoryInterface

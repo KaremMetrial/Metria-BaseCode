@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Notifications;
+namespace Modules\Auth\Infrastructure\Notifications;
 
 use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
 use Modules\Shared\Infrastructure\Notifications\Channels\SmsChannel;
@@ -42,7 +42,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
         }
 
         // If the user has active FCM device tokens, send a push notification too!
-        if ($notifiable instanceof \App\Domain\Auth\Models\User && $notifiable->fcmDeviceTokens()->exists()) {
+        if ($notifiable instanceof \Modules\Auth\Domain\Models\User && $notifiable->fcmDeviceTokens()->exists()) {
             $channels[] = FcmChannel::class;
         }
 

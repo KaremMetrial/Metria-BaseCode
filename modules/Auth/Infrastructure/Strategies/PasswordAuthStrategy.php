@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Strategies;
+namespace Modules\Auth\Infrastructure\Strategies;
 
 use Modules\Shared\Application\Exceptions\ApiException;
-use App\Domain\Auth\Contracts\AuthStrategyInterface;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Contracts\AuthStrategyInterface;
+use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;

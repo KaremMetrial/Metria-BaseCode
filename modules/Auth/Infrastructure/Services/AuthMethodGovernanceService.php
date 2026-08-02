@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Governance\Infrastructure\Services\SettingsService;

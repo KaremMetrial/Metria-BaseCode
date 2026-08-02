@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Pipelines;
+namespace Modules\Auth\Infrastructure\Pipelines;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Illuminate\Http\Request;
 
 class AuthContext

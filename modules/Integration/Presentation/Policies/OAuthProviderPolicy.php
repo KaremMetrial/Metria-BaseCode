@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Integration\Presentation\Policies;
 
-// TODO: update when IAM module lands
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Integration\Domain\Models\OAuthProvider;
 use Illuminate\Auth\Access\HandlesAuthorization;
 

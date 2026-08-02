@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Listeners;
+namespace Modules\Auth\Infrastructure\Listeners;
 
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 

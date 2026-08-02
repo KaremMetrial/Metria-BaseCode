@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
-use App\Domain\Auth\Events\UserRegisteredByOtp;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Events\UserRegisteredByOtp;
+use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

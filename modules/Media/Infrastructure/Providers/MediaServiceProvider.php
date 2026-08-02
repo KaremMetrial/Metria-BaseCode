@@ -26,5 +26,7 @@ class MediaServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Media::class, MediaPolicy::class);
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

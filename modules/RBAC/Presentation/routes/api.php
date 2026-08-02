@@ -11,9 +11,8 @@ use Modules\RBAC\Presentation\Http\Controllers\Api\V1\UserRoleController;
 
 // Registered via loadRoutesFrom(), so this file is outside the `api` prefix +
 // `api` middleware group that bootstrap/app.php's withRouting(api: ...)
-// applies automatically to routes/api.php, and outside routes/api_v1.php's
-// enclosing groups — both must be repeated explicitly here (same reasoning
-// as modules/Webhook/Presentation/routes/api.php).
+// applies automatically to routes/api.php — that must be repeated explicitly
+// here (same reasoning as modules/Webhook/Presentation/routes/api.php).
 Route::prefix('api/v1')
     ->middleware(['api', 'auth:sanctum', 'tenant', 'throttle:api'])
     ->group(function () {

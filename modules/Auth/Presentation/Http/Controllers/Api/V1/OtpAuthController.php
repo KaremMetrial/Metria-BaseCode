@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Http\Controllers\Api\V1;
+namespace Modules\Auth\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Auth\Http\Requests\OtpLoginRequest;
-use App\Domain\Auth\Http\Requests\OtpRegisterRequest;
-use App\Domain\Auth\Http\Requests\SendOtpRequest;
-use App\Domain\Auth\Http\Resources\UserResource;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Pipelines\AuthContext;
-use App\Domain\Auth\Pipelines\AuthPipeline;
-use App\Domain\Auth\Services\AuthMethodGovernanceService;
-use App\Domain\Auth\Services\RegisterWithOtp;
-use App\Domain\Auth\Services\SendOtp;
-use App\Domain\Auth\Strategies\OtpAuthStrategy;
+use Modules\Auth\Presentation\Http\Requests\OtpLoginRequest;
+use Modules\Auth\Presentation\Http\Requests\OtpRegisterRequest;
+use Modules\Auth\Presentation\Http\Requests\SendOtpRequest;
+use Modules\Auth\Presentation\Http\Resources\UserResource;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Infrastructure\Pipelines\AuthContext;
+use Modules\Auth\Infrastructure\Pipelines\AuthPipeline;
+use Modules\Auth\Infrastructure\Services\AuthMethodGovernanceService;
+use Modules\Auth\Infrastructure\Services\RegisterWithOtp;
+use Modules\Auth\Infrastructure\Services\SendOtp;
+use Modules\Auth\Infrastructure\Strategies\OtpAuthStrategy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

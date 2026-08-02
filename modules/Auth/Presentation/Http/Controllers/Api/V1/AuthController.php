@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Http\Controllers\Api\V1;
+namespace Modules\Auth\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Application\Exceptions\ApiException;
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Auth\Http\Requests\ConfirmMfaRequest;
-use App\Domain\Auth\Http\Requests\DisableMfaRequest;
-use App\Domain\Auth\Http\Requests\ForgotPasswordRequest;
-use App\Domain\Auth\Http\Requests\LoginRequest;
-use App\Domain\Auth\Http\Requests\RegisterRequest;
-use App\Domain\Auth\Http\Requests\ResetPasswordRequest;
-use App\Domain\Auth\Http\Requests\UpdateFcmTokenRequest;
-use App\Domain\Auth\Http\Resources\UserResource;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Models\UserSession;
-use App\Domain\Auth\Pipelines\AuthContext;
-use App\Domain\Auth\Pipelines\AuthPipeline;
-use App\Domain\Auth\Services\AuthMethodGovernanceService;
-use App\Domain\Auth\Services\IssueApiToken;
-use App\Domain\Auth\Services\MfaService;
-use App\Domain\Auth\Services\PasswordResetService;
-use App\Domain\Auth\Services\RegisterUser;
-use App\Domain\Auth\Strategies\PasswordAuthStrategy;
+use Modules\Auth\Presentation\Http\Requests\ConfirmMfaRequest;
+use Modules\Auth\Presentation\Http\Requests\DisableMfaRequest;
+use Modules\Auth\Presentation\Http\Requests\ForgotPasswordRequest;
+use Modules\Auth\Presentation\Http\Requests\LoginRequest;
+use Modules\Auth\Presentation\Http\Requests\RegisterRequest;
+use Modules\Auth\Presentation\Http\Requests\ResetPasswordRequest;
+use Modules\Auth\Presentation\Http\Requests\UpdateFcmTokenRequest;
+use Modules\Auth\Presentation\Http\Resources\UserResource;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Domain\Models\UserSession;
+use Modules\Auth\Infrastructure\Pipelines\AuthContext;
+use Modules\Auth\Infrastructure\Pipelines\AuthPipeline;
+use Modules\Auth\Infrastructure\Services\AuthMethodGovernanceService;
+use Modules\Auth\Infrastructure\Services\IssueApiToken;
+use Modules\Auth\Infrastructure\Services\MfaService;
+use Modules\Auth\Infrastructure\Services\PasswordResetService;
+use Modules\Auth\Infrastructure\Services\RegisterUser;
+use Modules\Auth\Infrastructure\Strategies\PasswordAuthStrategy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -144,7 +144,7 @@ class AuthController extends ApiController
 
     public function revokeSession(Request $request, string $id): JsonResponse
     {
-        /** @var \App\Domain\Auth\Models\UserSession $session */
+        /** @var \Modules\Auth\Domain\Models\UserSession $session */
         $session = $this->getAuthenticatedUser($request)->sessions()->where('id', $id)->firstOrFail();
         $session->revoke();
 

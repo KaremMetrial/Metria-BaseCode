@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Pipelines;
+namespace Modules\Auth\Infrastructure\Pipelines;
 
 use Modules\Shared\Application\Exceptions\ApiException;
 use Closure;

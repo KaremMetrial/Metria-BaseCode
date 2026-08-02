@@ -14,7 +14,6 @@ return [
     |
     */
 
-    'social_login_v2' => env('FEATURE_SOCIAL_LOGIN_V2', false),
     'ai_translation_v2' => env('FEATURE_AI_TRANSLATION_V2', true),
 
     // 'queue_context' moved to modules/Shared/Infrastructure/config/core.php
@@ -24,4 +23,7 @@ return [
     // ('webhook.outbox.state_machine_enabled') — its only consumer lives in Webhook.
     // 'payment_v2' moved to modules/Payment/Infrastructure/config/payments.php
     // ('payments.v2_enabled') — its only consumer, PaymentService, lives in Payment.
+    // 'social_login_v2' moved to modules/Auth/Infrastructure/config/auth_features.php
+    // ('auth_features.social_login_v2_enabled') — its only consumer, SocialProviderStrategy,
+    // lives in the Auth module.
 ];

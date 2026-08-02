@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Integration\Infrastructure\Providers;
 
-// TODO: update when IAM module lands
-use App\Domain\Auth\Contracts\OAuthConfigurationRepositoryInterface;
+use Modules\Auth\Domain\Contracts\OAuthConfigurationRepositoryInterface;
 use Modules\Integration\Domain\Models\OAuthProvider;
 use Modules\Integration\Presentation\Policies\OAuthProviderPolicy;
 use Modules\Integration\Infrastructure\Repositories\DatabaseOAuthConfigurationRepository;

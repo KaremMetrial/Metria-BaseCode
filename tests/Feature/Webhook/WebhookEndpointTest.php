@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Webhook;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Auth;
 
-use App\Domain\Auth\Models\OtpCode;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Services\SendPushToUser;
+use Modules\Auth\Domain\Models\OtpCode;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Infrastructure\Services\SendPushToUser;
 use Modules\Integration\Infrastructure\Push\FcmPushProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;

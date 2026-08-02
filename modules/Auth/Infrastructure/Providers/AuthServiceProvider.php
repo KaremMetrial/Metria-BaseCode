@@ -2,45 +2,50 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Providers;
+namespace Modules\Auth\Infrastructure\Providers;
 
-use App\Domain\Auth\Console\PruneExpiredTokens;
-use App\Domain\Auth\Events\AccountLockedOut;
-use App\Domain\Auth\Events\AllSessionsRevoked;
-use App\Domain\Auth\Events\AuthMethodBlocked;
-use App\Domain\Auth\Events\MfaDisabled;
-use App\Domain\Auth\Events\MfaEnabled;
-use App\Domain\Auth\Events\MfaVerified;
-use App\Domain\Auth\Events\OtpGenerated;
-use App\Domain\Auth\Events\PasswordResetRequested;
-use App\Domain\Auth\Events\PasswordResetSuccessfully;
-use App\Domain\Auth\Events\SocialIdentityLinked;
-use App\Domain\Auth\Events\SocialIdentityUnlinked;
-use App\Domain\Auth\Events\UserLoggedIn;
-use App\Domain\Auth\Events\UserLoggedInByOtp;
-use App\Domain\Auth\Events\UserLoggedInByProvider;
-use App\Domain\Auth\Events\UserRegisteredByOtp;
-use App\Domain\Auth\Events\UserSessionRevoked;
-use App\Domain\Auth\Listeners\AuditSecurityEvent;
-use App\Domain\Auth\Listeners\NotifyPasswordChanged;
-use App\Domain\Auth\Listeners\NotifySocialAccountLinked;
-use App\Domain\Auth\Listeners\ProvisionUserDefaults;
-use App\Domain\Auth\Listeners\SendLoginAlert;
-use App\Domain\Auth\Listeners\SendOtpNotification;
-use App\Domain\Auth\Models\FcmDeviceToken;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Models\UserSession;
-use App\Domain\Auth\Models\UserSocialIdentity;
-use App\Domain\Auth\Policies\FcmDeviceTokenPolicy;
-use App\Domain\Auth\Policies\UserPolicy;
-use App\Domain\Auth\Policies\UserSessionPolicy;
-use App\Domain\Auth\Policies\UserSocialIdentityPolicy;
+use Modules\Auth\Infrastructure\Console\PruneExpiredTokens;
+use Modules\Auth\Domain\Events\AccountLockedOut;
+use Modules\Auth\Domain\Events\AllSessionsRevoked;
+use Modules\Auth\Domain\Events\AuthMethodBlocked;
+use Modules\Auth\Domain\Events\MfaDisabled;
+use Modules\Auth\Domain\Events\MfaEnabled;
+use Modules\Auth\Domain\Events\MfaVerified;
+use Modules\Auth\Domain\Events\OtpGenerated;
+use Modules\Auth\Domain\Events\PasswordResetRequested;
+use Modules\Auth\Domain\Events\PasswordResetSuccessfully;
+use Modules\Auth\Domain\Events\SocialIdentityLinked;
+use Modules\Auth\Domain\Events\SocialIdentityUnlinked;
+use Modules\Auth\Domain\Events\UserLoggedIn;
+use Modules\Auth\Domain\Events\UserLoggedInByOtp;
+use Modules\Auth\Domain\Events\UserLoggedInByProvider;
+use Modules\Auth\Domain\Events\UserRegisteredByOtp;
+use Modules\Auth\Domain\Events\UserSessionRevoked;
+use Modules\Auth\Infrastructure\Listeners\AuditSecurityEvent;
+use Modules\Auth\Infrastructure\Listeners\NotifyPasswordChanged;
+use Modules\Auth\Infrastructure\Listeners\NotifySocialAccountLinked;
+use Modules\Auth\Infrastructure\Listeners\ProvisionUserDefaults;
+use Modules\Auth\Infrastructure\Listeners\SendLoginAlert;
+use Modules\Auth\Infrastructure\Listeners\SendOtpNotification;
+use Modules\Auth\Domain\Models\FcmDeviceToken;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Domain\Models\UserSession;
+use Modules\Auth\Domain\Models\UserSocialIdentity;
+use Modules\Auth\Presentation\Policies\FcmDeviceTokenPolicy;
+use Modules\Auth\Presentation\Policies\UserPolicy;
+use Modules\Auth\Presentation\Policies\UserSessionPolicy;
+use Modules\Auth\Presentation\Policies\UserSocialIdentityPolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../config/auth_features.php', 'auth_features');
+    }
+
     public function boot(): void
     {
         Gate::policy(User::class, UserPolicy::class);
@@ -74,5 +79,7 @@ class AuthServiceProvider extends ServiceProvider
                 PruneExpiredTokens::class,
             ]);
         }
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

@@ -6,8 +6,7 @@ namespace Modules\RBAC\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-// TODO: update when IAM module lands
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\RBAC\Infrastructure\Actions\SyncUserRolesAction;
 use Modules\RBAC\Presentation\Http\Resources\RoleResource;
 use Illuminate\Http\JsonResponse;

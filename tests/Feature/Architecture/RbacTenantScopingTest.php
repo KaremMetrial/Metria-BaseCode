@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Architecture;
 
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Services\IssueApiToken;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Infrastructure\Services\IssueApiToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;

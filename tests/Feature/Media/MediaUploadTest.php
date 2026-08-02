@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Media;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Media\Domain\Enums\MediaStatus;
 use Modules\Media\Domain\Enums\MediaType;
 use Modules\Media\Domain\Enums\MediaVariantType;

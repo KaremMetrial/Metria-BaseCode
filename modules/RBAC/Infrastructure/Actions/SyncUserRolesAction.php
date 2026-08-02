@@ -6,8 +6,7 @@ namespace Modules\RBAC\Infrastructure\Actions;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\DomainException;
-// TODO: update when IAM module lands
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
 use Modules\RBAC\Domain\Events\UserRolesUpdated;
 use Illuminate\Support\Facades\DB;

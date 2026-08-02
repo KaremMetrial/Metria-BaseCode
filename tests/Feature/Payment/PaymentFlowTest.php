@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Payment;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Payment\Domain\Enums\PaymentStatus;
 use Modules\Payment\Domain\Models\Payment;
 use Modules\Payment\Infrastructure\Services\PaymentService;

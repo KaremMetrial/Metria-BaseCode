@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Services;
+namespace Modules\Auth\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Auth\Events\SocialIdentityLinked;
-use App\Domain\Auth\Events\SocialIdentityUnlinked;
-use App\Domain\Auth\Events\UserLoggedInByProvider;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Models\UserSocialIdentity;
+use Modules\Auth\Domain\Events\SocialIdentityLinked;
+use Modules\Auth\Domain\Events\SocialIdentityUnlinked;
+use Modules\Auth\Domain\Events\UserLoggedInByProvider;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Domain\Models\UserSocialIdentity;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature\Auth;
 
 use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
-use App\Domain\Auth\Models\OtpCode;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Notifications\LoginAlertNotification;
-use App\Domain\Auth\Notifications\OtpNotification;
-use App\Domain\Auth\Notifications\WelcomeNotification;
+use Modules\Auth\Domain\Models\OtpCode;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Infrastructure\Notifications\LoginAlertNotification;
+use Modules\Auth\Infrastructure\Notifications\OtpNotification;
+use Modules\Auth\Infrastructure\Notifications\WelcomeNotification;
 use Modules\Integration\Infrastructure\Sms\SmsManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;

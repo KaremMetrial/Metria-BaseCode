@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Strategies;
+namespace Modules\Auth\Infrastructure\Strategies;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Auth\Contracts\AuthStrategyInterface;
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Services\SocialIdentityService;
+use Modules\Auth\Domain\Contracts\AuthStrategyInterface;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Infrastructure\Services\SocialIdentityService;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialProviderStrategy implements AuthStrategyInterface
@@ -72,7 +72,7 @@ class SocialProviderStrategy implements AuthStrategyInterface
      */
     public function verifySocialIdentity(string $provider, array $socialUser, ?string $tenantId = null): void
     {
-        if (! config('features.social_login_v2', false)) {
+        if (! config('auth_features.social_login_v2_enabled', false)) {
             return;
         }
 

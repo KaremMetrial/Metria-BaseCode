@@ -6,7 +6,7 @@ namespace Tests\Feature\Architecture;
 
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Shared\Domain\Support\Money;
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Domain\Enums\ApprovalStatus;
 use Modules\Governance\Domain\Models\ApprovalRequest;
 use Modules\Governance\Infrastructure\Services\ApprovalService;

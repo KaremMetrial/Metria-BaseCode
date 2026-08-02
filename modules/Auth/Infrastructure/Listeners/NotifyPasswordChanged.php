@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Listeners;
+namespace Modules\Auth\Infrastructure\Listeners;
 
-use App\Domain\Auth\Events\PasswordResetSuccessfully;
-use App\Domain\Auth\Notifications\LoginAlertNotification;
+use Modules\Auth\Domain\Events\PasswordResetSuccessfully;
+use Modules\Auth\Infrastructure\Notifications\LoginAlertNotification;
 
 class NotifyPasswordChanged
 {

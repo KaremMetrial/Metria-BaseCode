@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Events;
+namespace Modules\Auth\Domain\Events;
 
 use Modules\Shared\Domain\Events\DomainEvent;
 use Modules\Shared\Domain\Events\StoredInOutbox;

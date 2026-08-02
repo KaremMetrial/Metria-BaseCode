@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Modules\Shared\Infrastructure\Notifications\Channels;
 
-// TODO(IAM migration, Phase 6): SendPushToUser::__invoke() requires a concrete
-// App\Domain\Auth\Models\User because it calls $user->fcmDeviceTokens(). Inverting
-// this cleanly means widening that method's parameter type to a shared contract,
-// which is Auth-domain code out of scope for this session — deferred to IAM's own
-// migration rather than edited here as a side effect of the Shared Kernel move.
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Services\SendPushToUser;
+// Known residual coupling: Shared depends on the concrete Auth module here
+// (Auth has since fully migrated into modules/, so this is no longer blocked
+// by namespace migration — it's a deliberate, disclosed trade-off). Inverting
+// it cleanly means widening SendPushToUser::__invoke()'s parameter type from
+// the concrete User to a shared contract exposing fcmDeviceTokens(), which is
+// a real Auth-domain design change, not something to force as a side effect
+// of a migration pass.
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Infrastructure\Services\SendPushToUser;
 use Illuminate\Notifications\Notification;
 
 class FcmChannel

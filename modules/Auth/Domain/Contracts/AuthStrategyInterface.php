@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Auth\Contracts;
+namespace Modules\Auth\Domain\Contracts;
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 
 interface AuthStrategyInterface
 {

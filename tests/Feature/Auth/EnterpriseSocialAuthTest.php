@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Auth;
 
-use App\Domain\Auth\Models\User;
-use App\Domain\Auth\Models\UserSocialIdentity;
+use Modules\Auth\Domain\Models\User;
+use Modules\Auth\Domain\Models\UserSocialIdentity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;

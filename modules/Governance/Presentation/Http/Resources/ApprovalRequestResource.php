@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Governance\Presentation\Http\Resources;
 
-use App\Domain\Auth\Http\Resources\UserResource;
+use Modules\Auth\Presentation\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

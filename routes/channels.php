@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Domain\Auth\Models\User;
+use Modules\Auth\Domain\Models\User;
 use Modules\Payment\Domain\Models\Payment;
 use Modules\Wallet\Domain\Models\Wallet;
 use Illuminate\Support\Facades\Broadcast;
