@@ -30,6 +30,8 @@ class PaymentServiceProvider extends ServiceProvider
 
         EnumRegistry::register('payment_status', PaymentStatus::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         RateLimiter::for('payments', function (Request $request) {
             return Limit::perMinute(30)->by($request->user()?->getAuthIdentifier() ?: $request->ip());
         });

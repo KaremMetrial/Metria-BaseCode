@@ -29,6 +29,8 @@ class IntegrationServiceProvider extends ServiceProvider
     {
         Gate::policy(OAuthProvider::class, OAuthProviderPolicy::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

@@ -27,6 +27,8 @@ class MediaServiceProvider extends ServiceProvider
     {
         Gate::policy(Media::class, MediaPolicy::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

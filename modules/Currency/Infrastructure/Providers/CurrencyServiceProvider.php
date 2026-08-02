@@ -50,6 +50,8 @@ class CurrencyServiceProvider extends ServiceProvider
         Gate::policy(Currency::class, CurrencyPolicy::class);
         Gate::policy(CurrencyExchangeRate::class, CurrencyExchangeRatePolicy::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 SyncExchangeRates::class,

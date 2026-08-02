@@ -35,6 +35,8 @@ class TerritoryServiceProvider extends ServiceProvider
         $translationRegistry->register(City::class);
         $translationRegistry->register(District::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Modules\Territory\Infrastructure\Console\Commands\CheckDuplicatesCommand::class,

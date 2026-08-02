@@ -42,6 +42,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerMiddleware();
         $this->registerExceptionHandling();
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
         $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 

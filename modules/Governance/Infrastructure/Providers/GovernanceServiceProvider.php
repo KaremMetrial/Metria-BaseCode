@@ -34,6 +34,8 @@ class GovernanceServiceProvider extends ServiceProvider
 
         EnumRegistry::register('approval_status', ApprovalStatus::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
 
         if ($this->app->runningInConsole()) {

@@ -24,6 +24,7 @@ class WebhookServiceProvider extends ServiceProvider
     {
         Gate::policy(WebhookEndpoint::class, WebhookEndpointPolicy::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
         $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
 
         if ($this->app->runningInConsole()) {

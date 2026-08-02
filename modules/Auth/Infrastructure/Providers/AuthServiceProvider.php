@@ -74,6 +74,8 @@ class AuthServiceProvider extends ServiceProvider
         Event::listen(AuthMethodBlocked::class, AuditSecurityEvent::class);
         Event::listen(AccountLockedOut::class, AuditSecurityEvent::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 PruneExpiredTokens::class,

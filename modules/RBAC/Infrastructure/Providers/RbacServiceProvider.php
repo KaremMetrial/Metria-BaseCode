@@ -35,6 +35,8 @@ class RbacServiceProvider extends ServiceProvider
         Event::subscribe(AuditRbacEvent::class);
         Event::subscribe(ClearRbacCache::class);
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         $this->app->make(TranslationRegistry::class)->register(RoleMetadata::class);
 
         $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
