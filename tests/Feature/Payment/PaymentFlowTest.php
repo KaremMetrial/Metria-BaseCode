@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Payment;
 
 use App\Domain\Auth\Models\User;
-use App\Domain\Payment\Enums\PaymentStatus;
-use App\Domain\Payment\Models\Payment;
-use App\Domain\Payment\Services\PaymentService;
+use Modules\Payment\Domain\Enums\PaymentStatus;
+use Modules\Payment\Domain\Models\Payment;
+use Modules\Payment\Infrastructure\Services\PaymentService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;

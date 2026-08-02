@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Models;
+namespace Modules\Media\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use App\Domain\Media\Enums\MediaVariantType;
+use Modules\Media\Domain\Enums\MediaVariantType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

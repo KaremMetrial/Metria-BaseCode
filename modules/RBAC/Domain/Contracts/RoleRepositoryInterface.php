@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Contracts;
+namespace Modules\RBAC\Domain\Contracts;
 
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Support\Collection;
 
 interface RoleRepositoryInterface

@@ -10,7 +10,7 @@ use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Notifications\LoginAlertNotification;
 use App\Domain\Auth\Notifications\OtpNotification;
 use App\Domain\Auth\Notifications\WelcomeNotification;
-use App\Domain\Integration\Sms\SmsManager;
+use Modules\Integration\Infrastructure\Sms\SmsManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Mail;

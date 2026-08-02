@@ -7,8 +7,8 @@ namespace Tests\Feature\Wallet;
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Shared\Domain\Support\Money;
 use App\Domain\Auth\Models\User;
-use App\Domain\Wallet\Enums\WalletTransactionType;
-use App\Domain\Wallet\Services\WalletService;
+use Modules\Wallet\Domain\Enums\WalletTransactionType;
+use Modules\Wallet\Infrastructure\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

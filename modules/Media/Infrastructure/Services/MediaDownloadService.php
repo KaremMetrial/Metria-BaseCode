@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Services;
+namespace Modules\Media\Infrastructure\Services;
 
-use App\Domain\Media\Models\Media;
+use Modules\Media\Domain\Models\Media;
 use Illuminate\Support\Facades\Storage;
 
 class MediaDownloadService

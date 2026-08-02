@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Domain\Auth\Models\User;
-use App\Domain\Payment\Models\Payment;
-use App\Domain\Wallet\Models\Wallet;
+use Modules\Payment\Domain\Models\Payment;
+use Modules\Wallet\Domain\Models\Wallet;
 use Illuminate\Support\Facades\Broadcast;
 
 /*

@@ -28,10 +28,8 @@ class CurrencyRegistryResolverImpl implements CurrencyRegistryResolver
                 // Fallback to configuration during transient database outages or early bootstrap
             }
 
-            // Fallback to configuration — payments.minor_units is the still-
-            // unmigrated Payment domain's config (TODO: update when Payment
-            // module lands). Accepted transitional coupling: this is a
-            // last-resort fallback behind the DB-backed lookup above.
+            // Fallback to configuration, behind the DB-backed lookup above —
+            // covers transient database outages and early bootstrap.
             $minorUnitsVal = config("payments.minor_units.{$currency}");
             return is_numeric($minorUnitsVal) ? (int) $minorUnitsVal : 2;
         });

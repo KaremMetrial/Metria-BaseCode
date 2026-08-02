@@ -6,9 +6,9 @@ namespace App\Domain\Auth\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use App\Domain\Governance\Traits\Auditable;
-use App\Domain\Media\Models\Media;
-use App\Domain\Wallet\Models\Wallet;
+use Modules\Governance\Infrastructure\Traits\Auditable;
+use Modules\Media\Domain\Models\Media;
+use Modules\Wallet\Domain\Models\Wallet;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;

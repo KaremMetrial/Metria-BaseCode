@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Auth\Services;
 
 use App\Domain\Auth\Models\User;
-use App\Domain\Integration\Push\FcmPushProvider;
+use Modules\Integration\Infrastructure\Push\FcmPushProvider;
 use Kreait\Firebase\Exception\Messaging\NotFound;
 use Throwable;
 

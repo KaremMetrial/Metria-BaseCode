@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Policies;
+namespace Modules\Governance\Presentation\Policies;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Models\AuditLog;
+use Modules\Governance\Domain\Models\AuditLog;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AuditLogPolicy

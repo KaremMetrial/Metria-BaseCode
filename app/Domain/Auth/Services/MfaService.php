@@ -9,7 +9,7 @@ use App\Domain\Auth\Events\MfaDisabled;
 use App\Domain\Auth\Events\MfaEnabled;
 use App\Domain\Auth\Events\MfaVerified;
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

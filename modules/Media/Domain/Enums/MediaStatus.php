@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Enums;
+namespace Modules\Media\Domain\Enums;
 
 enum MediaStatus: string
 {

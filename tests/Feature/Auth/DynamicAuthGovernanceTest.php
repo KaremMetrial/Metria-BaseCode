@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Auth;
 
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\SettingsService;
+use Modules\Governance\Infrastructure\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

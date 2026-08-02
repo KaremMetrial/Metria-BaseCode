@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Models;
+namespace Modules\Governance\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;

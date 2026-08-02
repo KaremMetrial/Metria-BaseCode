@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Console\Commands;
+namespace Modules\RBAC\Infrastructure\Console\Commands;
 
-use App\Domain\RBAC\Support\AuthorizationCache;
-use App\Domain\RBAC\Support\PermissionRegistry;
+use Modules\RBAC\Infrastructure\Support\AuthorizationCache;
+use Modules\RBAC\Infrastructure\Support\PermissionRegistry;
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Permission;
 

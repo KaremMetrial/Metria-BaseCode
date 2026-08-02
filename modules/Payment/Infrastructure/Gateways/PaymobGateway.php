@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Gateways;
+namespace Modules\Payment\Infrastructure\Gateways;
 
 use Modules\Shared\Application\Exceptions\PaymentException;
 use Modules\Shared\Domain\Support\Money;
-use App\Domain\Payment\Contracts\PaymentGateway;
-use App\Domain\Payment\DTOs\PaymentResult;
-use App\Domain\Payment\DTOs\WebhookResult;
-use App\Domain\Payment\Enums\PaymentStatus;
-use App\Domain\Payment\Models\Payment;
+use Modules\Payment\Domain\Contracts\PaymentGateway;
+use Modules\Payment\Domain\DTOs\PaymentResult;
+use Modules\Payment\Domain\DTOs\WebhookResult;
+use Modules\Payment\Domain\Enums\PaymentStatus;
+use Modules\Payment\Domain\Models\Payment;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -253,6 +253,8 @@ class PaymobGateway implements PaymentGateway
 
     private function http(): PendingRequest
     {
+        // integrations.http.timeout: still-unmigrated Integration domain's config
+        // (TODO: update when Integration module lands).
         $timeoutVal = config('integrations.http.timeout', 15);
         $timeout = is_numeric($timeoutVal) ? (int) $timeoutVal : 15;
         $baseUrlVal = $this->config['base_url'] ?? 'https://accept.paymob.com/api';

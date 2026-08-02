@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Http\Controllers\Api\V1;
+namespace Modules\Wallet\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Wallet\Http\Resources\WalletResource;
-use App\Domain\Wallet\Http\Resources\WalletTransactionResource;
-use App\Domain\Wallet\Services\WalletService;
+use Modules\Wallet\Presentation\Http\Resources\WalletResource;
+use Modules\Wallet\Presentation\Http\Resources\WalletTransactionResource;
+use Modules\Wallet\Infrastructure\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;

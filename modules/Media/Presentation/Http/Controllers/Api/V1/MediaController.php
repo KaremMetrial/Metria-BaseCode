@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Http\Controllers\Api\V1;
+namespace Modules\Media\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Media\Http\Requests\ConfirmUploadRequest;
-use App\Domain\Media\Http\Requests\GeneratePresignedUrlRequest;
-use App\Domain\Media\Http\Resources\MediaResource;
-use App\Domain\Media\Models\Media;
-use App\Domain\Media\Services\MediaDownloadService;
-use App\Domain\Media\Services\MediaUploadService;
+use Modules\Media\Presentation\Http\Requests\ConfirmUploadRequest;
+use Modules\Media\Presentation\Http\Requests\GeneratePresignedUrlRequest;
+use Modules\Media\Presentation\Http\Resources\MediaResource;
+use Modules\Media\Domain\Models\Media;
+use Modules\Media\Infrastructure\Services\MediaDownloadService;
+use Modules\Media\Infrastructure\Services\MediaUploadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 

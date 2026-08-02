@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Auth;
 
 use App\Domain\Auth\Models\User;
-use App\Domain\Payment\Enums\PaymentStatus;
-use App\Domain\Payment\Models\Payment;
-use App\Domain\Wallet\Models\Wallet;
+use Modules\Payment\Domain\Enums\PaymentStatus;
+use Modules\Payment\Domain\Models\Payment;
+use Modules\Wallet\Domain\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Services;
+namespace Modules\Payment\Infrastructure\Services;
 
-use App\Domain\Payment\Contracts\PaymentGateway;
-use App\Domain\Payment\Gateways\FawryGateway;
-use App\Domain\Payment\Gateways\PaymobGateway;
-use App\Domain\Payment\Gateways\PaytabsGateway;
-use App\Domain\Payment\Gateways\StripeGateway;
+use Modules\Payment\Domain\Contracts\PaymentGateway;
+use Modules\Payment\Infrastructure\Gateways\FawryGateway;
+use Modules\Payment\Infrastructure\Gateways\PaymobGateway;
+use Modules\Payment\Infrastructure\Gateways\PaytabsGateway;
+use Modules\Payment\Infrastructure\Gateways\StripeGateway;
 use Illuminate\Support\Manager;
 
 /**

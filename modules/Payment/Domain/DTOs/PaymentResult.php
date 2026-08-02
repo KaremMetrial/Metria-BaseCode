@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\DTOs;
+namespace Modules\Payment\Domain\DTOs;
 
 use Modules\Shared\Application\Abstracts\DataTransferObject;
-use App\Domain\Payment\Enums\PaymentStatus;
+use Modules\Payment\Domain\Enums\PaymentStatus;
 
 /**
  * Uniform result returned by every gateway operation (create / refund).

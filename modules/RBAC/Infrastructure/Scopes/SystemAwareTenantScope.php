@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Scopes;
+namespace Modules\RBAC\Infrastructure\Scopes;
 
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 use Illuminate\Database\Eloquent\Builder;

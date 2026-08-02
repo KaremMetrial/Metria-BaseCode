@@ -2,22 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Services;
+namespace Modules\Payment\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\ApiException;
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Shared\Domain\Support\Money;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Models\ApprovalRequest;
-use App\Domain\Governance\Services\ApprovalService;
-use App\Domain\Governance\Services\AuditLogger;
-use App\Domain\Payment\DTOs\PaymentResult;
-use App\Domain\Payment\Enums\PaymentStatus;
-use App\Domain\Payment\Events\PaymentFailed;
-use App\Domain\Payment\Events\PaymentRefunded;
-use App\Domain\Payment\Events\PaymentSucceeded;
-use App\Domain\Payment\Models\Payment;
+use Modules\Governance\Domain\Models\ApprovalRequest;
+use Modules\Governance\Infrastructure\Services\ApprovalService;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Payment\Domain\DTOs\PaymentResult;
+use Modules\Payment\Domain\Enums\PaymentStatus;
+use Modules\Payment\Domain\Events\PaymentFailed;
+use Modules\Payment\Domain\Events\PaymentRefunded;
+use Modules\Payment\Domain\Events\PaymentSucceeded;
+use Modules\Payment\Domain\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -156,7 +157,7 @@ class PaymentService
     /** Actually perform the refund on the gateway. Called by ApproveRefundHandler. */
     public function executeRefund(Payment $payment, ?int $amountMinor = null): Payment
     {
-        if (! config('features.payment_v2', true)) {
+        if (! config('payments.v2_enabled', true)) {
             return DB::transaction(function () use ($payment, $amountMinor) {
                 $payment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
                 $amount = $amountMinor !== null ? Money::of($amountMinor, $payment->currency) : null;
@@ -208,7 +209,7 @@ class PaymentService
             DB::transaction(function () use ($payment, $refunded, $e) {
                 $lockedPayment = Payment::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($payment->id);
                 $lockedPayment->update(['status' => PaymentStatus::RefundFailed]);
-                $this->events->publish(new \App\Domain\Payment\Events\PaymentRefundFailed($lockedPayment, $refunded, $e->getMessage()));
+                $this->events->publish(new \Modules\Payment\Domain\Events\PaymentRefundFailed($lockedPayment, $refunded, $e->getMessage()));
             });
 
             throw $e;

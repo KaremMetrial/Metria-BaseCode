@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Contracts;
+namespace Modules\RBAC\Domain\Contracts;
 
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;

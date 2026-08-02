@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Services;
+namespace Modules\Media\Infrastructure\Services;
 
-use App\Domain\Media\Contracts\VirusScanner;
-use App\Domain\Media\DTOs\VirusScanResult;
+use Modules\Media\Domain\Contracts\VirusScanner;
+use Modules\Media\Domain\DTOs\VirusScanResult;
 
 class ClamAvVirusScanner implements VirusScanner
 {

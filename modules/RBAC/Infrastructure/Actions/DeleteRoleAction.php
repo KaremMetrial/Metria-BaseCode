@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Actions;
+namespace Modules\RBAC\Infrastructure\Actions;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
-use App\Domain\RBAC\Events\RoleDeleted;
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
+use Modules\RBAC\Domain\Events\RoleDeleted;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Support\Facades\DB;
 
 class DeleteRoleAction

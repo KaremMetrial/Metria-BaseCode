@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Auth;
 
 use App\Domain\Auth\Models\User;
-use App\Domain\Wallet\Models\Wallet;
+use Modules\Wallet\Domain\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

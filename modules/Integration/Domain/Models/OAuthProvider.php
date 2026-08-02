@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Models;
+namespace Modules\Integration\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Builder;

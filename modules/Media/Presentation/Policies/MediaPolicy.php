@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Policies;
+namespace Modules\Media\Presentation\Policies;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Media\Models\Media;
+use Modules\Media\Domain\Models\Media;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MediaPolicy

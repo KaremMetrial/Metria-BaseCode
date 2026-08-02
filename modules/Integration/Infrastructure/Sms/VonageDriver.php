@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Sms;
+namespace Modules\Integration\Infrastructure\Sms;
 
 use Modules\Shared\Application\Exceptions\IntegrationException;
-use App\Domain\Integration\Contracts\SmsProvider;
-use App\Domain\Integration\Support\CircuitBreaker;
+use Modules\Integration\Domain\Contracts\SmsProvider;
+use Modules\Integration\Infrastructure\Support\CircuitBreaker;
 use Illuminate\Support\Facades\Http;
 
 /**

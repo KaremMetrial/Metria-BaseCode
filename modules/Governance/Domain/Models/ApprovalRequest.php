@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Models;
+namespace Modules\Governance\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Enums\ApprovalStatus;
+use Modules\Governance\Domain\Enums\ApprovalStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Contracts;
+namespace Modules\Payment\Domain\Contracts;
 
 use Modules\Shared\Domain\Support\Money;
-use App\Domain\Payment\DTOs\PaymentResult;
-use App\Domain\Payment\DTOs\WebhookResult;
-use App\Domain\Payment\Models\Payment;
+use Modules\Payment\Domain\DTOs\PaymentResult;
+use Modules\Payment\Domain\DTOs\WebhookResult;
+use Modules\Payment\Domain\Models\Payment;
 use Illuminate\Http\Request;
 
 /**

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Policies;
+namespace Modules\Wallet\Presentation\Policies;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Wallet\Models\Wallet;
+use Modules\Wallet\Domain\Models\Wallet;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class WalletPolicy

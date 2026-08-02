@@ -2,24 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Providers;
+namespace Modules\Governance\Infrastructure\Providers;
 
-use App\Domain\Governance\Console\Commands\PruneGovernanceData;
-use App\Domain\Governance\Enums\ApprovalStatus;
-use App\Domain\Governance\Models\ApprovalRequest;
-use App\Domain\Governance\Models\AuditLog;
-use App\Domain\Governance\Models\FeatureFlag;
-use App\Domain\Governance\Models\Setting;
-use App\Domain\Governance\Policies\ApprovalRequestPolicy;
-use App\Domain\Governance\Policies\AuditLogPolicy;
-use App\Domain\Governance\Policies\FeatureFlagPolicy;
-use App\Domain\Governance\Policies\SettingPolicy;
+use Modules\Governance\Infrastructure\Console\Commands\PruneGovernanceData;
+use Modules\Governance\Domain\Enums\ApprovalStatus;
+use Modules\Governance\Domain\Models\ApprovalRequest;
+use Modules\Governance\Domain\Models\AuditLog;
+use Modules\Governance\Domain\Models\FeatureFlag;
+use Modules\Governance\Domain\Models\Setting;
+use Modules\Governance\Presentation\Policies\ApprovalRequestPolicy;
+use Modules\Governance\Presentation\Policies\AuditLogPolicy;
+use Modules\Governance\Presentation\Policies\FeatureFlagPolicy;
+use Modules\Governance\Presentation\Policies\SettingPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Shared\Application\Support\EnumRegistry;
 
 class GovernanceServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../config/governance.php', 'governance');
+    }
+
     public function boot(): void
     {
         Gate::policy(Setting::class, SettingPolicy::class);
@@ -28,6 +33,8 @@ class GovernanceServiceProvider extends ServiceProvider
         Gate::policy(ApprovalRequest::class, ApprovalRequestPolicy::class);
 
         EnumRegistry::register('approval_status', ApprovalStatus::class);
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
 
         if ($this->app->runningInConsole()) {
             $this->commands([

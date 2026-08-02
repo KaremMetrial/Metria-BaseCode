@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Http\Requests;
+namespace Modules\RBAC\Presentation\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Http\Controllers\Api\V1;
+namespace Modules\RBAC\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
 use Illuminate\Http\JsonResponse;
 
@@ -24,7 +25,7 @@ class EffectivePermissionController extends ApiController
 
         // Build the source map
         $sourceMap = [];
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Domain\RBAC\Models\Role> $userRoles */
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \Modules\RBAC\Domain\Models\Role> $userRoles */
         $userRoles = $user->roles()->with('permissions')->get();
         foreach ($userRoles as $role) {
             foreach ($role->permissions as $permission) {

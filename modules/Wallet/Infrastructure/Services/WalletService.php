@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Services;
+namespace Modules\Wallet\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Shared\Domain\Support\Money;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Wallet\Enums\WalletTransactionType;
-use App\Domain\Wallet\Events\WalletCredited;
-use App\Domain\Wallet\Events\WalletDebited;
-use App\Domain\Wallet\Models\Wallet;
-use App\Domain\Wallet\Models\WalletTransaction;
+use Modules\Wallet\Domain\Enums\WalletTransactionType;
+use Modules\Wallet\Domain\Events\WalletCredited;
+use Modules\Wallet\Domain\Events\WalletDebited;
+use Modules\Wallet\Domain\Models\Wallet;
+use Modules\Wallet\Domain\Models\WalletTransaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 

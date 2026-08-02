@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Repositories;
+namespace Modules\Integration\Infrastructure\Repositories;
 
 use App\Domain\Auth\Contracts\OAuthConfigurationRepositoryInterface;
-use App\Domain\Integration\Models\OAuthProvider;
+use Modules\Integration\Domain\Models\OAuthProvider;
 
 class DatabaseOAuthConfigurationRepository implements OAuthConfigurationRepositoryInterface
 {

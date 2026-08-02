@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Enums;
+namespace Modules\Wallet\Domain\Enums;
 
 enum WalletTransactionType: string
 {

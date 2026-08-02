@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Events;
+namespace Modules\Media\Domain\Events;
 
-use App\Domain\Media\Models\Media;
+use Modules\Media\Domain\Models\Media;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 

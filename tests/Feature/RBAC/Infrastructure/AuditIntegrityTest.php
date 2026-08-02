@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\RBAC\Infrastructure;
 
-use App\Domain\Governance\Models\AuditLog;
+use Modules\Governance\Domain\Models\AuditLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;
@@ -37,7 +37,7 @@ class AuditIntegrityTest extends TestCase
         // 2. Assert Audit Log exists for creation
         // We assume an audit log system exists under Governance or Core and uses 'created' event.
         // If it doesn't, this test serves as the contract that it SHOULD exist.
-        $creationAudit = AuditLog::where('auditable_type', 'App\\Domain\\RBAC\\Models\\Role')
+        $creationAudit = AuditLog::where('auditable_type', 'Modules\\RBAC\\Domain\\Models\\Role')
             ->where('auditable_id', $roleId)
             ->where('action', 'created')
             ->first();

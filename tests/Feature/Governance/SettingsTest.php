@@ -6,7 +6,7 @@ namespace Tests\Feature\Governance;
 
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\SettingsService;
+use Modules\Governance\Infrastructure\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;

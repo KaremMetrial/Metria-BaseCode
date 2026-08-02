@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Events;
+namespace Modules\Wallet\Domain\Events;
 
 use Modules\Shared\Domain\Events\BroadcastableEvent;
 use Modules\Shared\Domain\Events\DomainEvent;
 use Modules\Shared\Domain\Events\StoredInOutbox;
-use App\Domain\Wallet\Models\Wallet;
+use Modules\Wallet\Domain\Models\Wallet;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;

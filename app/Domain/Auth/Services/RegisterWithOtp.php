@@ -7,7 +7,7 @@ namespace App\Domain\Auth\Services;
 use Modules\Shared\Infrastructure\Events\EventBus;
 use App\Domain\Auth\Events\UserRegisteredByOtp;
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

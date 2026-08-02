@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Models;
+namespace Modules\Wallet\Domain\Models;
 
 use Modules\Shared\Domain\Support\Money;
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Traits\Auditable;
+use Modules\Governance\Infrastructure\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

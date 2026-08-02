@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Http\Controllers\Api\V1;
+namespace Modules\RBAC\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\RBAC\Actions\SyncUserRolesAction;
-use App\Domain\RBAC\Http\Resources\RoleResource;
+use Modules\RBAC\Infrastructure\Actions\SyncUserRolesAction;
+use Modules\RBAC\Presentation\Http\Resources\RoleResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;

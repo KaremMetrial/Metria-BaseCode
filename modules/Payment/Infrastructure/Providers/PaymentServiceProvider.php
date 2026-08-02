@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Providers;
+namespace Modules\Payment\Infrastructure\Providers;
 
-use App\Domain\Payment\Enums\PaymentStatus;
-use App\Domain\Payment\Models\Payment;
-use App\Domain\Payment\Policies\PaymentPolicy;
-use App\Domain\Payment\Services\PaymentManager;
+use Modules\Payment\Domain\Enums\PaymentStatus;
+use Modules\Payment\Domain\Models\Payment;
+use Modules\Payment\Presentation\Policies\PaymentPolicy;
+use Modules\Payment\Infrastructure\Services\PaymentManager;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -19,6 +19,8 @@ class PaymentServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/payments.php', 'payments');
+
         $this->app->singleton(PaymentManager::class, fn (\Illuminate\Contracts\Container\Container $app) => new PaymentManager($app));
     }
 
@@ -31,5 +33,7 @@ class PaymentServiceProvider extends ServiceProvider
         RateLimiter::for('payments', function (Request $request) {
             return Limit::perMinute(30)->by($request->user()?->getAuthIdentifier() ?: $request->ip());
         });
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

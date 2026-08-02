@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature\System;
 
 use App\Domain\Auth\Models\User;
-use App\Domain\Payment\Enums\PaymentStatus;
-use App\Domain\Payment\Events\PaymentSucceeded;
-use App\Domain\Payment\Models\Payment;
-use App\Domain\Wallet\Events\WalletCredited;
-use App\Domain\Wallet\Services\WalletService;
+use Modules\Payment\Domain\Enums\PaymentStatus;
+use Modules\Payment\Domain\Events\PaymentSucceeded;
+use Modules\Payment\Domain\Models\Payment;
+use Modules\Wallet\Domain\Events\WalletCredited;
+use Modules\Wallet\Infrastructure\Services\WalletService;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Testing\RefreshDatabase;

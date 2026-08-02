@@ -9,7 +9,7 @@ use App\Domain\Auth\Events\AllSessionsRevoked;
 use App\Domain\Auth\Events\PasswordResetRequested;
 use App\Domain\Auth\Events\PasswordResetSuccessfully;
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

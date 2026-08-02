@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Http\Resources;
+namespace Modules\Governance\Presentation\Http\Resources;
 
 use App\Domain\Auth\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property \App\Domain\Governance\Models\ApprovalRequest $resource
- * @mixin \App\Domain\Governance\Models\ApprovalRequest
+ * @property \Modules\Governance\Domain\Models\ApprovalRequest $resource
+ * @mixin \Modules\Governance\Domain\Models\ApprovalRequest
  */
 class ApprovalRequestResource extends JsonResource
 {

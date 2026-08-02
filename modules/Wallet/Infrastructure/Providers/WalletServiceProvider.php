@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Providers;
+namespace Modules\Wallet\Infrastructure\Providers;
 
-use App\Domain\Wallet\Enums\WalletTransactionType;
-use App\Domain\Wallet\Models\Wallet;
-use App\Domain\Wallet\Policies\WalletPolicy;
+use Modules\Wallet\Domain\Enums\WalletTransactionType;
+use Modules\Wallet\Domain\Models\Wallet;
+use Modules\Wallet\Presentation\Policies\WalletPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Shared\Application\Support\EnumRegistry;

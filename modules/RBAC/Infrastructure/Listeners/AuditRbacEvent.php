@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Listeners;
+namespace Modules\RBAC\Infrastructure\Listeners;
 
-use App\Domain\Governance\Services\AuditLogger;
-use App\Domain\RBAC\Events\RoleCreated;
-use App\Domain\RBAC\Events\RoleDeleted;
-use App\Domain\RBAC\Events\RolePermissionsUpdated;
-use App\Domain\RBAC\Events\UserRolesUpdated;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\RBAC\Domain\Events\RoleCreated;
+use Modules\RBAC\Domain\Events\RoleDeleted;
+use Modules\RBAC\Domain\Events\RolePermissionsUpdated;
+use Modules\RBAC\Domain\Events\UserRolesUpdated;
 use Illuminate\Events\Dispatcher;
 
 class AuditRbacEvent

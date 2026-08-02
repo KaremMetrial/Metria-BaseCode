@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Actions;
+namespace Modules\RBAC\Infrastructure\Actions;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
-use App\Domain\RBAC\DTOs\CreateRoleDTO;
-use App\Domain\RBAC\Events\RoleCreated;
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
+use Modules\RBAC\Application\DTOs\CreateRoleDTO;
+use Modules\RBAC\Domain\Events\RoleCreated;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Support\Facades\DB;
 
 class CreateRoleAction

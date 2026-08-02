@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Modules\Territory\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
-// TODO: update when Governance module lands
-use App\Domain\Governance\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Modules\Territory\Domain\Events\ZoneStatusChanged;
 use Modules\Territory\Infrastructure\Persistence\Filters\TerritoryFilter;
 use Modules\Territory\Domain\Models\Zone;

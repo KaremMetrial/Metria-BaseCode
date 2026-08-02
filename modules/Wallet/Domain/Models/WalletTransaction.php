@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Models;
+namespace Modules\Wallet\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use App\Domain\Wallet\Enums\WalletTransactionType;
+use Modules\Wallet\Domain\Enums\WalletTransactionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $description
  * @property array|null $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
- * @property \App\Domain\Wallet\Models\Wallet|null $wallet
+ * @property \Modules\Wallet\Domain\Models\Wallet|null $wallet
  */
 class WalletTransaction extends Model
 {

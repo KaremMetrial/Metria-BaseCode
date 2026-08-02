@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Services;
+namespace Modules\Media\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Media\Enums\MediaStatus;
-use App\Domain\Media\Models\Media;
+use Modules\Media\Domain\Enums\MediaStatus;
+use Modules\Media\Domain\Models\Media;
 
 class MediaStateMachine
 {

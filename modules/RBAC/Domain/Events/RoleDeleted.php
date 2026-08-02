@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Events;
+namespace Modules\RBAC\Domain\Events;
 
 use Modules\Shared\Domain\Events\DomainEvent;
 

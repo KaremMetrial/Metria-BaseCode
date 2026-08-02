@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\RBAC\Infrastructure;
 
-use App\Domain\RBAC\Events\RolePermissionsUpdated;
+use Modules\RBAC\Domain\Events\RolePermissionsUpdated;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;

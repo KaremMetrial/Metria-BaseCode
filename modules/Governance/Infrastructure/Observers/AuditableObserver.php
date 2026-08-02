@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Observers;
+namespace Modules\Governance\Infrastructure\Observers;
 
-use App\Domain\Governance\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Database\Eloquent\Model;
 
 class AuditableObserver

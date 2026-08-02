@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Services;
+namespace Modules\Governance\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use App\Domain\Governance\Models\AuditLog;
+use Modules\Governance\Domain\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
 
 class AuditLogger

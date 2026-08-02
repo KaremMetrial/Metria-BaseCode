@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Actions;
+namespace Modules\RBAC\Infrastructure\Actions;
 
-use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
-use App\Domain\RBAC\DTOs\UpdateRoleDTO;
-use App\Domain\RBAC\Exceptions\RoleNotEditableException;
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
+use Modules\RBAC\Application\DTOs\UpdateRoleDTO;
+use Modules\RBAC\Application\Exceptions\RoleNotEditableException;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Support\Facades\DB;
 
 class UpdateRoleAction

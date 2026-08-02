@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Http\Resources;
+namespace Modules\Wallet\Presentation\Http\Resources;
 
 use Modules\Shared\Domain\Support\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Domain\Wallet\Models\WalletTransaction */
+/** @mixin \Modules\Wallet\Domain\Models\WalletTransaction */
 class WalletTransactionResource extends JsonResource
 {
     public function toArray(Request $request): array

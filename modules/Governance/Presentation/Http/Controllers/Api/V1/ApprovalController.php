@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Http\Controllers\Api\V1;
+namespace Modules\Governance\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Governance\Enums\ApprovalStatus;
-use App\Domain\Governance\Http\Resources\ApprovalRequestResource;
-use App\Domain\Governance\Models\ApprovalRequest;
-use App\Domain\Governance\Services\ApprovalService;
+use Modules\Governance\Domain\Enums\ApprovalStatus;
+use Modules\Governance\Presentation\Http\Resources\ApprovalRequestResource;
+use Modules\Governance\Domain\Models\ApprovalRequest;
+use Modules\Governance\Infrastructure\Services\ApprovalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;

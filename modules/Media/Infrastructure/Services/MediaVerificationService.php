@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Services;
+namespace Modules\Media\Infrastructure\Services;
 
-use App\Domain\Media\Contracts\ContentModerator;
-use App\Domain\Media\Contracts\VirusScanner;
-use App\Domain\Media\Enums\MediaStatus;
-use App\Domain\Media\Enums\MediaType;
-use App\Domain\Media\Events\MediaQuarantined;
-use App\Domain\Media\Events\MediaVerified;
-use App\Domain\Media\Jobs\ProcessMediaVariants;
-use App\Domain\Media\Models\Media;
+use Modules\Media\Domain\Contracts\ContentModerator;
+use Modules\Media\Domain\Contracts\VirusScanner;
+use Modules\Media\Domain\Enums\MediaStatus;
+use Modules\Media\Domain\Enums\MediaType;
+use Modules\Media\Domain\Events\MediaQuarantined;
+use Modules\Media\Domain\Events\MediaVerified;
+use Modules\Media\Infrastructure\Jobs\ProcessMediaVariants;
+use Modules\Media\Domain\Models\Media;
 use Illuminate\Support\Facades\Storage;
 
 class MediaVerificationService

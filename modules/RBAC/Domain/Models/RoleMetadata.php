@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Models;
+namespace Modules\RBAC\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;

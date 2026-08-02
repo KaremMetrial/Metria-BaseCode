@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Providers;
+namespace Modules\Integration\Infrastructure\Providers;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Contracts\OAuthConfigurationRepositoryInterface;
-use App\Domain\Integration\Models\OAuthProvider;
-use App\Domain\Integration\Policies\OAuthProviderPolicy;
-use App\Domain\Integration\Repositories\DatabaseOAuthConfigurationRepository;
-use App\Domain\Integration\Sms\SmsManager;
+use Modules\Integration\Domain\Models\OAuthProvider;
+use Modules\Integration\Presentation\Policies\OAuthProviderPolicy;
+use Modules\Integration\Infrastructure\Repositories\DatabaseOAuthConfigurationRepository;
+use Modules\Integration\Infrastructure\Sms\SmsManager;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +17,8 @@ class IntegrationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/integrations.php', 'integrations');
+
         $this->app->singleton(SmsManager::class, fn (\Illuminate\Contracts\Container\Container $app) => new SmsManager($app));
         $this->app->bind(
             OAuthConfigurationRepositoryInterface::class,
@@ -26,5 +29,7 @@ class IntegrationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(OAuthProvider::class, OAuthProviderPolicy::class);
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

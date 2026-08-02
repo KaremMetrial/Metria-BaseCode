@@ -10,7 +10,7 @@ use App\Domain\Auth\Events\SocialIdentityUnlinked;
 use App\Domain\Auth\Events\UserLoggedInByProvider;
 use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Models\UserSocialIdentity;
-use App\Domain\Governance\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 

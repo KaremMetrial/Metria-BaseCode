@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Http\Controllers\Api\V1;
+namespace Modules\Governance\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Governance\Models\FeatureFlag;
-use App\Domain\Governance\Services\FeatureFlagService;
+use Modules\Governance\Domain\Models\FeatureFlag;
+use Modules\Governance\Infrastructure\Services\FeatureFlagService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;

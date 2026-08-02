@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Listeners;
+namespace Modules\RBAC\Infrastructure\Listeners;
 
-use App\Domain\RBAC\Events\RolePermissionsUpdated;
-use App\Domain\RBAC\Events\UserRolesUpdated;
-use App\Domain\RBAC\Support\AuthorizationCache;
+use Modules\RBAC\Domain\Events\RolePermissionsUpdated;
+use Modules\RBAC\Domain\Events\UserRolesUpdated;
+use Modules\RBAC\Infrastructure\Support\AuthorizationCache;
 use Illuminate\Events\Dispatcher;
 
 class ClearRbacCache

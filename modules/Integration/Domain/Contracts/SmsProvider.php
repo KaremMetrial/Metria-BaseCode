@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Contracts;
+namespace Modules\Integration\Domain\Contracts;
 
 interface SmsProvider
 {

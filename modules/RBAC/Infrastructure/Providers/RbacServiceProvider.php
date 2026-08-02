@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Providers;
+namespace Modules\RBAC\Infrastructure\Providers;
 
-use App\Domain\RBAC\Console\Commands\SyncPermissionsCommand;
-use App\Domain\RBAC\Contracts\PermissionRepositoryInterface;
-use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
-use App\Domain\RBAC\Listeners\AuditRbacEvent;
-use App\Domain\RBAC\Listeners\ClearRbacCache;
-use App\Domain\RBAC\Models\RoleMetadata;
-use App\Domain\RBAC\Repositories\PermissionRepository;
-use App\Domain\RBAC\Repositories\RoleRepository;
+use Modules\RBAC\Infrastructure\Console\Commands\SyncPermissionsCommand;
+use Modules\RBAC\Domain\Contracts\PermissionRepositoryInterface;
+use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
+use Modules\RBAC\Infrastructure\Listeners\AuditRbacEvent;
+use Modules\RBAC\Infrastructure\Listeners\ClearRbacCache;
+use Modules\RBAC\Domain\Models\RoleMetadata;
+use Modules\RBAC\Infrastructure\Repositories\PermissionRepository;
+use Modules\RBAC\Infrastructure\Repositories\RoleRepository;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Modules\Shared\Infrastructure\Translation\TranslationRegistry;
@@ -36,5 +36,7 @@ class RbacServiceProvider extends ServiceProvider
         Event::subscribe(ClearRbacCache::class);
 
         $this->app->make(TranslationRegistry::class)->register(RoleMetadata::class);
+
+        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
     }
 }

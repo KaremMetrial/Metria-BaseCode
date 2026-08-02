@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Traits;
+namespace Modules\Governance\Infrastructure\Traits;
 
-use App\Domain\Governance\Observers\AuditableObserver;
+use Modules\Governance\Infrastructure\Observers\AuditableObserver;
 
 /**
  * Attach to any model whose lifecycle should be written to the audit trail.

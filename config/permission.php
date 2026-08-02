@@ -1,6 +1,6 @@
 <?php
 
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Models\Role;
 use Spatie\Permission\DefaultTeamResolver;
 use Spatie\Permission\Models\Permission;
 

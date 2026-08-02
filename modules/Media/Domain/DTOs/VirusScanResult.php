@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\DTOs;
+namespace Modules\Media\Domain\DTOs;
 
 final class VirusScanResult
 {

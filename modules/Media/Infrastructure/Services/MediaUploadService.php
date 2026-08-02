@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Services;
+namespace Modules\Media\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Media\Enums\MediaStatus;
-use App\Domain\Media\Enums\MediaType;
-use App\Domain\Media\Events\MediaUploaded;
-use App\Domain\Media\Events\MediaUploadInitiated;
-use App\Domain\Media\Jobs\VerifyMediaUpload;
-use App\Domain\Media\Models\Media;
-use App\Domain\Media\Models\MediaBlob;
+use Modules\Media\Domain\Enums\MediaStatus;
+use Modules\Media\Domain\Enums\MediaType;
+use Modules\Media\Domain\Events\MediaUploaded;
+use Modules\Media\Domain\Events\MediaUploadInitiated;
+use Modules\Media\Infrastructure\Jobs\VerifyMediaUpload;
+use Modules\Media\Domain\Models\Media;
+use Modules\Media\Domain\Models\MediaBlob;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;

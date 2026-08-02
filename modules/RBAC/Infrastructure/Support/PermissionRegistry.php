@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Support;
+namespace Modules\RBAC\Infrastructure\Support;
 
 /**
  * Single source of truth for all application capabilities.

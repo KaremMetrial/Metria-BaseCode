@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Repositories;
+namespace Modules\RBAC\Infrastructure\Repositories;
 
 use Modules\Shared\Infrastructure\Persistence\BaseRepository;
-use App\Domain\RBAC\Contracts\PermissionRepositoryInterface;
+use Modules\RBAC\Domain\Contracts\PermissionRepositoryInterface;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 

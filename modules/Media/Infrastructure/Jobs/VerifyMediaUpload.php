@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Jobs;
+namespace Modules\Media\Infrastructure\Jobs;
 
-use App\Domain\Media\Enums\MediaStatus;
-use App\Domain\Media\Models\Media;
-use App\Domain\Media\Services\MediaVerificationService;
+use Modules\Media\Domain\Enums\MediaStatus;
+use Modules\Media\Domain\Models\Media;
+use Modules\Media\Infrastructure\Services\MediaVerificationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

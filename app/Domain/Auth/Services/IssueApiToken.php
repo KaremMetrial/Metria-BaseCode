@@ -7,7 +7,7 @@ namespace App\Domain\Auth\Services;
 use Modules\Shared\Application\Exceptions\ApiException;
 use App\Domain\Auth\Events\UserLoggedIn;
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 

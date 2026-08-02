@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Models;
+namespace Modules\Media\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use App\Domain\Governance\Traits\Auditable;
-use App\Domain\Media\Enums\MediaStatus;
-use App\Domain\Media\Enums\MediaType;
+use Modules\Governance\Infrastructure\Traits\Auditable;
+use Modules\Media\Domain\Enums\MediaStatus;
+use Modules\Media\Domain\Enums\MediaType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,10 +24,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|int|null $media_blob_id
  * @property string|null $mediable_type
  * @property string|int|null $mediable_id
- * @property \App\Domain\Media\Enums\MediaType $media_type
+ * @property \Modules\Media\Domain\Enums\MediaType $media_type
  * @property string|null $purpose
  * @property bool $is_public
- * @property \App\Domain\Media\Enums\MediaStatus $status
+ * @property \Modules\Media\Domain\Enums\MediaStatus $status
  * @property string|null $checksum
  * @property string|null $hash_algorithm
  * @property array $custom_properties
@@ -48,7 +48,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \App\Domain\Media\Models\MediaBlob|null $blob
+ * @property \Modules\Media\Domain\Models\MediaBlob|null $blob
  */
 class Media extends Model
 {

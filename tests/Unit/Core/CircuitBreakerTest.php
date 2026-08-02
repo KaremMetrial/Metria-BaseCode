@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Core;
 
 use Modules\Shared\Application\Exceptions\IntegrationException;
-use App\Domain\Integration\Support\CircuitBreaker;
+use Modules\Integration\Infrastructure\Support\CircuitBreaker;
 use Tests\TestCase;
 
 class CircuitBreakerTest extends TestCase

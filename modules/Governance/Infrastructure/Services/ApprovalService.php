@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Services;
+namespace Modules\Governance\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Governance\Enums\ApprovalStatus;
-use App\Domain\Governance\Models\ApprovalRequest;
+use Modules\Governance\Domain\Enums\ApprovalStatus;
+use Modules\Governance\Domain\Models\ApprovalRequest;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 

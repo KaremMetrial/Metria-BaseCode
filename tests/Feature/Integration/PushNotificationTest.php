@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Integration;
 
 use Modules\Shared\Application\Exceptions\IntegrationException;
-use App\Domain\Integration\Push\FcmPushProvider;
+use Modules\Integration\Infrastructure\Push\FcmPushProvider;
 use Illuminate\Support\Facades\Cache;
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Exception\Messaging\NotFound;

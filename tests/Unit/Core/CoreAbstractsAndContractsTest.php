@@ -9,7 +9,7 @@ use Modules\Shared\Application\Abstracts\DataTransferObject;
 use Modules\Shared\Domain\Contracts\CurrencyRegistryResolver;
 use Modules\Shared\Domain\Contracts\RepositoryInterface;
 use Modules\Currency\Infrastructure\Services\CurrencyRegistryResolverImpl;
-use App\Domain\Payment\Enums\PaymentStatus;
+use Modules\Payment\Domain\Enums\PaymentStatus;
 use Modules\Territory\Domain\Models\Country;
 use Modules\Territory\Infrastructure\Persistence\Repositories\CountryRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;

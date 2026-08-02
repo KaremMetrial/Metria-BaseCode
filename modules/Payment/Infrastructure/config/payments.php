@@ -16,7 +16,7 @@ return [
     | Gateways
     |--------------------------------------------------------------------------
     | Each gateway is a driver on the PaymentManager. Add your own by
-    | implementing App\Domain\Payment\Contracts\PaymentGateway and calling
+    | implementing Modules\Payment\Domain\Contracts\PaymentGateway and calling
     | PaymentManager::extend('name', fn () => new YourGateway(...)).
     */
     'gateways' => [
@@ -63,4 +63,11 @@ return [
         'JPY' => 0,
         'EGP' => 2,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Feature flags
+    |--------------------------------------------------------------------------
+    */
+    'v2_enabled' => env('FEATURE_PAYMENT_V2', true),
 ];

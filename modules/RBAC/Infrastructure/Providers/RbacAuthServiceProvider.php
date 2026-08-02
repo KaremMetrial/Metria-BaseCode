@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Providers;
+namespace Modules\RBAC\Infrastructure\Providers;
 
-use App\Domain\RBAC\Models\Role;
-use App\Domain\RBAC\Policies\RolePolicy;
+use Modules\RBAC\Domain\Models\Role;
+use Modules\RBAC\Presentation\Policies\RolePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class RbacAuthServiceProvider extends ServiceProvider

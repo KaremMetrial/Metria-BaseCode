@@ -5,21 +5,9 @@ declare(strict_types=1);
 use App\Domain\Auth\Http\Controllers\Api\V1\AuthController;
 use App\Domain\Auth\Http\Controllers\Api\V1\OtpAuthController;
 use App\Domain\Auth\Http\Controllers\Api\V1\SocialAuthController;
-use App\Domain\Governance\Http\Controllers\Api\V1\ApprovalController;
-use App\Domain\Governance\Http\Controllers\Api\V1\AuditLogController;
-use App\Domain\Governance\Http\Controllers\Api\V1\FeatureFlagController;
-use App\Domain\Governance\Http\Controllers\Api\V1\SettingsController;
-use App\Domain\Integration\Http\Controllers\Api\V1\OAuthProviderController;
-use App\Domain\Media\Http\Controllers\Api\V1\MediaController;
-use App\Domain\Payment\Http\Controllers\Api\V1\PaymentController;
-use App\Domain\Payment\Http\Controllers\Api\V1\PaymentWebhookController;
-use App\Domain\RBAC\Http\Controllers\Api\V1\EffectivePermissionController;
-use App\Domain\RBAC\Http\Controllers\Api\V1\PermissionController;
-use App\Domain\RBAC\Http\Controllers\Api\V1\RoleController;
-use App\Domain\RBAC\Http\Controllers\Api\V1\RolePermissionController;
-use App\Domain\RBAC\Http\Controllers\Api\V1\UserRoleController;
+use Modules\Media\Presentation\Http\Controllers\Api\V1\MediaController;
 use Modules\Territory\Presentation\Http\Controllers\Api\V1\TerritoryController;
-use App\Domain\Wallet\Http\Controllers\Api\V1\WalletController;
+use Modules\Wallet\Presentation\Http\Controllers\Api\V1\WalletController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,11 +49,9 @@ Route::middleware('throttle:auth')->prefix('auth')->name('auth.')->group(functio
     });
 });
 
-// Payment Gateway Callbacks (Signed Webhooks)
-Route::post('/webhooks/payments/{gateway}', PaymentWebhookController::class)
-    ->whereIn('gateway', ['stripe', 'paymob', 'fawry', 'paytabs'])
-    ->middleware('throttle:webhooks')
-    ->name('webhooks.payments');
+// Payment routes (webhook callback + processing) moved to
+// modules/Payment/Presentation/routes/api.php, self-registered by
+// Modules\Payment\Infrastructure\Providers\PaymentServiceProvider.
 
 /*
 |--------------------------------------------------------------------------
@@ -95,7 +81,8 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
             Route::delete('/{provider}/unlink', [SocialAuthController::class, 'unlink'])->name('unlink');
         });
 
-        Route::apiResource('oauth-providers', OAuthProviderController::class);
+        // oauth-providers moved to modules/Integration/Presentation/routes/api.php,
+        // self-registered by Modules\Integration\Infrastructure\Providers\IntegrationServiceProvider.
     });
 
     // Wallet Ledger
@@ -104,87 +91,11 @@ Route::middleware(['auth:sanctum', 'tenant', 'throttle:api'])->group(function ()
         Route::get('/transactions', [WalletController::class, 'transactions'])->name('transactions');
     });
 
-    // Payment Processing
-    Route::prefix('payments')->name('payments.')->group(function () {
-        Route::get('/', [PaymentController::class, 'index'])->name('index');
-        Route::post('/', [PaymentController::class, 'store'])
-            ->middleware(['idempotent', 'throttle:payments'])
-            ->name('store');
-        Route::get('/{payment}', [PaymentController::class, 'show'])->name('show');
-        Route::post('/{payment}/refund', [PaymentController::class, 'refund'])
-            ->middleware('permission:payments.refund')
-            ->name('refund');
-    });
+    // Governance routes moved to modules/Governance/Presentation/routes/api.php,
+    // self-registered by Modules\Governance\Infrastructure\Providers\GovernanceServiceProvider.
 
-    // Governance & Administration
-    Route::prefix('governance')->name('governance.')->group(function () {
-
-        // Settings Management
-        Route::prefix('settings')->name('settings.')->group(function () {
-            Route::middleware('permission:governance.settings.view')->group(function () {
-                Route::get('/', [SettingsController::class, 'index'])->name('index');
-                Route::get('/{key}', [SettingsController::class, 'show'])->name('show');
-            });
-            Route::middleware('permission:governance.settings.manage')->group(function () {
-                Route::put('/{key}', [SettingsController::class, 'update'])->name('update');
-                Route::delete('/{key}', [SettingsController::class, 'destroy'])->name('destroy');
-            });
-        });
-
-        // Feature Flags
-        Route::prefix('flags')->name('flags.')->group(function () {
-            Route::get('/', [FeatureFlagController::class, 'index'])
-                ->middleware('permission:governance.flags.manage')
-                ->name('index');
-            Route::get('/{name}', [FeatureFlagController::class, 'show'])->name('show');
-            Route::put('/{name}', [FeatureFlagController::class, 'toggle'])
-                ->middleware('permission:governance.flags.manage')
-                ->name('toggle');
-        });
-
-        // Maker-Checker Approvals
-        Route::prefix('approvals')->name('approvals.')->group(function () {
-            Route::get('/', [ApprovalController::class, 'index'])
-                ->middleware('permission:governance.approvals.view')
-                ->name('index');
-            Route::post('/{approvalRequest}/approve', [ApprovalController::class, 'approve'])
-                ->middleware('permission:governance.approvals.decide')
-                ->name('approve');
-            Route::post('/{approvalRequest}/reject', [ApprovalController::class, 'reject'])
-                ->middleware('permission:governance.approvals.decide')
-                ->name('reject');
-        });
-
-        // Audit Logs
-        Route::get('/audit-logs', [AuditLogController::class, 'index'])
-            ->middleware('permission:governance.audit.view')
-            ->name('audit.index');
-    });
-
-    // RBAC Engine
-    Route::prefix('rbac')->name('rbac.')->group(function () {
-        Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
-
-        Route::apiResource('roles', RoleController::class);
-
-        Route::prefix('roles/{role}/permissions')->name('roles.permissions.')->group(function () {
-            Route::get('/', [RolePermissionController::class, 'index'])->name('index');
-            Route::post('/', [RolePermissionController::class, 'store'])->name('store');
-            Route::put('/', [RolePermissionController::class, 'update'])->name('update');
-            Route::delete('/', [RolePermissionController::class, 'destroy'])->name('destroy');
-        });
-
-        Route::prefix('users/{user}')->name('users.')->group(function () {
-            Route::get('/effective-permissions', [EffectivePermissionController::class, 'show'])->name('effective-permissions');
-
-            Route::prefix('roles')->name('roles.')->group(function () {
-                Route::get('/', [UserRoleController::class, 'index'])->name('index');
-                Route::post('/', [UserRoleController::class, 'store'])->name('store');
-                Route::put('/', [UserRoleController::class, 'update'])->name('update');
-                Route::delete('/', [UserRoleController::class, 'destroy'])->name('destroy');
-            });
-        });
-    });
+    // RBAC routes moved to modules/RBAC/Presentation/routes/api.php,
+    // self-registered by Modules\RBAC\Infrastructure\Providers\RbacServiceProvider.
 
     // Media Upload & Download
     Route::prefix('media')->name('media.')->group(function () {

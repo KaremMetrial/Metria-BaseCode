@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Http\Controllers\Api\V1;
+namespace Modules\RBAC\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\RBAC\Actions\CreateRoleAction;
-use App\Domain\RBAC\Actions\DeleteRoleAction;
-use App\Domain\RBAC\Actions\UpdateRoleAction;
-use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
-use App\Domain\RBAC\DTOs\CreateRoleDTO;
-use App\Domain\RBAC\DTOs\UpdateRoleDTO;
-use App\Domain\RBAC\Http\Requests\StoreRoleRequest;
-use App\Domain\RBAC\Http\Requests\UpdateRoleRequest;
-use App\Domain\RBAC\Http\Resources\RoleResource;
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Infrastructure\Actions\CreateRoleAction;
+use Modules\RBAC\Infrastructure\Actions\DeleteRoleAction;
+use Modules\RBAC\Infrastructure\Actions\UpdateRoleAction;
+use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
+use Modules\RBAC\Application\DTOs\CreateRoleDTO;
+use Modules\RBAC\Application\DTOs\UpdateRoleDTO;
+use Modules\RBAC\Presentation\Http\Requests\StoreRoleRequest;
+use Modules\RBAC\Presentation\Http\Requests\UpdateRoleRequest;
+use Modules\RBAC\Presentation\Http\Resources\RoleResource;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

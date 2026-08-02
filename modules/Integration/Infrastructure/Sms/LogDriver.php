@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Sms;
+namespace Modules\Integration\Infrastructure\Sms;
 
-use App\Domain\Integration\Contracts\SmsProvider;
+use Modules\Integration\Domain\Contracts\SmsProvider;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 

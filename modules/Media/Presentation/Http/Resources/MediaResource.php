@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Http\Resources;
+namespace Modules\Media\Presentation\Http\Resources;
 
-use App\Domain\Media\Enums\MediaStatus;
-use App\Domain\Media\Models\Media;
-use App\Domain\Media\Services\MediaDownloadService;
+use Modules\Media\Domain\Enums\MediaStatus;
+use Modules\Media\Domain\Models\Media;
+use Modules\Media\Infrastructure\Services\MediaDownloadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;

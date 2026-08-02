@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Http\Resources;
+namespace Modules\RBAC\Presentation\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property \App\Domain\RBAC\Models\Role $resource
- * @mixin \App\Domain\RBAC\Models\Role
+ * @property \Modules\RBAC\Domain\Models\Role $resource
+ * @mixin \Modules\RBAC\Domain\Models\Role
  */
 class RoleResource extends JsonResource
 {

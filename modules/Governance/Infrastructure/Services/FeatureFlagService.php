@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Services;
+namespace Modules\Governance\Infrastructure\Services;
 
-use App\Domain\Governance\Models\FeatureFlag;
+use Modules\Governance\Domain\Models\FeatureFlag;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Cache;
 

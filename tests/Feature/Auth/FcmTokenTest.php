@@ -7,7 +7,7 @@ namespace Tests\Feature\Auth;
 use App\Domain\Auth\Models\OtpCode;
 use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Services\SendPushToUser;
-use App\Domain\Integration\Push\FcmPushProvider;
+use Modules\Integration\Infrastructure\Push\FcmPushProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Kreait\Firebase\Exception\Messaging\NotFound;

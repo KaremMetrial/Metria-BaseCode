@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Support\Str;
 
 trait CreatesRole

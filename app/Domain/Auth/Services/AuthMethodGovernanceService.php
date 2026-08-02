@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Auth\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Governance\Services\SettingsService;
+use Modules\Governance\Infrastructure\Services\SettingsService;
 
 class AuthMethodGovernanceService
 {

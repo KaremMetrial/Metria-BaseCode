@@ -52,10 +52,6 @@ class CurrencyConversionService
             ];
         }
 
-        // Find default/base currency. The payments.currency fallback reads
-        // the still-unmigrated Payment domain's config — accepted transitional
-        // coupling (TODO: update when Payment module lands), same category as
-        // the App\Domain\Auth\Models\User import in this module's policies.
         $baseCurrencyCode = config('currencies.base_currency', config('payments.currency', 'EGP'));
 
         // Fetch rates to base

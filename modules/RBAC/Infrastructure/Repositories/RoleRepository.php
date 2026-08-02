@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Repositories;
+namespace Modules\RBAC\Infrastructure\Repositories;
 
 use Modules\Shared\Infrastructure\Persistence\BaseRepository;
-use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Database\Eloquent\Model;
 
 /**

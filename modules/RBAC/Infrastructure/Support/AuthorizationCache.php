@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Support;
+namespace Modules\RBAC\Infrastructure\Support;
 
 use Spatie\Permission\PermissionRegistrar;
 

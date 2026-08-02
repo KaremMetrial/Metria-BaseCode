@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Actions;
+namespace Modules\RBAC\Infrastructure\Actions;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\RBAC\Contracts\PermissionRepositoryInterface;
-use App\Domain\RBAC\Events\RolePermissionsUpdated;
-use App\Domain\RBAC\Models\Role;
+use Modules\RBAC\Domain\Contracts\PermissionRepositoryInterface;
+use Modules\RBAC\Domain\Events\RolePermissionsUpdated;
+use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Support\Facades\DB;
 
 class SyncRolePermissionsAction

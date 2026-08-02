@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Support;
+namespace Modules\Integration\Infrastructure\Support;
 
 use Modules\Shared\Application\Exceptions\IntegrationException;
 use Illuminate\Support\Facades\Cache;

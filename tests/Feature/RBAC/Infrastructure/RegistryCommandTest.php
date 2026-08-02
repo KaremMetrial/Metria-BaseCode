@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\RBAC\Infrastructure;
 
-use App\Domain\RBAC\Support\PermissionRegistry;
+use Modules\RBAC\Infrastructure\Support\PermissionRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;

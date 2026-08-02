@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Services;
+namespace Modules\Media\Infrastructure\Services;
 
-use App\Domain\Media\Contracts\ContentModerator;
-use App\Domain\Media\DTOs\ModerationResult;
+use Modules\Media\Domain\Contracts\ContentModerator;
+use Modules\Media\Domain\DTOs\ModerationResult;
 
 class RekognitionModerator implements ContentModerator
 {

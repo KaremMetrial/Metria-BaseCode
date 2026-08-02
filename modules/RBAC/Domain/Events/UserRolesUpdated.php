@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Events;
+namespace Modules\RBAC\Domain\Events;
 
 use Modules\Shared\Domain\Events\DomainEvent;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
 
 class UserRolesUpdated extends DomainEvent

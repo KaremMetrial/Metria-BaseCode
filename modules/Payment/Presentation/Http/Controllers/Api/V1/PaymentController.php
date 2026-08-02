@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Http\Controllers\Api\V1;
+namespace Modules\Payment\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use Modules\Shared\Domain\Support\Money;
-use App\Domain\Governance\Http\Resources\ApprovalRequestResource;
-use App\Domain\Governance\Models\ApprovalRequest;
-use App\Domain\Payment\Http\Requests\CreatePaymentRequest;
-use App\Domain\Payment\Http\Requests\RefundPaymentRequest;
-use App\Domain\Payment\Http\Resources\PaymentResource;
-use App\Domain\Payment\Models\Payment;
-use App\Domain\Payment\Services\PaymentService;
+use Modules\Governance\Presentation\Http\Resources\ApprovalRequestResource;
+use Modules\Governance\Domain\Models\ApprovalRequest;
+use Modules\Payment\Presentation\Http\Requests\CreatePaymentRequest;
+use Modules\Payment\Presentation\Http\Requests\RefundPaymentRequest;
+use Modules\Payment\Presentation\Http\Resources\PaymentResource;
+use Modules\Payment\Domain\Models\Payment;
+use Modules\Payment\Infrastructure\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;

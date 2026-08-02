@@ -2,14 +2,14 @@
 
 use App\Domain\Auth\Providers\AuthServiceProvider;
 use Modules\Currency\Infrastructure\Providers\CurrencyServiceProvider;
-use App\Domain\Governance\Providers\GovernanceServiceProvider;
-use App\Domain\Integration\Providers\IntegrationServiceProvider;
-use App\Domain\Media\Providers\MediaServiceProvider;
-use App\Domain\Payment\Providers\PaymentServiceProvider;
-use App\Domain\RBAC\Providers\RbacAuthServiceProvider;
-use App\Domain\RBAC\Providers\RbacServiceProvider;
+use Modules\Governance\Infrastructure\Providers\GovernanceServiceProvider;
+use Modules\Integration\Infrastructure\Providers\IntegrationServiceProvider;
+use Modules\Media\Infrastructure\Providers\MediaServiceProvider;
+use Modules\Payment\Infrastructure\Providers\PaymentServiceProvider;
+use Modules\RBAC\Infrastructure\Providers\RbacAuthServiceProvider;
+use Modules\RBAC\Infrastructure\Providers\RbacServiceProvider;
 use Modules\Territory\Infrastructure\Providers\TerritoryServiceProvider;
-use App\Domain\Wallet\Providers\WalletServiceProvider;
+use Modules\Wallet\Infrastructure\Providers\WalletServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\BroadcastServiceProvider;
 use App\Providers\DomainEventServiceProvider;

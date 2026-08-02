@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Http\Controllers\Api\V1;
+namespace Modules\Integration\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use App\Domain\Integration\Http\Requests\UpdateOAuthProviderRequest;
-use App\Domain\Integration\Models\OAuthProvider;
+use Modules\Integration\Presentation\Http\Requests\UpdateOAuthProviderRequest;
+use Modules\Integration\Domain\Models\OAuthProvider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Policies;
+namespace Modules\Payment\Presentation\Policies;
 
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\Payment\Models\Payment;
+use Modules\Payment\Domain\Models\Payment;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PaymentPolicy

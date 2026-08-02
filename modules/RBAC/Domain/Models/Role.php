@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Models;
+namespace Modules\RBAC\Domain\Models;
 
-use App\Domain\RBAC\Scopes\SystemAwareTenantScope;
+use Modules\RBAC\Infrastructure\Scopes\SystemAwareTenantScope;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
- * @property \App\Domain\RBAC\Models\RoleMetadata|null $metadata
+ * @property \Modules\RBAC\Domain\Models\RoleMetadata|null $metadata
  */
 class Role extends SpatieRole
 {

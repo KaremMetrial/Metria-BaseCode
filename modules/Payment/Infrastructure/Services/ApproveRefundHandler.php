@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Services;
+namespace Modules\Payment\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
-use App\Domain\Governance\Models\ApprovalRequest;
-use App\Domain\Payment\Models\Payment;
+use Modules\Governance\Domain\Models\ApprovalRequest;
+use Modules\Payment\Domain\Models\Payment;
 
 /**
  * Invokable executed by ApprovalService when a `payments.refund` approval

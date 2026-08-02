@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\DTOs;
+namespace Modules\RBAC\Application\DTOs;
 
 use Modules\Shared\Application\Abstracts\DataTransferObject;
 

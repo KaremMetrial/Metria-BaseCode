@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Contracts;
+namespace Modules\Media\Domain\Contracts;
 
-use App\Domain\Media\DTOs\ModerationResult;
+use Modules\Media\Domain\DTOs\ModerationResult;
 
 interface ContentModerator
 {

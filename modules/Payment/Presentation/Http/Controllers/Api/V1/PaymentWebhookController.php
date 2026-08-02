@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Http\Controllers\Api\V1;
+namespace Modules\Payment\Presentation\Http\Controllers\Api\V1;
 
 use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use App\Domain\Payment\Services\PaymentService;
+use Modules\Payment\Infrastructure\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

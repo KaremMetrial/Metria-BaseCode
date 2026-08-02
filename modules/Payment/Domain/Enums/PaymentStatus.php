@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Enums;
+namespace Modules\Payment\Domain\Enums;
 
 enum PaymentStatus: string
 {

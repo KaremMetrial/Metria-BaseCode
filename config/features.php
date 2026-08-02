@@ -14,7 +14,6 @@ return [
     |
     */
 
-    'payment_v2' => env('FEATURE_PAYMENT_V2', true),
     'social_login_v2' => env('FEATURE_SOCIAL_LOGIN_V2', false),
     'ai_translation_v2' => env('FEATURE_AI_TRANSLATION_V2', true),
 
@@ -23,4 +22,6 @@ return [
     // lives in the Shared module.
     // 'outbox_state_machine' moved to modules/Webhook/Infrastructure/config/webhook.php
     // ('webhook.outbox.state_machine_enabled') — its only consumer lives in Webhook.
+    // 'payment_v2' moved to modules/Payment/Infrastructure/config/payments.php
+    // ('payments.v2_enabled') — its only consumer, PaymentService, lives in Payment.
 ];

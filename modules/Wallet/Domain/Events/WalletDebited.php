@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Wallet\Events;
+namespace Modules\Wallet\Domain\Events;
 
 use Modules\Shared\Domain\Events\DomainEvent;
 use Modules\Shared\Domain\Events\StoredInOutbox;
-use App\Domain\Wallet\Models\Wallet;
+use Modules\Wallet\Domain\Models\Wallet;
 
 class WalletDebited extends DomainEvent implements StoredInOutbox
 {

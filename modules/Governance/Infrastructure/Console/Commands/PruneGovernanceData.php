@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Governance\Console\Commands;
+namespace Modules\Governance\Infrastructure\Console\Commands;
 
 use Modules\Shared\Infrastructure\Persistence\Models\IdempotencyKey;
-use App\Domain\Governance\Models\AuditLog;
+use Modules\Governance\Domain\Models\AuditLog;
 use Illuminate\Console\Command;
 
 class PruneGovernanceData extends Command

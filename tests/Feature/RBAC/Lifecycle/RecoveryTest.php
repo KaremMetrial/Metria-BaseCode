@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\RBAC\Lifecycle;
 
-use App\Domain\RBAC\Support\AuthorizationCache;
+use Modules\RBAC\Infrastructure\Support\AuthorizationCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesPermission;
 use Tests\Support\CreatesRole;

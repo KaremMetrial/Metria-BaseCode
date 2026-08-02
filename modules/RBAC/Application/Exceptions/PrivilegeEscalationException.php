@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Exceptions;
+namespace Modules\RBAC\Application\Exceptions;
 
 use Modules\Shared\Application\Exceptions\DomainException;
 

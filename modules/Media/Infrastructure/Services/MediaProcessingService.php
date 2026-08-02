@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Media\Services;
+namespace Modules\Media\Infrastructure\Services;
 
-use App\Domain\Media\Enums\MediaStatus;
-use App\Domain\Media\Enums\MediaType;
-use App\Domain\Media\Enums\MediaVariantType;
-use App\Domain\Media\Events\MediaActivated;
-use App\Domain\Media\Models\Media;
-use App\Domain\Media\Models\MediaVariant;
+use Modules\Media\Domain\Enums\MediaStatus;
+use Modules\Media\Domain\Enums\MediaType;
+use Modules\Media\Domain\Enums\MediaVariantType;
+use Modules\Media\Domain\Events\MediaActivated;
+use Modules\Media\Domain\Models\Media;
+use Modules\Media\Domain\Models\MediaVariant;
 use Illuminate\Support\Facades\Storage;
 
 class MediaProcessingService
@@ -96,7 +96,7 @@ class MediaProcessingService
         }
     }
 
-    private function processImage(Media $media, \App\Domain\Media\Models\MediaBlob $blob, string $filePath, \Illuminate\Contracts\Filesystem\Filesystem $disk): void
+    private function processImage(Media $media, \Modules\Media\Domain\Models\MediaBlob $blob, string $filePath, \Illuminate\Contracts\Filesystem\Filesystem $disk): void
     {
         // 1. Extract metadata (Width, Height, Orientation)
         $width = 800;
@@ -180,7 +180,7 @@ class MediaProcessingService
         }
     }
 
-    private function processVideo(Media $media, \App\Domain\Media\Models\MediaBlob $blob, string $filePath, \Illuminate\Contracts\Filesystem\Filesystem $disk): void
+    private function processVideo(Media $media, \Modules\Media\Domain\Models\MediaBlob $blob, string $filePath, \Illuminate\Contracts\Filesystem\Filesystem $disk): void
     {
         $duration = null;
         $fps = null;

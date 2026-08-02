@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Http\Requests;
+namespace Modules\Payment\Presentation\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Integration\Push;
+namespace Modules\Integration\Infrastructure\Push;
 
 use Modules\Shared\Application\Exceptions\IntegrationException;
-use App\Domain\Integration\Support\CircuitBreaker;
+use Modules\Integration\Infrastructure\Support\CircuitBreaker;
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Factory;

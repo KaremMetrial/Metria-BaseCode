@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Payment\Http\Resources;
+namespace Modules\Payment\Presentation\Http\Resources;
 
 use Modules\Shared\Domain\Support\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property \App\Domain\Payment\Models\Payment $resource
- * @mixin \App\Domain\Payment\Models\Payment
+ * @property \Modules\Payment\Domain\Models\Payment $resource
+ * @mixin \Modules\Payment\Domain\Models\Payment
  */
 class PaymentResource extends JsonResource
 {

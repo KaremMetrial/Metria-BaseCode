@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\RBAC\Actions;
+namespace Modules\RBAC\Infrastructure\Actions;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Shared\Application\Exceptions\DomainException;
+// TODO: update when IAM module lands
 use App\Domain\Auth\Models\User;
-use App\Domain\RBAC\Contracts\RoleRepositoryInterface;
-use App\Domain\RBAC\Events\UserRolesUpdated;
+use Modules\RBAC\Domain\Contracts\RoleRepositoryInterface;
+use Modules\RBAC\Domain\Events\UserRolesUpdated;
 use Illuminate\Support\Facades\DB;
 
 class SyncUserRolesAction

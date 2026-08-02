@@ -1,6 +1,6 @@
 <?php
 
-use App\Domain\Payment\Services\ApproveRefundHandler;
+use Modules\Payment\Infrastructure\Services\ApproveRefundHandler;
 
 return [
 
