@@ -11,6 +11,7 @@ use Modules\RBAC\Infrastructure\Providers\RbacServiceProvider;
 use Modules\Territory\Infrastructure\Providers\TerritoryServiceProvider;
 use Modules\Wallet\Infrastructure\Providers\WalletServiceProvider;
 use App\Providers\AppServiceProvider;
+use App\Providers\ApiDocumentationServiceProvider;
 use App\Providers\BroadcastServiceProvider;
 use App\Providers\DomainEventServiceProvider;
 use Modules\Shared\Infrastructure\Providers\SharedServiceProvider;
@@ -18,6 +19,7 @@ use Modules\Webhook\Infrastructure\Providers\WebhookServiceProvider;
 
 return [
     AppServiceProvider::class,
+    ApiDocumentationServiceProvider::class,
     BroadcastServiceProvider::class,
     DomainEventServiceProvider::class,
     SharedServiceProvider::class,

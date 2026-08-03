@@ -105,6 +105,13 @@ server {
         try_files   $uri =404;
     }
 
+    # Scramble serves the OpenAPI documents dynamically. This must precede the
+    # generic static `.json` rule below, otherwise Nginx returns a filesystem
+    # 404 before Laravel can apply the documentation access policy.
+    location ~ ^/docs/[^/]+\.json$ {
+        try_files   "" /index.php?$query_string;
+    }
+
     # -------------------------------------------------------------------------
     # Other static files — unhashed names, so only a moderate TTL
     # -------------------------------------------------------------------------

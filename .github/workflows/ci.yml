@@ -55,3 +55,20 @@ jobs:
       - name: Two-node Redis and Socket.IO production gate
         working-directory: services/realtime
         run: npm run test:integration:cluster
+
+  api-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, redis, bcmath, intl
+      - run: composer install --prefer-dist --no-progress --no-interaction
+      - run: cp .env.example .env && php artisan key:generate
+      - run: mkdir -p artifacts/openapi && php artisan scramble:analyze && php artisan scramble:export --path=artifacts/openapi/api.json && php artisan scramble:export --api=admin --path=artifacts/openapi/admin.json && php artisan scramble:export --api=webhooks --path=artifacts/openapi/webhooks.json
+      - run: php artisan test tests/Feature/System/ApiDocumentationTest.php
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openapi-documents
+          path: artifacts/openapi/*.json

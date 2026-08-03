@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "dedoc/scramble": "^0.13.37",
         "guzzlehttp/guzzle": "^7.8",
         "kreait/firebase-php": "^7.0",
         "laravel/framework": "^12.0",
