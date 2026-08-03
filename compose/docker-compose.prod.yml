@@ -86,3 +86,20 @@ services:
         limits:
           cpus: "${SCHEDULER_CPU_LIMIT:-1}"
           memory: "${SCHEDULER_MEMORY_LIMIT:-512m}"
+
+  realtime:
+    restart: always
+    environment:
+      NODE_ENV: production
+      REALTIME_ALLOWED_ORIGINS: "${REALTIME_ALLOWED_ORIGINS:?REALTIME_ALLOWED_ORIGINS is required for production}"
+      REALTIME_INTERNAL_SECRET: "${REALTIME_INTERNAL_SECRET:?REALTIME_INTERNAL_SECRET is required for production}"
+      REALTIME_EVENT_HMAC_SECRET: "${REALTIME_EVENT_HMAC_SECRET:?REALTIME_EVENT_HMAC_SECRET is required for production}"
+      REALTIME_REDIS_PASSWORD: "${REDIS_PASSWORD:?REDIS_PASSWORD is required for production}"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,mode=1777,size=32m
+    deploy:
+      resources:
+        limits:
+          cpus: "${REALTIME_CPU_LIMIT:-1}"
+          memory: "${REALTIME_MEMORY_LIMIT:-256m}"

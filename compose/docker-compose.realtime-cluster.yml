@@ -1,0 +1,78 @@
+services:
+  # The base development image expects a bind mount. The isolated gate instead
+  # uses the self-contained production target so app and queue both execute the
+  # exact image that CI builds.
+  app:
+    build:
+      target: production
+
+  # Direct ports are intentionally available only in this test overlay. They
+  # provide deterministic client-to-node placement without changing the edge.
+  nginx:
+    profiles: [disabled]
+
+  scheduler:
+    profiles: [disabled]
+
+  realtime:
+    profiles: [disabled]
+
+  realtime-a:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/realtime:${IMAGE_TAG:-latest}"
+    build:
+      context: ../services/realtime
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: test
+      REALTIME_HOST: 0.0.0.0
+      REALTIME_PORT: 6001
+      REALTIME_PATH: /socket.io
+      REALTIME_ALLOWED_ORIGINS: "${REALTIME_ALLOWED_ORIGINS}"
+      REALTIME_AUTH_URL: http://internal-nginx:8080/api/internal/realtime/authenticate
+      REALTIME_RESOURCE_AUTH_URL: http://internal-nginx:8080/api/internal/realtime/authorize-resource
+      REALTIME_INTERNAL_SECRET: "${REALTIME_INTERNAL_SECRET}"
+      REALTIME_REDIS_URL: redis://redis:6379
+      REALTIME_REDIS_PASSWORD: "${REDIS_PASSWORD}"
+      REALTIME_REDIS_KEY_PREFIX: "${REALTIME_REDIS_KEY_PREFIX}"
+      REALTIME_EVENT_CHANNEL: "${REALTIME_EVENT_CHANNEL}"
+      REALTIME_EVENT_HMAC_SECRET: "${REALTIME_EVENT_HMAC_SECRET}"
+      REALTIME_NODE_ID: realtime-a
+      REALTIME_DEDUPE_TTL_SECONDS: "3"
+    ports:
+      - "127.0.0.1:6101:6001"
+    depends_on:
+      redis:
+        condition: service_healthy
+      internal-nginx:
+        condition: service_started
+    networks: [edge, backend]
+
+  realtime-b:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/realtime:${IMAGE_TAG:-latest}"
+    build:
+      context: ../services/realtime
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: test
+      REALTIME_HOST: 0.0.0.0
+      REALTIME_PORT: 6001
+      REALTIME_PATH: /socket.io
+      REALTIME_ALLOWED_ORIGINS: "${REALTIME_ALLOWED_ORIGINS}"
+      REALTIME_AUTH_URL: http://internal-nginx:8080/api/internal/realtime/authenticate
+      REALTIME_RESOURCE_AUTH_URL: http://internal-nginx:8080/api/internal/realtime/authorize-resource
+      REALTIME_INTERNAL_SECRET: "${REALTIME_INTERNAL_SECRET}"
+      REALTIME_REDIS_URL: redis://redis:6379
+      REALTIME_REDIS_PASSWORD: "${REDIS_PASSWORD}"
+      REALTIME_REDIS_KEY_PREFIX: "${REALTIME_REDIS_KEY_PREFIX}"
+      REALTIME_EVENT_CHANNEL: "${REALTIME_EVENT_CHANNEL}"
+      REALTIME_EVENT_HMAC_SECRET: "${REALTIME_EVENT_HMAC_SECRET}"
+      REALTIME_NODE_ID: realtime-b
+      REALTIME_DEDUPE_TTL_SECONDS: "3"
+    ports:
+      - "127.0.0.1:6102:6001"
+    depends_on:
+      redis:
+        condition: service_healthy
+      internal-nginx:
+        condition: service_started
+    networks: [edge, backend]

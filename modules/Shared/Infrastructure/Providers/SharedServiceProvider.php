@@ -19,8 +19,18 @@ class SharedServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/core.php', 'core');
+        $this->mergeConfigFrom(__DIR__.'/../config/realtime.php', 'realtime');
+
+        // Laravel's normal Redis connection prefixes all command keys. That is
+        // correct for cache/session isolation but breaks the fixed pub/sub
+        // channel contract consumed by the standalone realtime service.
+        // Register a cloned, explicitly unprefixed connection before the
+        // publisher can resolve the Redis manager.
+        $defaultRedis = (array) config('database.redis.default', []);
+        config()->set('database.redis.realtime', array_replace($defaultRedis, ['prefix' => '']));
 
         $this->app->register(CoreServiceProvider::class);
+        $this->app->register(RealtimeServiceProvider::class);
         $this->app->register(TranslationServiceProvider::class);
     }
 }

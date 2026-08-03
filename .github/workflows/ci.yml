@@ -35,3 +35,23 @@ jobs:
 
       - name: Tests
         run: php artisan test
+
+  realtime-cluster-integration:
+    name: realtime-cluster-integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: services/realtime/package-lock.json
+
+      - name: Install realtime test dependencies
+        working-directory: services/realtime
+        run: npm ci
+
+      - name: Two-node Redis and Socket.IO production gate
+        working-directory: services/realtime
+        run: npm run test:integration:cluster

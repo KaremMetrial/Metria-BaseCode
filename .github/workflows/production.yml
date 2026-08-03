@@ -1,0 +1,42 @@
+name: PRODUCTION  
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Steps
+        run: 
+          echo "Building the application..."
+          # Add your build commands here, e.g., npm run build, composer install, etc.
+          # composer install --prefer-dist --no-progress --no-interaction
+          # php artisan key:generate  
+          # php artisan migrate --seed
+          # php artisan optimize
+          
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Tests
+        run: 
+          echo "Running tests..."
+          # Add your test commands here, e.g., php artisan test, npm test, etc.
+          # php artisan test
+          # npm test
+  
+  deploy:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production
+        run: 
+          echo "Deploying to production..."
+          # Add your deployment commands here, e.g., rsync, scp, etc.
+          # rsync -avz --exclude='.git' ./ user@yourserver:/path/to/deploy

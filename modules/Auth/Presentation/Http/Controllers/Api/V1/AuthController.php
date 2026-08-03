@@ -16,6 +16,7 @@ use Modules\Auth\Presentation\Http\Requests\UpdateFcmTokenRequest;
 use Modules\Auth\Presentation\Http\Resources\UserResource;
 use Modules\Auth\Domain\Models\User;
 use Modules\Auth\Domain\Models\UserSession;
+use Modules\Auth\Domain\Events\UserSessionRevoked;
 use Modules\Auth\Infrastructure\Pipelines\AuthContext;
 use Modules\Auth\Infrastructure\Pipelines\AuthPipeline;
 use Modules\Auth\Infrastructure\Services\AuthMethodGovernanceService;
@@ -146,7 +147,9 @@ class AuthController extends ApiController
     {
         /** @var \Modules\Auth\Domain\Models\UserSession $session */
         $session = $this->getAuthenticatedUser($request)->sessions()->where('id', $id)->firstOrFail();
+        $tokenId = $session->personal_access_token_id;
         $session->revoke();
+        event(new UserSessionRevoked($this->getAuthenticatedUser($request), $id, $tokenId));
 
         return $this->respond(message: __('auth.session.revoked'));
     }
@@ -200,7 +203,11 @@ class AuthController extends ApiController
         $user = $this->getAuthenticatedUser($request);
         $token = $user->currentAccessToken();
         if ($token && method_exists($token, 'delete')) {
+            $session = $user->sessions()->where('personal_access_token_id', $token->getKey())->first();
+            $tokenId = (string) $token->getKey();
+            $sessionId = (string) ($session?->getKey() ?? $tokenId);
             $token->delete();
+            event(new UserSessionRevoked($user, $sessionId, $tokenId));
         }
 
         if ($tokenVal = $request->string('device_token')->value()) {

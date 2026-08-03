@@ -1,0 +1,8 @@
+NAME                                        IMAGE                                            COMMAND                  SERVICE          CREATED              STATUS                            PORTS
+metrial-realtime-cluster-app-1              metrial-realtime-cluster/app:latest              "entrypoint php-fpm …"   app              About a minute ago   Up About a minute (healthy)       9000/tcp
+metrial-realtime-cluster-internal-nginx-1   metrial-realtime-cluster/internal-nginx:latest   "/docker-entrypoint.…"   internal-nginx   About a minute ago   Up 55 seconds (healthy)           8080/tcp
+metrial-realtime-cluster-mysql-1            metrial-realtime-cluster/mysql:latest            "docker-entrypoint.s…"   mysql            About a minute ago   Up About a minute (healthy)       3306/tcp, 33060/tcp
+metrial-realtime-cluster-queue-1            metrial-realtime-cluster/app:latest              "entrypoint supervis…"   queue            About a minute ago   Up About a minute (healthy)       9000/tcp
+metrial-realtime-cluster-realtime-a-1       metrial-realtime-cluster/realtime:latest         "docker-entrypoint.s…"   realtime-a       About a minute ago   Up 5 seconds (healthy)            127.0.0.1:6101->6001/tcp
+metrial-realtime-cluster-realtime-b-1       metrial-realtime-cluster/realtime:latest         "docker-entrypoint.s…"   realtime-b       About a minute ago   Up 55 seconds (healthy)           127.0.0.1:6102->6001/tcp
+metrial-realtime-cluster-redis-1            metrial-realtime-cluster/redis:latest            "redis-entrypoint re…"   redis            About a minute ago   Up 4 seconds (health: starting)   6379/tcp

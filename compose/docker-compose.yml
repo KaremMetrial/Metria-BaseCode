@@ -2,7 +2,7 @@ services:
   mysql:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/mysql:${IMAGE_TAG:-latest}"
     build:
-      context: .
+      context: ..
       dockerfile: docker/mysql/Dockerfile
       args:
         MYSQL_VERSION: "${MYSQL_VERSION:-8.4}"
@@ -30,7 +30,7 @@ services:
   redis:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/redis:${IMAGE_TAG:-latest}"
     build:
-      context: .
+      context: ..
       dockerfile: docker/redis/Dockerfile
       args:
         REDIS_VERSION: "${REDIS_VERSION:-8}"
@@ -54,7 +54,7 @@ services:
   app:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/app:${IMAGE_TAG:-latest}"
     build:
-      context: .
+      context: ..
       dockerfile: docker/php/Dockerfile
       target: development
       args:
@@ -85,6 +85,12 @@ services:
       CACHE_STORE: "${CACHE_STORE:-redis}"
       SESSION_DRIVER: "${SESSION_DRIVER:-redis}"
       QUEUE_CONNECTION: "${QUEUE_CONNECTION:-redis}"
+      REALTIME_ENABLED: "${REALTIME_ENABLED:-false}"
+      REALTIME_REDIS_CONNECTION: "${REALTIME_REDIS_CONNECTION:-realtime}"
+      REALTIME_EVENT_CHANNEL: "${REALTIME_EVENT_CHANNEL:-metrial:realtime:events}"
+      REALTIME_EVENT_HMAC_SECRET: "${REALTIME_EVENT_HMAC_SECRET:-}"
+      REALTIME_INTERNAL_SECRET: "${REALTIME_INTERNAL_SECRET:-}"
+      REALTIME_SESSION_TTL_SECONDS: "${REALTIME_SESSION_TTL_SECONDS:-300}"
       XDEBUG_MODE: "${XDEBUG_MODE:-off}"
       XDEBUG_CONFIG: "client_host=host.docker.internal"
       PHP_IDE_CONFIG: "serverName=${XDEBUG_SERVER_NAME:-laravel}"
@@ -106,7 +112,7 @@ services:
   nginx:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/nginx:${IMAGE_TAG:-latest}"
     build:
-      context: .
+      context: ..
       dockerfile: docker/nginx/Dockerfile
       target: base
       args:
@@ -120,6 +126,8 @@ services:
     depends_on:
       app:
         condition: service_healthy
+      realtime:
+        condition: service_started
     networks: [edge]
     read_only: true
     tmpfs:
@@ -132,6 +140,31 @@ services:
       options:
         max-size: "${LOG_MAX_SIZE:-10m}"
         max-file: "${LOG_MAX_FILE:-5}"
+
+  internal-nginx:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/internal-nginx:${IMAGE_TAG:-latest}"
+    build:
+      context: ..
+      dockerfile: docker/nginx/Dockerfile
+      target: internal
+      args:
+        NGINX_VERSION: "${NGINX_VERSION:-1.29}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    environment:
+      NGINX_SERVER_NAME: internal-realtime
+      NGINX_FPM_HOST: app
+      NGINX_FPM_PORT: 9000
+      NGINX_ROOT: "${NGINX_ROOT:-/var/www/html/public}"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [backend]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,mode=1777,size=32m
+      - /etc/nginx/conf.d:rw,mode=1777,size=4m
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
 
   queue:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/app:${IMAGE_TAG:-latest}"
@@ -155,6 +188,49 @@ services:
       retries: 5
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
+
+  realtime:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/realtime:${IMAGE_TAG:-latest}"
+    build:
+      context: ../services/realtime
+      dockerfile: Dockerfile
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    environment:
+      NODE_ENV: development
+      REALTIME_HOST: 0.0.0.0
+      REALTIME_PORT: 6001
+      REALTIME_PATH: /socket.io
+      REALTIME_ALLOWED_ORIGINS: "${REALTIME_ALLOWED_ORIGINS:-http://localhost}"
+      REALTIME_MAX_CONNECTIONS_PER_USER: "${REALTIME_MAX_CONNECTIONS_PER_USER:-10}"
+      REALTIME_MAX_ROOMS_PER_SOCKET: "${REALTIME_MAX_ROOMS_PER_SOCKET:-20}"
+      REALTIME_MAX_PAYLOAD_BYTES: "${REALTIME_MAX_PAYLOAD_BYTES:-65536}"
+      REALTIME_MAX_EVENT_BYTES: "${REALTIME_MAX_EVENT_BYTES:-65536}"
+      REALTIME_AUTH_URL: "${REALTIME_AUTH_URL:-http://internal-nginx:8080/api/internal/realtime/authenticate}"
+      REALTIME_RESOURCE_AUTH_URL: "${REALTIME_RESOURCE_AUTH_URL:-http://internal-nginx:8080/api/internal/realtime/authorize-resource}"
+      REALTIME_INTERNAL_SECRET: "${REALTIME_INTERNAL_SECRET:-}"
+      REALTIME_SESSION_TTL_SECONDS: "${REALTIME_SESSION_TTL_SECONDS:-300}"
+      REALTIME_REDIS_URL: "redis://redis:6379"
+      REALTIME_REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REALTIME_REDIS_KEY_PREFIX: "${REALTIME_REDIS_KEY_PREFIX:-metrial:realtime:}"
+      REALTIME_EVENT_CHANNEL: "${REALTIME_EVENT_CHANNEL:-metrial:realtime:events}"
+      REALTIME_EVENT_HMAC_SECRET: "${REALTIME_EVENT_HMAC_SECRET:-}"
+      REALTIME_LOG_LEVEL: "${REALTIME_LOG_LEVEL:-info}"
+      REALTIME_SHUTDOWN_TIMEOUT_MS: "${REALTIME_SHUTDOWN_TIMEOUT_MS:-10000}"
+    depends_on:
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+      internal-nginx:
+        condition: service_started
+    networks: [edge, backend]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: "${LOG_DRIVER:-json-file}"
+      options:
+        max-size: "${LOG_MAX_SIZE:-10m}"
+        max-file: "${LOG_MAX_FILE:-5}"
 
   scheduler:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/app:${IMAGE_TAG:-latest}"
@@ -182,7 +258,7 @@ services:
   composer:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/composer:${IMAGE_TAG:-latest}"
     build:
-      context: .
+      context: ..
       dockerfile: docker/composer/Dockerfile
       args:
         PHP_VERSION: "${PHP_VERSION:-8.4}"
@@ -192,7 +268,7 @@ services:
         USER: "${DOCKER_USER:-app}"
     profiles: [tools]
     volumes:
-      - .:/var/www/html
+      - ../:/var/www/html
       - composer_cache:/tmp/composer/cache
     networks: [edge]
     security_opt: [no-new-privileges:true]
@@ -201,7 +277,7 @@ services:
   npm:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/node:${IMAGE_TAG:-latest}"
     build:
-      context: .
+      context: ..
       dockerfile: docker/node/Dockerfile
       args:
         NODE_VERSION: "${NODE_VERSION:-22}"
@@ -209,7 +285,7 @@ services:
         GID: "${GID:-1000}"
     profiles: [frontend, tools]
     volumes:
-      - .:/var/www/html
+      - ../:/var/www/html
       - node_modules:/var/www/html/node_modules
       - node_cache:/home/node/.npm
     networks: [edge]

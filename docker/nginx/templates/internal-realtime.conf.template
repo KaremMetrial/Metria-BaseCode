@@ -1,0 +1,27 @@
+upstream php_fpm {
+    server ${NGINX_FPM_HOST}:${NGINX_FPM_PORT};
+}
+
+server {
+    listen 8080 default_server;
+    listen [::]:8080 default_server;
+    server_name ${NGINX_SERVER_NAME};
+    root ${NGINX_ROOT};
+
+    location = /healthz {
+        access_log off;
+        return 200 "healthy\n";
+    }
+
+    location ^~ /api/internal/realtime/ {
+        include fastcgi_params;
+        fastcgi_pass php_fpm;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param REQUEST_URI $request_uri;
+    }
+
+    location / {
+        return 404;
+    }
+}

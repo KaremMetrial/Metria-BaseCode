@@ -80,6 +80,10 @@ class CoreServiceProvider extends ServiceProvider
         RateLimiter::for('auth', function (Request $request) {
             return Limit::perMinute(10)->by($request->ip());
         });
+
+        RateLimiter::for('realtime-internal', function (Request $request) {
+            return Limit::perMinute(120)->by($request->ip());
+        });
     }
 
     /**

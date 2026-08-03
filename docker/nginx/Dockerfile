@@ -35,6 +35,9 @@ RUN set -eux; \
 COPY docker/nginx/nginx.conf   /etc/nginx/nginx.conf
 COPY docker/nginx/snippets/    /etc/nginx/snippets/
 COPY docker/nginx/templates/   /etc/nginx/templates/
+# The internal-only template is copied explicitly by the `internal` target.
+# Leaving it here would make nginx's entrypoint render a second public server.
+RUN rm -f /etc/nginx/templates/internal-realtime.conf.template
 
 # nginx creates its own *_temp_path directories at startup (see nginx.conf),
 # so nothing needs pre-creating under /tmp — it is a tmpfs at runtime anyway.
@@ -72,3 +75,10 @@ FROM base AS production
 USER root
 COPY --from=app_image --chown=101:101 /var/www/html/public /var/www/html/public
 USER 101
+
+# Backend-only Laravel HTTP upstream used solely by the realtime service.
+# It is attached only to Compose's internal backend network and has no ports.
+FROM base AS internal
+
+COPY docker/nginx/templates/internal-realtime.conf.template /etc/nginx/templates/default.conf.template
+RUN rm -f /etc/nginx/templates/internal-realtime.conf.template

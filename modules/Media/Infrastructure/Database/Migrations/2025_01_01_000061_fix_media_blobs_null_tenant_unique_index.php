@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * Replaces the simple UNIQUE(tenant_id, sha256) index on media_blobs with a
@@ -15,8 +14,7 @@ use Illuminate\Support\Facades\Schema;
  * PostgreSQL fix: use COALESCE to substitute NULL with a sentinel string so
  * NULL rows are treated as belonging to a single shared "GLOBAL" namespace.
  *
- * MySQL/MariaDB: Use a generated virtual column that coalesces NULL to 'GLOBAL',
- * then index on (tenant_id_coalesced, sha256).
+ * MySQL 8: Use a functional index that coalesces NULL to a sentinel UUID.
  */
 return new class extends Migration
 {
@@ -34,19 +32,18 @@ return new class extends Migration
                 ON media_blobs (COALESCE(tenant_id::text, 'GLOBAL'), sha256)
                 WHERE deleted_at IS NULL
             SQL);
-        } elseif (in_array($driver, ['mysql', 'mariadb'], true)) {
-            // MySQL doesn't support functional indexes in older versions;
-            // use a generated column approach instead.
-            Schema::table('media_blobs', function ($table) {
-                // Add a generated column that is never NULL.
-                DB::statement(
-                    "ALTER TABLE media_blobs ADD COLUMN tenant_id_coalesced VARCHAR(36) GENERATED ALWAYS AS (COALESCE(tenant_id, 'GLOBAL')) STORED"
-                );
-            });
-
-            // Drop old index, add new one on the generated column.
+        } elseif ($driver === 'mysql') {
+            // MySQL 8 supports functional indexes. This avoids a generated
+            // column, which MySQL cannot add when it derives from a column
+            // participating in an ON DELETE CASCADE foreign key.
+            // Keep a dedicated index for the tenant foreign key before removing
+            // the composite one MySQL initially selected to enforce it.
+            DB::statement('CREATE INDEX media_blobs_tenant_id_index ON media_blobs (tenant_id)');
             DB::statement('ALTER TABLE media_blobs DROP INDEX media_blobs_tenant_id_sha256_unique');
-            DB::statement('CREATE UNIQUE INDEX media_blobs_tenant_sha256_unique ON media_blobs (tenant_id_coalesced, sha256)');
+            DB::statement(<<<'SQL'
+                CREATE UNIQUE INDEX media_blobs_tenant_sha256_unique
+                ON media_blobs ((COALESCE(tenant_id, '00000000-0000-0000-0000-000000000000')), sha256)
+            SQL);
         }
         // SQLite (testing): the original index is sufficient for tests since
         // tenant_id is always provided in the test environment.
@@ -59,10 +56,10 @@ return new class extends Migration
         if ($driver === 'pgsql') {
             DB::statement('DROP INDEX IF EXISTS media_blobs_tenant_sha256_unique');
             DB::statement('CREATE UNIQUE INDEX media_blobs_tenant_id_sha256_unique ON media_blobs (tenant_id, sha256)');
-        } elseif (in_array($driver, ['mysql', 'mariadb'], true)) {
+        } elseif ($driver === 'mysql') {
             DB::statement('DROP INDEX media_blobs_tenant_sha256_unique ON media_blobs');
-            DB::statement('ALTER TABLE media_blobs DROP COLUMN tenant_id_coalesced');
             DB::statement('CREATE UNIQUE INDEX media_blobs_tenant_id_sha256_unique ON media_blobs (tenant_id, sha256)');
+            DB::statement('DROP INDEX media_blobs_tenant_id_index ON media_blobs');
         }
     }
 };

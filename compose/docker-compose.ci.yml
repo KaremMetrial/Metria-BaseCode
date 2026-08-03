@@ -15,7 +15,7 @@ services:
 
   app:
     volumes:
-      - .:/var/www/html
+      - ../:/var/www/html
 
   queue:
     profiles: [disabled]

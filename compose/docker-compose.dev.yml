@@ -9,7 +9,7 @@ services:
 
   app:
     volumes:
-      - .:/var/www/html
+      - ../:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -17,17 +17,21 @@ services:
     ports:
       - "${APP_PORT:-80}:8080"
     volumes:
-      - ./public:/var/www/html/public:ro
+      - ../public:/var/www/html/public:ro
+
+  realtime:
+    ports:
+      - "127.0.0.1:${REALTIME_PORT:-6001}:6001"
 
   queue:
     volumes:
-      - .:/var/www/html
+      - ../:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
   scheduler:
     volumes:
-      - .:/var/www/html
+      - ../:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

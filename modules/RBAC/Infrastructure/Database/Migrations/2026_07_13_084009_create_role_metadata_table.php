@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('role_metadata', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('role_id')->constrained('roles')->cascadeOnDelete();
+            $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
 
             $table->string('display_name')->nullable();
             $table->text('description')->nullable();

@@ -1,0 +1,238 @@
+app-1  | [0;36m[entrypoint][0m starting: php-fpm --nodaemonize
+app-1  | [03-Aug-2026 09:16:00] NOTICE: fpm is running, pid 1
+app-1  | [03-Aug-2026 09:16:00] NOTICE: ready to handle connections
+app-1  | 127.0.0.1 -  03/Aug/2026:09:16:05 +0000 "GET /ping" 200
+app-1  | 127.0.0.1 -  03/Aug/2026:09:16:20 +0000 "GET /ping" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 403
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:32 +0000 "POST /index.php" 403
+app-1  | 127.0.0.1 -  03/Aug/2026:09:16:35 +0000 "GET /ping" 200
+app-1  | 127.0.0.1 -  03/Aug/2026:09:16:50 +0000 "GET /ping" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:56 +0000 "POST /index.php" 200
+app-1  | 172.24.0.6 -  03/Aug/2026:09:16:59 +0000 "POST /index.php" 401
+app-1  | 172.24.0.6 -  03/Aug/2026:09:17:01 +0000 "POST /index.php" 401
+redis-1  | [redis] authentication enabled
+redis-1  | 1:C 03 Aug 2026 09:15:39.039 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+redis-1  | 1:C 03 Aug 2026 09:15:39.039 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-1  | 1:C 03 Aug 2026 09:15:39.039 * Redis version=8.4.0, bits=64, commit=00000000, modified=1, pid=1, just started
+redis-1       | 1:C 03 Aug 2026 09:15:39.039 * Configuration loaded
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:07.242Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:07.247Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-publisher"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:07.249Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"event-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:07.255Z","service":"metrial-realtime","level":"info","event":"server.started","host":"0.0.0.0","port":6001}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:32.755Z","service":"metrial-realtime","level":"info","event":"socket.connected","socket_id":"r_qgfh7CDHbKBTDwAAAB","user_id":"a269b309-b7a9-468e-927a-c9cfd7c1745b","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","token_id":"1"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:33.471Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"c5bafe1b-7288-439e-97b8-66cf5772d972","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:35.044Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"c5bafe1b-7288-439e-97b8-66cf5772d972","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:36.589Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"43f9c831-53eb-47c2-a8c3-d3e9a5670514","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:38.182Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"aa72731a-5e5c-4c80-90d8-f54aedad1c25","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:39.773Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"f1e725fe-e98a-4f0a-be9f-c72f8b0efd9e","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:41.572Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-a","dedupe_claimed":true,"broadcast_performed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:41.673Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:41.712Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:41.739Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:41.779Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:42.965Z","service":"metrial-realtime","level":"info","event":"server.stopping","signal":"SIGTERM"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:42.965Z","service":"metrial-realtime","level":"info","event":"socket.disconnected","socket_id":"r_qgfh7CDHbKBTDwAAAB","user_id":"a269b309-b7a9-468e-927a-c9cfd7c1745b","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","reason":"server shutting down"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:56.069Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:56.070Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"event-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:56.070Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-publisher"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:56.074Z","service":"metrial-realtime","level":"info","event":"server.started","host":"0.0.0.0","port":6001}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:56.153Z","service":"metrial-realtime","level":"info","event":"socket.connected","socket_id":"7FkWP8zfGmgsroqqAAAB","user_id":"a269b309-b7a9-468e-927a-c9cfd7c1745b","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","token_id":"1"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:56.672Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"c0835d86-f6b6-4156-b755-263d0ff84446","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.001Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"event-subscriber","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.001Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"event-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.005Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"command","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.005Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"command"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.005Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-subscriber","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.007Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.007Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-publisher","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.008Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-publisher"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.009Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"event-subscriber","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.010Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"command","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.010Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-subscriber","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:57.011Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-publisher","error_code":"Error"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.010Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"event-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.011Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"command"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.011Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"event-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.012Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.012Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-publisher"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.012Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"command"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.013Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-subscriber"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.013Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-publisher"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:58.562Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"b0b3cfa5-61ac-4f83-a81b-8fc6ef8dd2c6","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:59.776Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"b8350962-9da2-40c6-ae48-762cb8ec7747","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-a-1  | {"timestamp":"2026-08-03T09:16:59.780Z","service":"metrial-realtime","level":"info","event":"socket.disconnected","socket_id":"7FkWP8zfGmgsroqqAAAB","user_id":"a269b309-b7a9-468e-927a-c9cfd7c1745b","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","reason":"server namespace disconnect"}
+realtime-a-1  | {"timestamp":"2026-08-03T09:17:01.003Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"20faa89d-7d43-4bba-b3d3-189045dd45a8","node_id":"realtime-a","dedupe_claimed":false,"duplicate_suppressed":true}
+redis-1       | 1:M 03 Aug 2026 09:15:39.039 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+redis-1       | 1:M 03 Aug 2026 09:15:39.039 * monotonic clock: POSIX clock_gettime
+redis-1       | 1:M 03 Aug 2026 09:15:39.040 * Running mode=standalone, port=6379.
+redis-1       | 1:M 03 Aug 2026 09:15:39.040 * Server initialized
+redis-1       | 1:M 03 Aug 2026 09:15:39.041 * BGSAVE done, 0 keys saved, 0 keys skipped, 88 bytes written.
+redis-1       | 1:M 03 Aug 2026 09:15:39.062 * Creating AOF base file appendonly.aof.1.base.rdb on server start
+redis-1       | 1:M 03 Aug 2026 09:15:39.102 * Creating AOF incr file appendonly.aof.1.incr.aof on server start
+redis-1       | 1:M 03 Aug 2026 09:15:39.102 * Ready to accept connections tcp
+redis-1       | 1:signal-handler (1785748616) Received SIGTERM scheduling shutdown...
+redis-1       | 1:M 03 Aug 2026 09:16:56.949 * User requested shutdown...
+redis-1       | 1:M 03 Aug 2026 09:16:56.950 * Calling fsync() on the AOF file.
+redis-1       | 1:M 03 Aug 2026 09:16:56.953 * Saving the final RDB snapshot before exiting.
+redis-1       | 1:M 03 Aug 2026 09:16:56.955 * BGSAVE done, 14 keys saved, 0 keys skipped, 1682 bytes written.
+redis-1       | 1:M 03 Aug 2026 09:16:56.972 * DB saved on disk
+redis-1       | 1:M 03 Aug 2026 09:16:56.986 # Redis is now ready to exit, bye bye...
+redis-1       | [redis] authentication enabled
+redis-1       | 1:C 03 Aug 2026 09:16:57.532 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+redis-1       | 1:C 03 Aug 2026 09:16:57.532 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-1       | 1:C 03 Aug 2026 09:16:57.532 * Redis version=8.4.0, bits=64, commit=00000000, modified=1, pid=1, just started
+redis-1       | 1:C 03 Aug 2026 09:16:57.532 * Configuration loaded
+redis-1       | 1:M 03 Aug 2026 09:16:57.532 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+redis-1       | 1:M 03 Aug 2026 09:16:57.532 * monotonic clock: POSIX clock_gettime
+redis-1       | 1:M 03 Aug 2026 09:16:57.534 * Running mode=standalone, port=6379.
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * Server initialized
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * Reading RDB base file on AOF loading...
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * Loading RDB produced by version 8.4.0
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * RDB age 78 seconds
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * RDB memory usage when created 0.64 Mb
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * RDB is base AOF
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * Done loading RDB, keys loaded: 0, keys expired: 0.
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * DB loaded from incr file appendonly.aof.1.incr.aof: 0.000 seconds
+redis-1       | 1:M 03 Aug 2026 09:16:57.535 * DB loaded from append only file: 0.000 seconds
+redis-1       | 1:M 03 Aug 2026 09:16:57.555 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+redis-1       | 1:M 03 Aug 2026 09:16:57.556 * Ready to accept connections tcp
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:07.244Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-publisher"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:07.247Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"event-subscriber"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:07.247Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-subscriber"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:07.253Z","service":"metrial-realtime","level":"info","event":"server.started","host":"0.0.0.0","port":6001}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:32.757Z","service":"metrial-realtime","level":"info","event":"socket.connected","socket_id":"C3w-nClAmPp6VJ7_AAAE","user_id":"a269b30a-3180-403d-8996-e463f6b7780f","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","token_id":"3"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:32.758Z","service":"metrial-realtime","level":"info","event":"socket.connected","socket_id":"P_m-3EUSD4qk41GqAAAF","user_id":"a269b30a-a914-4bff-b95e-1c66ec066d20","tenant_id":"9c2c8e1f-ef39-4e61-b16c-5aed6c7099b6","token_id":"4"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:32.759Z","service":"metrial-realtime","level":"info","event":"socket.connected","socket_id":"W8jCPtHuqG8N-pbEAAAD","user_id":"a269b309-b7a9-468e-927a-c9cfd7c1745b","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","token_id":"2"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:32.852Z","service":"metrial-realtime","level":"warn","event":"room.subscription_denied","socket_id":"P_m-3EUSD4qk41GqAAAF","user_id":"a269b30a-a914-4bff-b95e-1c66ec066d20","tenant_id":"9c2c8e1f-ef39-4e61-b16c-5aed6c7099b6","error_code":"RESOURCE_FORBIDDEN"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:32.869Z","service":"metrial-realtime","level":"warn","event":"room.subscription_denied","socket_id":"C3w-nClAmPp6VJ7_AAAE","user_id":"a269b30a-3180-403d-8996-e463f6b7780f","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","error_code":"RESOURCE_FORBIDDEN"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:33.473Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"c5bafe1b-7288-439e-97b8-66cf5772d972","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:35.044Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"c5bafe1b-7288-439e-97b8-66cf5772d972","node_id":"realtime-b","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:36.590Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"43f9c831-53eb-47c2-a8c3-d3e9a5670514","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:38.182Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"aa72731a-5e5c-4c80-90d8-f54aedad1c25","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:39.774Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"f1e725fe-e98a-4f0a-be9f-c72f8b0efd9e","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:41.570Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-b","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:41.671Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-b","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:41.712Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-b","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:41.739Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-b","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:41.780Z","service":"metrial-realtime","level":"info","event":"event.duplicate_suppressed","event_id":"ee292ff0-fc86-467c-b21d-cc5df87a785a","node_id":"realtime-b","dedupe_claimed":false,"duplicate_suppressed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:53.777Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"9e2432d4-6a75-4290-af64-87291242525e","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:56.670Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"c0835d86-f6b6-4156-b755-263d0ff84446","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.001Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"command","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.001Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"command"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.002Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-publisher","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.002Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-publisher"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.002Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"event-subscriber","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.002Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"event-subscriber"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.003Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-subscriber","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.003Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-subscriber"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.006Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"command","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.008Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-publisher","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.008Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"adapter-subscriber","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:57.008Z","service":"metrial-realtime","level":"error","event":"redis.error","client":"event-subscriber","error_code":"Error"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:58.008Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"command"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:58.008Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-publisher"}
+realtime-b-1  | {"timestamp":"2026-08-03T09:16:58.008Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"adapter-subscriber"}
+internal-nginx-1  | /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+internal-nginx-1  | /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+internal-nginx-1  | /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+internal-nginx-1  | 10-listen-on-ipv6-by-default.sh: info: /etc/nginx/conf.d/default.conf is not a file or does not exist
+internal-nginx-1  | /docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+internal-nginx-1  | /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+internal-nginx-1  | 20-envsubst-on-templates.sh: Running envsubst on /etc/nginx/templates/default.conf.template to /etc/nginx/conf.d/default.conf
+internal-nginx-1  | /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+internal-nginx-1  | /docker-entrypoint.sh: Configuration complete; ready for start up
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.8","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authenticate","status":200,"body_bytes_sent":482,"request_time":0.330,"upstream_response_time":"0.330","upstream_status":"200","referer":"","user_agent":"node","request_id":"27fd32fbb5c99cb89f6f3128bd7a58ff"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:16:58.008Z","service":"metrial-realtime","level":"warn","event":"redis.reconnecting","client":"event-subscriber"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:16:58.009Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"command"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:16:58.009Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-publisher"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:16:58.010Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"adapter-subscriber"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:16:58.010Z","service":"metrial-realtime","level":"info","event":"redis.ready","client":"event-subscriber"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:16:58.563Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"b0b3cfa5-61ac-4f83-a81b-8fc6ef8dd2c6","event_name":"wallet.credited","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1      | {"timestamp":"2026-08-03T09:16:59.779Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"b8350962-9da2-40c6-ae48-762cb8ec7747","event_name":"security.session_revoked","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1      | {"timestamp":"2026-08-03T09:17:01.006Z","service":"metrial-realtime","level":"info","event":"socket.disconnected","socket_id":"W8jCPtHuqG8N-pbEAAAD","user_id":"a269b309-b7a9-468e-927a-c9cfd7c1745b","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","reason":"server namespace disconnect"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:17:01.006Z","service":"metrial-realtime","level":"info","event":"event.emitted","event_id":"20faa89d-7d43-4bba-b3d3-189045dd45a8","event_name":"security.all_sessions_revoked","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","node_id":"realtime-b","dedupe_claimed":true,"broadcast_performed":true}
+realtime-b-1      | {"timestamp":"2026-08-03T09:17:01.041Z","service":"metrial-realtime","level":"info","event":"socket.disconnected","socket_id":"C3w-nClAmPp6VJ7_AAAE","user_id":"a269b30a-3180-403d-8996-e463f6b7780f","tenant_id":"2f94cd75-27b6-4e51-b6e4-4ba8f923c99a","reason":"client namespace disconnect"}
+realtime-b-1      | {"timestamp":"2026-08-03T09:17:01.041Z","service":"metrial-realtime","level":"info","event":"socket.disconnected","socket_id":"P_m-3EUSD4qk41GqAAAF","user_id":"a269b30a-a914-4bff-b95e-1c66ec066d20","tenant_id":"9c2c8e1f-ef39-4e61-b16c-5aed6c7099b6","reason":"client namespace disconnect"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.7","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authenticate","status":200,"body_bytes_sent":455,"request_time":0.333,"upstream_response_time":"0.333","upstream_status":"200","referer":"","user_agent":"node","request_id":"64bbf07d4bdb121d92a2b0072a15a479"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.8","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authenticate","status":200,"body_bytes_sent":458,"request_time":0.332,"upstream_response_time":"0.332","upstream_status":"200","referer":"","user_agent":"node","request_id":"5f61f169e7f5766e1088db8d9ed59d03"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.8","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authenticate","status":200,"body_bytes_sent":454,"request_time":0.335,"upstream_response_time":"0.335","upstream_status":"200","referer":"","user_agent":"node","request_id":"e1d0a5e72e8abfb0735465f13109afa2"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.7","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authorize-resource","status":200,"body_bytes_sent":47,"request_time":0.024,"upstream_response_time":"0.024","upstream_status":"200","referer":"","user_agent":"node","request_id":"c449d2868d4e75256fa0d368bc3fb779"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.8","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authorize-resource","status":200,"body_bytes_sent":47,"request_time":0.028,"upstream_response_time":"0.028","upstream_status":"200","referer":"","user_agent":"node","request_id":"bf07af6b071cedfcc4d8da5800c6ddf9"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.8","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authorize-resource","status":403,"body_bytes_sent":86,"request_time":0.013,"upstream_response_time":"0.014","upstream_status":"403","referer":"","user_agent":"node","request_id":"8e2bd80f43d0c0bae320cd103ee403a9"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:32+00:00","remote_addr":"172.24.0.8","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authorize-resource","status":403,"body_bytes_sent":86,"request_time":0.012,"upstream_response_time":"0.012","upstream_status":"403","referer":"","user_agent":"node","request_id":"9463d89be4faafc007f9aab5c8b113d1"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:56+00:00","remote_addr":"172.24.0.7","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authenticate","status":200,"body_bytes_sent":456,"request_time":0.017,"upstream_response_time":"0.018","upstream_status":"200","referer":"","user_agent":"node","request_id":"8225d2f68749ec74f635d92aa90294a4"}
+internal-nginx-1  | {"time":"2026-08-03T09:16:59+00:00","remote_addr":"172.24.0.7","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authenticate","status":401,"body_bytes_sent":66,"request_time":0.014,"upstream_response_time":"0.014","upstream_status":"401","referer":"","user_agent":"node","request_id":"b67facd04018cc9883895a9f8764885c"}
+internal-nginx-1  | {"time":"2026-08-03T09:17:01+00:00","remote_addr":"172.24.0.8","x_forwarded_for":"","method":"POST","uri":"/api/internal/realtime/authenticate","status":401,"body_bytes_sent":66,"request_time":0.012,"upstream_response_time":"0.011","upstream_status":"401","referer":"","user_agent":"node","request_id":"24f632863d479067cdecf88b48baf604"}
+queue-1           | [0;36m[entrypoint][0m starting: supervisord -c /etc/supervisor/supervisord.conf
+queue-1           | 2026-08-03 09:16:00,332 INFO Included extra file "/etc/supervisor/conf.d/queue.conf" during parsing
+queue-1           | 2026-08-03 09:16:00,332 INFO Included extra file "/etc/supervisor/conf.d/queue.conf" during parsing
+queue-1           | 2026-08-03 09:16:00,336 INFO RPC interface 'supervisor' initialized
+queue-1           | 2026-08-03 09:16:00,336 INFO RPC interface 'supervisor' initialized
+queue-1           | 2026-08-03 09:16:00,336 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+queue-1           | 2026-08-03 09:16:00,336 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+queue-1           | 2026-08-03 09:16:00,336 INFO supervisord started with pid 1
+queue-1           | 2026-08-03 09:16:00,336 INFO supervisord started with pid 1
+queue-1           | 2026-08-03 09:16:01,339 INFO spawned: 'queue_00' with pid 10
+queue-1           | 2026-08-03 09:16:01,339 INFO spawned: 'queue_00' with pid 10
+queue-1           | 2026-08-03 09:16:01,340 INFO spawned: 'queue_01' with pid 11
+queue-1           | 2026-08-03 09:16:01,340 INFO spawned: 'queue_01' with pid 11
+queue-1           | 2026-08-03 09:16:07,284 INFO success: queue_00 entered RUNNING state, process has stayed up for > than 5 seconds (startsecs)
+queue-1           | 2026-08-03 09:16:07,284 INFO success: queue_00 entered RUNNING state, process has stayed up for > than 5 seconds (startsecs)
+queue-1           | 2026-08-03 09:16:07,284 INFO success: queue_01 entered RUNNING state, process has stayed up for > than 5 seconds (startsecs)
+queue-1           | 2026-08-03 09:16:07,284 INFO success: queue_01 entered RUNNING state, process has stayed up for > than 5 seconds (startsecs)
+mysql-1           | 2026-08-03 09:15:39+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.11-1.el9 started.
+mysql-1           | 2026-08-03 09:15:39+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+mysql-1           | 2026-08-03 09:15:39+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.11-1.el9 started.
+mysql-1           | 2026-08-03 09:15:39+00:00 [Note] [Entrypoint]: Initializing database files
+mysql-1           | 2026-08-03T09:15:39.582903Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+mysql-1           | 2026-08-03T09:15:39.584335Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.4.11) initializing of server in progress as process 80
+mysql-1           | 2026-08-03T09:15:39.599612Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+mysql-1           | 2026-08-03T09:15:41.134311Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+mysql-1           | 2026-08-03T09:15:44.404412Z 0 [Warning] [MY-010161] [Server] You need to use --log-bin to make --binlog-expire-logs-seconds work.
+mysql-1           | 2026-08-03T09:15:44.738794Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+mysql-1           | 2026-08-03T09:15:49.192148Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+mysql-1           | 2026-08-03 09:15:49+00:00 [Note] [Entrypoint]: Database files initialized
+mysql-1           | 2026-08-03 09:15:49+00:00 [Note] [Entrypoint]: Starting temporary server
+mysql-1           | 2026-08-03T09:15:49.266027Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+mysql-1           | 2026-08-03T09:15:49.522411Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.11) starting as process 130
+mysql-1           | 2026-08-03T09:15:49.554684Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+mysql-1           | 2026-08-03T09:15:50.478710Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+mysql-1           | 2026-08-03T09:15:51.132230Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+mysql-1           | 2026-08-03T09:15:51.132275Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+mysql-1           | 2026-08-03T09:15:51.143824Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+mysql-1           | 2026-08-03T09:15:51.165199Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.11'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+mysql-1           | 2026-08-03T09:15:51.165741Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: /var/run/mysqld/mysqlx.sock
+mysql-1           | 2026-08-03 09:15:51+00:00 [Note] [Entrypoint]: Temporary server started.
+mysql-1           | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+mysql-1           | 2026-08-03 09:15:53+00:00 [Note] [Entrypoint]: Creating database metrial_cluster
+mysql-1           | 2026-08-03 09:15:53+00:00 [Note] [Entrypoint]: Creating user metrial
+mysql-1           | 2026-08-03 09:15:53+00:00 [Note] [Entrypoint]: Giving user metrial access to schema metrial_cluster
+mysql-1           | 
+mysql-1           | 2026-08-03 09:15:53+00:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-testing-database.sh
+mysql-1           | [init] creating test database 'metrial_cluster_test' for user 'metrial'
+mysql-1           | [init] 'metrial_cluster_test' ready
+mysql-1           | 
+mysql-1           | 2026-08-03 09:15:53+00:00 [Note] [Entrypoint]: Stopping temporary server
+mysql-1           | 2026-08-03T09:15:53.967358Z 14 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.11).
+mysql-1           | 2026-08-03T09:15:55.415001Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+mysql-1           | 2026-08-03T09:15:55.415012Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+mysql-1           | 2026-08-03 09:15:55+00:00 [Note] [Entrypoint]: Temporary server stopped
+mysql-1           | 
+mysql-1           | 2026-08-03 09:15:55+00:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+mysql-1           | 
+mysql-1           | 2026-08-03T09:15:55.990649Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+mysql-1           | 2026-08-03T09:15:56.251606Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.11) starting as process 1
+mysql-1           | 2026-08-03T09:15:56.258381Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+mysql-1           | 2026-08-03T09:15:57.257829Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+mysql-1           | 2026-08-03T09:15:57.747988Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+mysql-1           | 2026-08-03T09:15:57.748014Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+mysql-1           | 2026-08-03T09:15:57.757636Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+mysql-1           | 2026-08-03T09:15:57.780014Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.11'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+mysql-1           | 2026-08-03T09:15:57.780411Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock

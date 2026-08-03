@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /home/metrial/Desktop/projects/Metrial/Metria-BaseCode/services/realtime
+
+ ✓ tests/integration/two-node-delivery.test.ts > two-node Socket.IO delivery gate > proves cross-instance delivery, dedupe, isolation, recovery, and revocation 28280ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  12:16:31
+   Duration  29.07s (transform 104ms, setup 0ms, collect 167ms, tests 28.67s, environment 0ms, prepare 75ms)
+

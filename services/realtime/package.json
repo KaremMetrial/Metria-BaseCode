@@ -1,0 +1,31 @@
+{
+  "name": "@metrial/realtime",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration:cluster": "bash tests/integration/run-two-node.sh",
+    "lint": "eslint src tests"
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "redis": "^5.8.3",
+    "socket.io": "^4.8.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.24.0",
+    "socket.io-client": "^4.8.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.30.1",
+    "vitest": "^3.1.2"
+  }
+}
