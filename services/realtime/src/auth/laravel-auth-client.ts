@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { RealtimeConfig } from "../config.js";
-import { identitySchema, type SocketIdentity } from "../types/realtime.js";
+import { identitySchema, type ResourceType, type SocketIdentity } from "../types/realtime.js";
 
 type AuthResult = { identity: SocketIdentity; assertion: string; expires_at: string };
 
@@ -26,7 +26,7 @@ export class LaravelAuthClient {
     });
   }
 
-  async authorizeResource(assertion: string, resourceType: "payment" | "wallet", resourceId: string): Promise<void> {
+  async authorizeResource(assertion: string, resourceType: ResourceType, resourceId: string): Promise<void> {
     await this.post(this.config.REALTIME_RESOURCE_AUTH_URL, { assertion, resource_type: resourceType, resource_id: resourceId }, () => undefined);
   }
 

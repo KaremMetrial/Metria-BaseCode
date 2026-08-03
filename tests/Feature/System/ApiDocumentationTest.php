@@ -39,5 +39,15 @@ class ApiDocumentationTest extends TestCase
         $this->assertTrue($operations->every(fn (array $operation) => ! empty($operation['operationId']) && ! empty($operation['tags'])));
         $this->assertSame([], collect($documents)->flatMap(fn (array $document) => array_keys($document['paths'] ?? []))
             ->filter(fn (string $path) => str_contains($path, 'internal/realtime'))->values()->all());
+
+        // Scramble's configured API server already includes the /api/v1 prefix,
+        // so published path keys are relative to that server URL.
+        $communicationMessage = $documents[0]['paths']['/communication/conversations/{conversation}/messages']['post'] ?? null;
+        $communicationSync = $documents[0]['paths']['/communication/conversations/{conversation}/sync']['get'] ?? null;
+        $this->assertIsArray($communicationMessage);
+        $this->assertIsArray($communicationSync);
+        $this->assertSame(['Communication'], $communicationMessage['tags']);
+        $this->assertStringContainsString('Socket.IO', (string) ($communicationMessage['description'] ?? ''));
+        $this->assertStringContainsString('authoritative cursor synchronization', (string) ($communicationSync['description'] ?? ''));
     }
 }

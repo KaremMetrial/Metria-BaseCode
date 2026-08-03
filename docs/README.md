@@ -37,6 +37,13 @@ Look things up here; you are not expected to read them front to back.
 | **[Troubleshooting](08-troubleshooting.md)** | Symptom → cause → fix for the failures you will actually hit |
 | **[Adopting & upgrading](09-adopting.md)** | Dropping this into an existing project; upgrading PHP/MySQL/Laravel |
 
+## Product architecture
+
+| Document | Answers |
+|---|---|
+| **[Communication platform architecture](communication/architecture.md)** | The Phase 1 design for the reusable, tenant-isolated communication engine; no implementation is included. |
+| **[Communication contract blueprint](communication/contract-blueprint.md)** | Mandatory Phase 1.5 REST, logical database, durable-event, and Socket.IO contracts before implementation. |
+
 ---
 
 ## Finding things fast

@@ -31,7 +31,12 @@ final class OperationDocumentation implements OperationTransformer
             $details[] = 'Requires the permission declared by the route middleware.';
         }
         if (collect($middleware)->contains(fn (string $m) => $m === 'idempotent')) {
-            $details[] = 'Send Idempotency-Key on retries; identical completed requests replay their stored response and concurrent use returns a conflict.';
+            $details[] = 'Send Idempotency-Key on retries; identical completed requests replay their stored response, concurrent use returns a conflict, and a key cannot be reused with different canonical request data.';
+        }
+        if (str_starts_with($route->uri(), 'api/v1/communication/conversations/') && str_ends_with($route->uri(), '/sync')) {
+            $details[] = 'This is the authoritative cursor synchronization endpoint; call it after reconnect, realtime:resync_required, or a sequence gap.';
+        } elseif (str_starts_with($route->uri(), 'api/v1/communication/') && strtolower($routeInfo->method) === 'post') {
+            $details[] = 'After commit, authorized Socket.IO clients may receive only a minimum-safe communication.* change hint. REST and MySQL remain authoritative; clients synchronize with the conversation cursor when needed.';
         }
         $operation->summary($this->summaryFor($routeInfo->method, $routeInfo->methodName() ?: 'operation'));
         $operation->description(implode(' ', $details));
@@ -55,7 +60,8 @@ final class OperationDocumentation implements OperationTransformer
             str_contains($controller, 'Media') => 'Media', str_contains($controller, 'Auth') || str_contains($controller, 'Otp') || str_contains($controller, 'Social') => 'Authentication',
             str_contains($controller, 'Role') => 'Roles and Permissions', str_contains($controller, 'Governance') || str_contains($uri, 'governance') => 'Governance',
             str_contains($controller, 'Territory') => 'Territories', str_contains($controller, 'Currency') => 'Currencies',
-            str_contains($controller, 'Webhook') => 'Webhooks', default => 'Platform',
+            str_contains($controller, 'Webhook') => 'Webhooks', str_contains($controller, 'Communication') => 'Communication',
+            default => 'Platform',
         };
     }
 }

@@ -1,10 +1,10 @@
-import type { RealtimeEvent, SocketIdentity } from "./types/realtime.js";
+import type { RealtimeEvent, ResourceType, SocketIdentity } from "./types/realtime.js";
 
 const safe = (value: string) => value.toLowerCase();
 export const Room = {
   user: (tenantId: string, userId: string) => `tenant:${safe(tenantId)}:user:${safe(userId)}`,
   tenant: (tenantId: string) => `tenant:${safe(tenantId)}`,
-  resource: (tenantId: string, type: "payment" | "wallet", id: string) => `tenant:${safe(tenantId)}:${type}:${safe(id)}`
+  resource: (tenantId: string, type: ResourceType, id: string) => "tenant:" + safe(tenantId) + ":" + type + ":" + safe(id)
 };
 
 export function automaticRooms(identity: SocketIdentity): string[] {

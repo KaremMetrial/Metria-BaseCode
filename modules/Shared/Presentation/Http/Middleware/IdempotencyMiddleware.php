@@ -40,7 +40,6 @@ class IdempotencyMiddleware
             throw new \UnexpectedValueException(__('core.expected_response_instance'));
         }
 
-
         $userId = $request->user()?->getAuthIdentifier();
         $scope = hash('sha256', implode('|', [
             $key,
@@ -49,6 +48,7 @@ class IdempotencyMiddleware
             is_scalar($userId) ? (string) $userId : '',
             (string) app(TenantManager::class)->id(),
         ]));
+        $fingerprint = $this->requestFingerprint($request);
 
         $ttlHours = config('core.idempotency.ttl_hours', 24);
         $ttlHoursInt = is_numeric($ttlHours) ? (int) $ttlHours : 24;
@@ -59,6 +59,20 @@ class IdempotencyMiddleware
             ->first();
 
         if ($existing) {
+            // Pre-fingerprint records are retained for backwards-compatible
+            // replay. Every new record binds the key to its canonical body,
+            // preventing accidental replay of a different durable command.
+            if (is_string($existing->request_fingerprint)
+                && ! hash_equals($existing->request_fingerprint, $fingerprint)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => [
+                        'code' => 'idempotency_key_reused',
+                        'message' => __('api.idempotency_in_flight'),
+                        'errors' => (object) [],
+                    ],
+                ], 409);
+            }
             if ($existing->response_body === null) {
                 return response()->json([
                     'success' => false,
@@ -79,6 +93,7 @@ class IdempotencyMiddleware
             $record = IdempotencyKey::query()->create([
                 'key' => $key,
                 'scope_hash' => $scope,
+                'request_fingerprint' => $fingerprint,
             ]);
         } catch (UniqueConstraintViolationException) {
             return response()->json([
@@ -105,5 +120,32 @@ class IdempotencyMiddleware
         }
 
         return $response;
+    }
+
+    private function requestFingerprint(Request $request): string
+    {
+        return hash('sha256', json_encode(
+            $this->canonicalize($request->all()),
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+        ));
+    }
+
+    private function canonicalize(mixed $value): mixed
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        if (array_is_list($value)) {
+            return array_map(fn (mixed $item): mixed => $this->canonicalize($item), $value);
+        }
+
+        ksort($value, SORT_STRING);
+
+        foreach ($value as $key => $item) {
+            $value[$key] = $this->canonicalize($item);
+        }
+
+        return $value;
     }
 }

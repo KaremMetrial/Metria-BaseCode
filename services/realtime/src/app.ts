@@ -121,6 +121,22 @@ export async function createRealtimeApp(config: RealtimeConfig) {
           }
         }
       }
+      if (event.name === "communication.membership.removed") {
+        const room = Room.resource(event.tenant_id, "conversation", event.payload.conversation_id);
+        const sockets = await io.in(room).fetchSockets();
+        for (const socket of sockets) {
+          if (socket.data.identity.sub === event.payload.actor_id) {
+            socket.emit("realtime:resync_required", { code: "MEMBERSHIP_REMOVED" });
+            socket.leave(room);
+          }
+        }
+        log.info("communication.membership_invalidated", {
+          event_id: event.id,
+          tenant_id: event.tenant_id,
+          conversation_id: event.payload.conversation_id,
+          actor_id: event.payload.actor_id
+        });
+      }
       io.to(roomsForAudience(event)).emit("realtime:event", event);
       log.info("event.emitted", { event_id: event.id, event_name: event.name, tenant_id: event.tenant_id, node_id: nodeId, dedupe_claimed: true, broadcast_performed: true });
     } catch (error) {

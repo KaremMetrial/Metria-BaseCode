@@ -40,6 +40,16 @@ class PermissionRegistry
                 'media.delete' => 'Delete Media',
             ],
         ],
+        'Communication' => [
+            'Conversations' => [
+                'communication.conversations.view' => 'View Conversations',
+                'communication.conversations.create' => 'Create Conversations',
+                'communication.conversations.manage' => 'Manage Conversations',
+            ],
+            'Messages' => [
+                'communication.messages.create' => 'Send Messages',
+            ],
+        ],
         'Webhooks' => [
             'Endpoints' => [
                 'webhooks.manage' => 'Manage Webhook Endpoints',

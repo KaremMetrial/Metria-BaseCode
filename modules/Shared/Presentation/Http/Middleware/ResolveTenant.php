@@ -19,14 +19,6 @@ class ResolveTenant
 
     public function handle(Request $request, Closure $next): Response
     {
-        if (! config('tenancy.enabled')) {
-            $response = $next($request);
-            if ($response instanceof Response) {
-                return $response;
-            }
-            throw new \UnexpectedValueException(__('core.expected_response_instance'));
-        }
-
         $user = $request->user();
         $userTenantId = null;
         if ($user !== null) {

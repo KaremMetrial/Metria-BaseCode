@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Sanctum\PersonalAccessToken;
 use Modules\Auth\Domain\Models\User;
+use Modules\Communication\Domain\Models\Conversation;
 use Modules\Payment\Domain\Models\Payment;
 use Modules\Shared\Infrastructure\Realtime\RealtimeAssertion;
 use Modules\Shared\Infrastructure\Realtime\RealtimeRequestSignature;
@@ -98,6 +99,7 @@ final class RealtimeAuthorizationController
             $resource = match ($type) {
                 'payment' => Payment::query()->withoutGlobalScopes()->find($id),
                 'wallet' => Wallet::query()->withoutGlobalScopes()->find($id),
+                'conversation' => Conversation::query()->withoutGlobalScopes()->find($id),
                 default => null,
             };
 

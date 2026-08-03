@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\RBAC\Infrastructure\Database\Seeders;
 
-use Modules\RBAC\Domain\Models\Role;
 use Illuminate\Database\Seeder;
+use Modules\RBAC\Domain\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -50,6 +50,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'governance.approvals.view', 'governance.approvals.decide',
             // Media
             'media.view', 'media.upload', 'media.delete', 'media.manage',
+            // Communication durable core
+            'communication.conversations.view', 'communication.conversations.create', 'communication.conversations.manage',
+            'communication.messages.create',
             // Webhooks
             'webhooks.view', 'webhooks.manage',
         ];
@@ -82,9 +85,11 @@ class RolesAndPermissionsSeeder extends Seeder
             ],
             'user' => [
                 'currencies.view', 'territories.view', 'zones.view', 'media.view', 'media.upload', 'payments.create',
+                'communication.conversations.view', 'communication.conversations.create', 'communication.messages.create',
             ],
             'customer' => [
                 'currencies.view', 'territories.view', 'zones.view', 'media.view', 'media.upload', 'payments.create',
+                'communication.conversations.view', 'communication.conversations.create', 'communication.messages.create',
             ],
         ];
 

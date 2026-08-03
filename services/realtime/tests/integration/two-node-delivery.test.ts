@@ -5,7 +5,7 @@ import { io, type Socket } from "socket.io-client";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 type UserFixture = { id: string; email: string; token: string; token_id?: string; second_token?: string; second_token_id?: string; wallet?: string };
-type Fixtures = { tenant_a: string; tenant_b: string; a1: UserFixture; a2: UserFixture; b1: UserFixture };
+type Fixtures = { tenant_a: string; tenant_b: string; conversation: string; a1: UserFixture; a2: UserFixture; b1: UserFixture };
 type Envelope = Record<string, unknown>;
 
 const fixtures = JSON.parse(process.env.REALTIME_CLUSTER_FIXTURES ?? "{}") as Fixtures;
@@ -19,6 +19,7 @@ const clusterDescribe = process.env.REALTIME_CLUSTER_FIXTURES ? describe.sequent
 
 class TestClient {
   readonly events: Envelope[] = [];
+  readonly resyncCodes: string[] = [];
   readonly disconnected: Promise<void>;
   nodeId = "";
   private readonly ready: Promise<void>;
@@ -32,13 +33,14 @@ class TestClient {
       this.socket.once("realtime:ready", (payload: { node_id?: string }) => { clearTimeout(timeout); this.nodeId = payload.node_id ?? ""; resolve(); });
     });
     this.socket.on("realtime:event", (event: Envelope) => this.events.push(event));
+    this.socket.on("realtime:resync_required", (payload: { code?: string }) => this.resyncCodes.push(payload.code ?? ""));
   }
 
   readonly socket: Socket;
 
   waitReady(): Promise<void> { return this.ready; }
 
-  subscribe(resourceType: "wallet" | "payment", resourceId: string): Promise<{ ok: boolean; code?: string }> {
+  subscribe(resourceType: "wallet" | "payment" | "conversation", resourceId: string): Promise<{ ok: boolean; code?: string }> {
     return new Promise((resolve) => this.socket.emit("resource:subscribe", { resource_type: resourceType, resource_id: resourceId }, resolve));
   }
 
@@ -71,6 +73,10 @@ function revokeToken(tokenId: string): void {
 
 function revokeUserTokens(userId: string): void {
   compose(["exec", "-T", "-e", `REALTIME_CLUSTER_USER_ID=${userId}`, "app", "php", "artisan", "tinker", "--execute", 'Laravel\\Sanctum\\PersonalAccessToken::query()->where("tokenable_type", Modules\\Auth\\Domain\\Models\\User::class)->where("tokenable_id", getenv("REALTIME_CLUSTER_USER_ID"))->delete();']);
+}
+
+function removeConversationMember(conversationId: string, userId: string): void {
+  compose(["exec", "-T", "-e", `REALTIME_CLUSTER_CONVERSATION_ID=${conversationId}`, "-e", `REALTIME_CLUSTER_USER_ID=${userId}`, "app", "php", "artisan", "tinker", "--execute", 'Modules\\Communication\\Domain\\Models\\Membership::query()->withoutGlobalScopes()->where("conversation_id", getenv("REALTIME_CLUSTER_CONVERSATION_ID"))->where("actor_id", getenv("REALTIME_CLUSTER_USER_ID"))->update(["state" => "left"]);']);
 }
 
 async function expectConnectionRejected(url: string, token: string): Promise<void> {
@@ -108,6 +114,26 @@ function securityEvent(id: string, name: "security.session_revoked" | "security.
   };
 }
 
+function communicationMessageEvent(id: string): Envelope {
+  return {
+    id, name: "communication.message.created", version: 1, occurred_at: new Date().toISOString(), tenant_id: fixtures.tenant_a,
+    audience: { type: "resource", resource_type: "conversation", resource_id: fixtures.conversation },
+    subject: { type: "message", id: crypto.randomUUID() },
+    payload: { conversation_id: fixtures.conversation, message_id: crypto.randomUUID(), sequence: 1, kind: "text", revision: 1, author_actor_id: fixtures.a1.id },
+    metadata: { correlation_id: id, causation_id: null, trace_id: null }
+  };
+}
+
+function membershipRemovedEvent(id: string): Envelope {
+  return {
+    id, name: "communication.membership.removed", version: 1, occurred_at: new Date().toISOString(), tenant_id: fixtures.tenant_a,
+    audience: { type: "resource", resource_type: "conversation", resource_id: fixtures.conversation },
+    subject: { type: "membership", id: fixtures.a2.id },
+    payload: { conversation_id: fixtures.conversation, actor_id: fixtures.a2.id, conversation_version: 2, state: "left" },
+    metadata: { correlation_id: id, causation_id: null, trace_id: null }
+  };
+}
+
 async function eventually(assertion: () => void | Promise<void>, timeoutMs = 8_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   let lastError: unknown;
@@ -134,6 +160,7 @@ clusterDescribe("two-node Socket.IO delivery gate", () => {
 
   beforeAll(async () => {
     expect(fixtures.a1?.token).toBeTypeOf("string");
+    expect(fixtures.conversation).toBeTypeOf("string");
     a1 = new TestClient("http://127.0.0.1:6101", fixtures.a1.token);
     a1Second = new TestClient("http://127.0.0.1:6102", fixtures.a1.second_token!);
     a2 = new TestClient("http://127.0.0.1:6102", fixtures.a2.token);
@@ -207,6 +234,24 @@ clusterDescribe("two-node Socket.IO delivery gate", () => {
     const afterRedisId = crypto.randomUUID();
     publish(walletEvent(afterRedisId, { type: "tenant" }));
     await eventually(() => { expect(a1.events).toHaveLength(2); expect(a2.events).toHaveLength(8); });
+
+    await expect(a1.subscribe("conversation", fixtures.conversation)).resolves.toEqual({ ok: true });
+    await expect(a2.subscribe("conversation", fixtures.conversation)).resolves.toEqual({ ok: true });
+    await expect(b1.subscribe("conversation", fixtures.conversation)).resolves.toEqual({ ok: false, code: "RESOURCE_FORBIDDEN" });
+    const communicationEventId = crypto.randomUUID();
+    publish(communicationMessageEvent(communicationEventId));
+    await eventually(() => { expect(a1.events).toHaveLength(3); expect(a2.events).toHaveLength(9); });
+    expect(a1.events[2]).toMatchObject({ id: communicationEventId, name: "communication.message.created", payload: { conversation_id: fixtures.conversation } });
+    expect(b1.events).toHaveLength(0);
+
+    removeConversationMember(fixtures.conversation, fixtures.a2.id);
+    publish(membershipRemovedEvent(crypto.randomUUID()));
+    await eventually(() => expect(a2.resyncCodes).toContain("MEMBERSHIP_REMOVED"));
+    await expect(a2.subscribe("conversation", fixtures.conversation)).resolves.toEqual({ ok: false, code: "RESOURCE_FORBIDDEN" });
+    const afterRemovalId = crypto.randomUUID();
+    publish(communicationMessageEvent(afterRemovalId));
+    await eventually(() => expect(a1.events).toHaveLength(5));
+    await assertStable([a1, a2, b1], [5, 9, 0]);
 
     revokeToken(fixtures.a1.token_id!);
     publish(securityEvent(crypto.randomUUID(), "security.session_revoked", fixtures.a1.token_id));

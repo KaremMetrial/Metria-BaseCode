@@ -23,4 +23,32 @@ describe("signed Redis transport", () => {
     const message = JSON.stringify({ payload: Buffer.from(serialized).toString("base64"), signature: crypto.createHmac("sha256", secret).update(serialized).digest("hex") });
     expect(() => verifyTransportMessage(message, secret)).toThrow();
   });
+
+  it("accepts only the strict minimum-safe communication message hint", () => {
+    const event = {
+      id: "33333333-3333-4333-8333-333333333333",
+      name: "communication.message.created",
+      version: 1,
+      occurred_at: "2026-08-03T00:00:00.000Z",
+      tenant_id: "11111111-1111-4111-8111-111111111111",
+      audience: { type: "resource", resource_type: "conversation", resource_id: "44444444-4444-4444-8444-444444444444" },
+      subject: { type: "message", id: "55555555-5555-4555-8555-555555555555" },
+      payload: {
+        conversation_id: "44444444-4444-4444-8444-444444444444",
+        message_id: "55555555-5555-4555-8555-555555555555",
+        sequence: 1,
+        kind: "text",
+        revision: 1,
+        author_actor_id: "22222222-2222-4222-8222-222222222222"
+      },
+      metadata: { correlation_id: null, causation_id: null, trace_id: null }
+    };
+    const serialized = JSON.stringify(event);
+    const message = JSON.stringify({ payload: Buffer.from(serialized).toString("base64"), signature: crypto.createHmac("sha256", secret).update(serialized).digest("hex") });
+
+    expect(verifyTransportMessage(message, secret)).toMatchObject({
+      name: "communication.message.created",
+      audience: { resource_type: "conversation" }
+    });
+  });
 });

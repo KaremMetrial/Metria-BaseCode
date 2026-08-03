@@ -25,3 +25,5 @@ php artisan scramble:export --api=webhooks --path=artifacts/openapi/webhooks.jso
 ```
 
 Use `Authorization: Bearer <Sanctum token>` for protected routes. Tenant-scoped operations resolve tenant context from the authenticated user; `X-Tenant-ID`/`X-Tenant` cannot switch a normal user to another tenant. Payment creation uses `Idempotency-Key` for safe retries. See [the realtime documentation](../realtime/architecture.md) for Socket.IO events.
+
+Communication create/send operations document their committed Socket.IO side effect in OpenAPI. The emitted communication event is only a minimum-safe change hint; clients use the documented conversation cursor-sync endpoint after reconnect, a resynchronization signal, or a sequence gap. See [the realtime documentation](../realtime/architecture.md) for transport guarantees.

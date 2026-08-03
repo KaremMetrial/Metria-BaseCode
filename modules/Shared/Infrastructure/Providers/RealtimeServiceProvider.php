@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Modules\Auth\Domain\Events\AllSessionsRevoked;
 use Modules\Auth\Domain\Events\UserSessionRevoked;
+use Modules\Communication\Domain\Events\CommunicationDomainEvent;
 use Modules\Payment\Domain\Events\PaymentFailed;
 use Modules\Payment\Domain\Events\PaymentRefunded;
 use Modules\Payment\Domain\Events\PaymentRefundFailed;
@@ -39,6 +40,7 @@ class RealtimeServiceProvider extends ServiceProvider
             WalletDebited::class,
             UserSessionRevoked::class,
             AllSessionsRevoked::class,
+            CommunicationDomainEvent::class,
         ] as $event) {
             Event::listen($event, RealtimeDomainEventListener::class);
         }

@@ -81,19 +81,27 @@ $a2 = $make("cluster-tenant-a-user-2", "cluster-a2@example.test");
 $b1 = $make("cluster-tenant-b", "cluster-b1@example.test");
 $tokenA1 = $a1["user"]->createToken("cluster-a1-one")->plainTextToken;
 $tokenA1Second = $a1["user"]->createToken("cluster-a1-two")->plainTextToken;
+$conversation = app(\Modules\Shared\Infrastructure\Tenancy\TenantManager::class)->runInContext($a1["tenantId"], function () use ($a1, $a2) {
+  return app(\Modules\Communication\Domain\Services\CommunicationService::class)->createConversation(
+    $a1["user"],
+    \Modules\Communication\Domain\Enums\ConversationType::Direct,
+    null,
+    [(string) $a2["user"]->id],
+  );
+});
 $walletView = \Spatie\Permission\Models\Permission::findOrCreate("wallets.view", "web");
 setPermissionsTeamId($a1["tenantId"]);
 $a2["user"]->fresh()->givePermissionTo($walletView);
 $tokenA2 = $a2["user"]->fresh()->createToken("cluster-a2")->plainTextToken;
 $tokenB1 = $b1["user"]->createToken("cluster-b1")->plainTextToken;
-echo json_encode(["tenant_a" => $a1["tenantId"], "tenant_b" => $b1["tenantId"], "a1" => ["id" => $a1["user"]->id, "email" => $a1["user"]->email, "token" => $tokenA1, "token_id" => explode("|", $tokenA1, 2)[0], "second_token" => $tokenA1Second, "second_token_id" => explode("|", $tokenA1Second, 2)[0], "wallet" => $a1["wallet"]->id], "a2" => ["id" => $a2["user"]->id, "email" => $a2["user"]->email, "token" => $tokenA2], "b1" => ["id" => $b1["user"]->id, "email" => $b1["user"]->email, "token" => $tokenB1, "wallet" => $b1["wallet"]->id]]);
+echo json_encode(["tenant_a" => $a1["tenantId"], "tenant_b" => $b1["tenantId"], "conversation" => $conversation->id, "a1" => ["id" => $a1["user"]->id, "email" => $a1["user"]->email, "token" => $tokenA1, "token_id" => explode("|", $tokenA1, 2)[0], "second_token" => $tokenA1Second, "second_token_id" => explode("|", $tokenA1Second, 2)[0], "wallet" => $a1["wallet"]->id], "a2" => ["id" => $a2["user"]->id, "email" => $a2["user"]->email, "token" => $tokenA2], "b1" => ["id" => $b1["user"]->id, "email" => $b1["user"]->email, "token" => $tokenB1, "wallet" => $b1["wallet"]->id]]);
 ' > "$fixture_stdout" 2> "$fixture_stderr"
 fixtures="$(< "$fixture_stdout")"
 
 log_step "11 validating fixtures"
 node -e '
 const fixture = JSON.parse(process.argv[1]);
-for (const path of [["tenant_a"], ["tenant_b"], ["a1", "id"], ["a1", "token"], ["a1", "second_token"], ["a2", "id"], ["a2", "token"], ["b1", "id"], ["b1", "token"], ["a1", "wallet"]]) {
+for (const path of [["tenant_a"], ["tenant_b"], ["conversation"], ["a1", "id"], ["a1", "token"], ["a1", "second_token"], ["a2", "id"], ["a2", "token"], ["b1", "id"], ["b1", "token"], ["a1", "wallet"]]) {
   let value = fixture;
   for (const key of path) value = value?.[key];
   if (typeof value !== "string" || value.trim() === "") throw new Error(`missing fixture ${path.join(".")}`);

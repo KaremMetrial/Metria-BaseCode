@@ -13,6 +13,9 @@ use Spatie\Permission\PermissionRegistrar;
 
 class QueueTenantProvider extends ServiceProvider
 {
+    /** @var array<int, int|string|null> */
+    private array $previousTenantIds = [];
+
     public function boot(): void
     {
         if (! config('core.queue_context_enabled', true)) {
@@ -26,6 +29,8 @@ class QueueTenantProvider extends ServiceProvider
         });
 
         Queue::before(function (JobProcessing $event) {
+            $this->previousTenantIds[] = app(TenantManager::class)->id();
+
             $payload = $event->job->payload();
             $tenantIdVal = $payload['tenant_id'] ?? null;
             $tenantId = (is_string($tenantIdVal) || is_int($tenantIdVal)) ? $tenantIdVal : null;
@@ -56,13 +61,14 @@ class QueueTenantProvider extends ServiceProvider
 
     private function resetTenantContext(): void
     {
-        app(TenantManager::class)->set(null);
+        $tenantId = array_pop($this->previousTenantIds);
+        app(TenantManager::class)->set($tenantId);
 
         if (class_exists(PermissionRegistrar::class)) {
             if (function_exists('setPermissionsTeamId')) {
-                setPermissionsTeamId(null);
+                setPermissionsTeamId($tenantId);
             }
-            $cacheKey = 'spatie.permission.cache.system';
+            $cacheKey = 'spatie.permission.cache.'.($tenantId ?? 'system');
             config(['permission.cache.key' => $cacheKey]);
 
             $registrar = app(PermissionRegistrar::class);
