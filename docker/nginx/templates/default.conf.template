@@ -1,0 +1,153 @@
+# =============================================================================
+# Laravel server block
+#
+# Rendered by the nginx entrypoint (envsubst) into /etc/nginx/conf.d/.
+# Only the ${NGINX_*} variables below are substituted — nginx's own runtime
+# variables ($uri, $request_id, …) are left untouched because the entrypoint
+# restricts substitution to names that actually exist in the environment.
+# =============================================================================
+
+upstream php_fpm {
+    server              ${NGINX_FPM_HOST}:${NGINX_FPM_PORT} max_fails=3 fail_timeout=10s;
+
+    # Connection reuse; pairs with `fastcgi_keep_conn on` in fastcgi-php.conf.
+    keepalive           32;
+    keepalive_timeout   60s;
+    keepalive_requests  1000;
+}
+
+server {
+    listen                  8080 default_server backlog=4096;
+    listen                  [::]:8080 default_server;
+
+    # HTTP/2 over cleartext. Browsers will still use HTTP/1.1 here; this makes
+    # the block correct as-is once TLS is terminated in front of (or by) nginx.
+    http2                   on;
+
+    server_name             ${NGINX_SERVER_NAME};
+
+    # Document root is public/ — never the project root. Application code,
+    # .env, vendor/ and storage/ are physically outside the served tree.
+    root                    ${NGINX_ROOT};
+    index                   index.php index.html;
+
+    charset                 utf-8;
+    client_max_body_size    100M;
+
+    include                 /etc/nginx/snippets/security-headers.conf;
+
+    # -------------------------------------------------------------------------
+    # Health endpoints
+    # -------------------------------------------------------------------------
+
+    # Edge liveness — answered by nginx alone, used by its own HEALTHCHECK.
+    location = /healthz {
+        access_log  off;
+        add_header  Content-Type text/plain always;
+        return      200 "healthy\n";
+    }
+
+    # Deep check — proves the FPM upstream is answering. Private networks only.
+    location = /healthz/php {
+        allow       127.0.0.1;
+        allow       10.0.0.0/8;
+        allow       172.16.0.0/12;
+        allow       192.168.0.0/16;
+        deny        all;
+
+        access_log  off;
+        include     fastcgi_params;
+        fastcgi_pass    php_fpm;
+        fastcgi_param   SCRIPT_NAME     /ping;
+        fastcgi_param   SCRIPT_FILENAME /ping;
+    }
+
+    # -------------------------------------------------------------------------
+    # Hardening — evaluated before the asset/PHP locations below
+    # -------------------------------------------------------------------------
+    include /etc/nginx/snippets/hardening.conf;
+
+    location = /favicon.ico { access_log off; log_not_found off; expires 7d; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    # -------------------------------------------------------------------------
+    # Build output — content-hashed by Vite, therefore safe to cache forever
+    # `^~` wins over the regex asset location below.
+    # -------------------------------------------------------------------------
+    # `expires` is deliberately NOT used here. It generates its own
+    # Cache-Control alongside the explicit add_header below, and the response
+    # then carries TWO conflicting Cache-Control headers — which caches are
+    # free to resolve either way. add_header alone emits exactly one.
+    location ^~ /build/ {
+        include     /etc/nginx/snippets/static-assets.conf;
+        add_header  Cache-Control "public, max-age=31536000, immutable" always;
+        try_files   $uri =404;
+    }
+
+    # -------------------------------------------------------------------------
+    # Other static files — unhashed names, so only a moderate TTL
+    # -------------------------------------------------------------------------
+    location ~* \.(?:css|js|mjs|json|map|jpg|jpeg|png|gif|ico|svg|webp|avif|bmp|woff|woff2|ttf|otf|eot|mp4|webm|ogv|mp3|ogg|wav|flac|pdf|zip)$ {
+        include     /etc/nginx/snippets/static-assets.conf;
+        add_header  Cache-Control "public, max-age=2592000" always;
+        try_files   $uri =404;
+    }
+
+    # -------------------------------------------------------------------------
+    # Application
+    # -------------------------------------------------------------------------
+    location / {
+        limit_req   zone=general burst=180 nodelay;
+        limit_conn  perip 96;
+
+        try_files   $uri $uri/ /index.php?$query_string;
+    }
+
+    # Stricter budget for credential endpoints. Adjust the paths to match the
+    # application's own routes.
+    location ~* ^/(?:login|register|password/(?:reset|email)|forgot-password|reset-password)$ {
+        limit_req   zone=auth burst=10 nodelay;
+
+        try_files   $uri $uri/ /index.php?$query_string;
+    }
+
+    location ^~ /api/ {
+        limit_req   zone=api burst=120 nodelay;
+        limit_conn  perip 96;
+
+        try_files   $uri $uri/ /index.php?$query_string;
+    }
+
+    # -------------------------------------------------------------------------
+    # PHP — index.php is the ONLY executable entry point.
+    # Must precede the catch-all `\.php$` rule below.
+    # -------------------------------------------------------------------------
+    location ~ ^/index\.php(/|$) {
+        fastcgi_pass    php_fpm;
+
+        include         /etc/nginx/snippets/fastcgi-php.conf;
+        include         /etc/nginx/snippets/security-headers.conf;
+
+        # `try_files $uri =404` guards against a mis-set root exposing the
+        # front controller of a different application.
+        try_files       $uri =404;
+    }
+
+    # Any other .php file — including one smuggled into storage/ or an upload
+    # directory — is served as 404 rather than executed.
+    location ~ \.php$ {
+        deny            all;
+        access_log      off;
+        return          404;
+    }
+
+    # -------------------------------------------------------------------------
+    # Errors
+    # -------------------------------------------------------------------------
+    error_page 500 502 503 504 /50x.html;
+
+    location = /50x.html {
+        root        /usr/share/nginx/html;
+        internal;
+    }
+}

@@ -1,0 +1,529 @@
+{
+  "info": {
+    "name": "Task Management API — v1",
+    "_postman_id": "b7c1f0e2-9a3d-4c58-9f21-3d5a7e8c1b04",
+    "description": "REST API for managing projects and tasks.\n\n## Getting started\n\n1. Import this collection **and** `postman_environment.json`.\n2. Select the *Task Management API — Local* environment.\n3. Run **Authentication → Login** (the seeded demo account is pre-filled).\n\nThe login and register requests capture the returned token into the `token`\nenvironment variable automatically, and every other request inherits collection-level\nbearer auth. You never need to copy a token by hand.\n\n## Response envelope\n\nEvery response uses the same shape:\n\n```json\n{ \"success\": true,  \"message\": \"...\", \"data\": {} }\n{ \"success\": false, \"message\": \"...\", \"errors\": {} }\n```\n\n## Ownership\n\nA project or task belonging to another user returns **404**, never 403 — a 403 would\nconfirm the record exists and allow ID enumeration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Fail fast with a readable message rather than a confusing 404.",
+          "if (!pm.environment.get('base_url')) {",
+          "    throw new Error('No environment selected. Import postman_environment.json and select it.');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Applies to every request in the collection.",
+          "pm.test('Response is JSON', () => {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});",
+          "",
+          "pm.test('Response uses the standard envelope', () => {",
+          "    const body = pm.response.json();",
+          "    pm.expect(body).to.have.property('success');",
+          "    pm.expect(body).to.have.property('message');",
+          "    pm.expect(body).to.have.property(body.success ? 'data' : 'errors');",
+          "});",
+          "",
+          "if (pm.response.code === 401) {",
+          "    console.warn('401 — run Authentication → Login to refresh the token.');",
+          "}"
+        ]
+      }
+    }
+  ],
+
+  "variable": [
+    { "key": "project_id", "value": "1", "type": "string" },
+    { "key": "task_id", "value": "1", "type": "string" }
+  ],
+
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Registration, login and token lifecycle.",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.environment.set('token', data.token);",
+                  "    pm.environment.set('user_id', data.user.id);",
+                  "    pm.test('Token captured', () => pm.expect(data.token).to.be.a('string'));",
+                  "    pm.test('Password is never returned', () => {",
+                  "        pm.expect(pm.response.text()).to.not.include('$2y$');",
+                  "        pm.expect(data.user).to.not.have.property('password');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ada Lovelace\",\n  \"email\": \"ada+{{$timestamp}}@example.com\",\n  \"password\": \"Str0ng!Passphrase22\",\n  \"password_confirmation\": \"Str0ng!Passphrase22\",\n  \"device_name\": \"postman\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "description": "Creates an account and returns its first token.\n\n`{{$timestamp}}` keeps the email unique so the request can be re-run without hitting the uniqueness rule.\n\nPassword rules: min 8 chars, mixed case, a number, and not present in a known breach corpus."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.environment.set('token', data.token);",
+                  "    pm.environment.set('user_id', data.user.id);",
+                  "    console.log('Token stored for user ' + data.user.email);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demo_email}}\",\n  \"password\": \"{{demo_password}}\",\n  \"device_name\": \"postman\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Start here. Uses the seeded demo account.\n\nAn unknown email and a wrong password return the identical 422, so the endpoint cannot be used to discover which addresses are registered.\n\nRate limited to 5 attempts per minute per email + IP."
+          }
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/me", "host": ["{{base_url}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "Logout (this device)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/logout", "host": ["{{base_url}}"], "path": ["auth", "logout"] },
+            "description": "Revokes only the token used for this request. Other sessions stay signed in."
+          }
+        },
+        {
+          "name": "Logout (all devices)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/logout-all", "host": ["{{base_url}}"], "path": ["auth", "logout-all"] },
+            "description": "Revokes every token for the user and reports how many were removed."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "List projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Paginated', () => {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('meta');",
+                  "    pm.expect(body).to.have.property('links');",
+                  "});",
+                  "",
+                  "const data = pm.response.json().data;",
+                  "if (data && data.length) { pm.environment.set('project_id', data[0].id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects?per_page=15&sort=-created_at",
+              "host": ["{{base_url}}"],
+              "path": ["projects"],
+              "query": [
+                { "key": "per_page", "value": "15", "description": "1-100. Default 15." },
+                { "key": "sort", "value": "-created_at", "description": "name | status | created_at | updated_at. Prefix - for desc." },
+                { "key": "status", "value": "active", "disabled": true },
+                { "key": "search", "value": "redesign", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true }
+              ]
+            },
+            "description": "Returns only your own projects. Stores the first project's id in `project_id` for the requests below."
+          }
+        },
+        {
+          "name": "Create project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('project_id', pm.response.json().data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Website Redesign\",\n  \"description\": \"Rebuild the marketing site with a new design system.\",\n  \"status\": \"active\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/projects", "host": ["{{base_url}}"], "path": ["projects"] },
+            "description": "`user_id` in the body is ignored — ownership always comes from the token."
+          }
+        },
+        {
+          "name": "Get project",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects/{{project_id}}", "host": ["{{base_url}}"], "path": ["projects", "{{project_id}}"] }
+          }
+        },
+        {
+          "name": "Update project (partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"completed\"\n}" },
+            "url": { "raw": "{{base_url}}/projects/{{project_id}}", "host": ["{{base_url}}"], "path": ["projects", "{{project_id}}"] },
+            "description": "Only the fields you send are changed.\n\nAn archived project returns **409** for content edits; a status-only change is allowed, which is how you reopen it."
+          }
+        },
+        {
+          "name": "Delete project",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects/{{project_id}}", "host": ["{{base_url}}"], "path": ["projects", "{{project_id}}"] },
+            "description": "Soft delete. The project's tasks are soft-deleted with it, in one transaction."
+          }
+        },
+        {
+          "name": "List tasks in project",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/tasks?per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "tasks"],
+              "query": [
+                { "key": "per_page", "value": "15" },
+                { "key": "status", "value": "pending", "disabled": true },
+                { "key": "overdue", "value": "true", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "List tasks",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json().data;",
+                  "if (data && data.length) { pm.environment.set('task_id', data[0].id); }",
+                  "",
+                  "pm.test('Project is embedded (no N+1 on the client side either)', () => {",
+                  "    if (data && data.length) { pm.expect(data[0]).to.have.property('project'); }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/tasks?per_page=15&sort=-priority,due_date",
+              "host": ["{{base_url}}"],
+              "path": ["tasks"],
+              "query": [
+                { "key": "per_page", "value": "15" },
+                { "key": "sort", "value": "-priority,due_date", "description": "title|status|priority|due_date|created_at|updated_at|completed_at" },
+                { "key": "status", "value": "pending,in_progress", "disabled": true, "description": "Single, comma-separated, or repeated status[]=" },
+                { "key": "priority", "value": "urgent", "disabled": true },
+                { "key": "project_id", "value": "{{project_id}}", "disabled": true },
+                { "key": "search", "value": "migration", "disabled": true },
+                { "key": "overdue", "value": "true", "disabled": true, "description": "Past due AND still open" },
+                { "key": "due_from", "value": "2026-01-01", "disabled": true },
+                { "key": "due_to", "value": "2026-12-31", "disabled": true }
+              ]
+            },
+            "description": "All your tasks across every project. Enable the disabled query params to explore filtering."
+          }
+        },
+        {
+          "name": "Create task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.environment.set('task_id', pm.response.json().data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_id\": {{project_id}},\n  \"title\": \"Write the migration\",\n  \"description\": \"With the right indexes.\",\n  \"status\": \"pending\",\n  \"priority\": \"high\",\n  \"due_date\": \"2026-12-01\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/tasks", "host": ["{{base_url}}"], "path": ["tasks"] },
+            "description": "A `project_id` you do not own returns **404** (not 403), so the endpoint reveals nothing about which IDs exist.\n\nAn archived project returns **409**."
+          }
+        },
+        {
+          "name": "Get task",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/tasks/{{task_id}}", "host": ["{{base_url}}"], "path": ["tasks", "{{task_id}}"] }
+          }
+        },
+        {
+          "name": "Complete task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('completed_at is set automatically', () => {",
+                  "    const task = pm.response.json().data;",
+                  "    pm.expect(task.status.value).to.eql('completed');",
+                  "    pm.expect(task.completed_at).to.not.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"completed\"\n}" },
+            "url": { "raw": "{{base_url}}/tasks/{{task_id}}", "host": ["{{base_url}}"], "path": ["tasks", "{{task_id}}"] },
+            "description": "`completed_at` is derived from `status`, never accepted from the client — set on completion, cleared when reopened, preserved across unrelated edits."
+          }
+        },
+        {
+          "name": "Move task to another project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"project_id\": {{project_id}}\n}" },
+            "url": { "raw": "{{base_url}}/tasks/{{task_id}}", "host": ["{{base_url}}"], "path": ["tasks", "{{task_id}}"] },
+            "description": "Allowed only between projects you own, and never into an archived one."
+          }
+        },
+        {
+          "name": "Delete task",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/tasks/{{task_id}}", "host": ["{{base_url}}"], "path": ["tasks", "{{task_id}}"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Statistics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('All metrics present', () => {",
+                  "    const d = pm.response.json().data;",
+                  "    ['projects', 'tasks', 'tasks_by_priority', 'completion_rate'].forEach(k =>",
+                  "        pm.expect(d).to.have.property(k));",
+                  "    ['total', 'completed', 'pending', 'overdue'].forEach(k =>",
+                  "        pm.expect(d.tasks).to.have.property(k));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/dashboard", "host": ["{{base_url}}"], "path": ["dashboard"] },
+            "description": "Aggregated in the database — three queries regardless of data volume."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Error cases",
+      "description": "Requests that are supposed to fail, so the error contract can be checked.",
+      "item": [
+        {
+          "name": "401 — no token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects", "host": ["{{base_url}}"], "path": ["projects"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('401', () => pm.response.to.have.status(401));"] }
+            }
+          ]
+        },
+        {
+          "name": "404 — someone else's project",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects/999999", "host": ["{{base_url}}"], "path": ["projects", "999999"] },
+            "description": "404 rather than 403 — deliberately indistinguishable from 'does not exist'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('404', () => pm.response.to.have.status(404));"] }
+            }
+          ]
+        },
+        {
+          "name": "422 — validation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"x\"\n}" },
+            "url": { "raw": "{{base_url}}/projects", "host": ["{{base_url}}"], "path": ["projects"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));",
+                  "pm.test('Field-keyed errors', () => pm.expect(pm.response.json().errors).to.have.property('name'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "405 — wrong method",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects", "host": ["{{base_url}}"], "path": ["projects"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('405', () => pm.response.to.have.status(405));"] }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

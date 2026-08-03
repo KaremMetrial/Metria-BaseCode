@@ -1,0 +1,24 @@
+services:
+  mysql:
+    volumes: !reset []
+    tmpfs:
+      - /var/lib/mysql:rw,size=1g
+    command:
+      - --innodb-flush-log-at-trx-commit=0
+      - --innodb-doublewrite=0
+      - --skip-log-bin
+
+  redis:
+    volumes: !reset []
+    tmpfs:
+      - /data:rw,size=256m,uid=999,gid=999
+
+  app:
+    volumes:
+      - .:/var/www/html
+
+  queue:
+    profiles: [disabled]
+
+  scheduler:
+    profiles: [disabled]

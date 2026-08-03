@@ -1,0 +1,233 @@
+services:
+  mysql:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/mysql:${IMAGE_TAG:-latest}"
+    build:
+      context: .
+      dockerfile: docker/mysql/Dockerfile
+      args:
+        MYSQL_VERSION: "${MYSQL_VERSION:-8.4}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_TEST_DATABASE: "${DB_TEST_DATABASE}"
+      TZ: "${TZ:-UTC}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_logs:/var/log/mysql
+    networks: [backend]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETGID, SETUID, DAC_OVERRIDE]
+    logging:
+      driver: "${LOG_DRIVER:-json-file}"
+      options:
+        max-size: "${LOG_MAX_SIZE:-10m}"
+        max-file: "${LOG_MAX_FILE:-5}"
+
+  redis:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/redis:${IMAGE_TAG:-latest}"
+    build:
+      context: .
+      dockerfile: docker/redis/Dockerfile
+      args:
+        REDIS_VERSION: "${REDIS_VERSION:-8}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    environment:
+      APP_ENV: "${APP_ENV:-local}"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_MAXMEMORY: "${REDIS_MAXMEMORY:-512mb}"
+      TZ: "${TZ:-UTC}"
+    volumes:
+      - redis_data:/data
+    networks: [backend]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: "${LOG_DRIVER:-json-file}"
+      options:
+        max-size: "${LOG_MAX_SIZE:-10m}"
+        max-file: "${LOG_MAX_FILE:-5}"
+
+  app:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/app:${IMAGE_TAG:-latest}"
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: development
+      args:
+        PHP_VERSION: "${PHP_VERSION:-8.4}"
+        COMPOSER_VERSION: "${COMPOSER_VERSION:-2.8}"
+        NODE_VERSION: "${NODE_VERSION:-22}"
+        UID: "${UID:-1000}"
+        GID: "${GID:-1000}"
+        USER: "${DOCKER_USER:-app}"
+        TZ: "${TZ:-UTC}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    environment: &app_environment
+      APP_ENV: "${APP_ENV:-local}"
+      APP_DEBUG: "${APP_DEBUG:-true}"
+      APP_URL: "${APP_URL:-http://localhost}"
+      LOG_CHANNEL: "${LOG_CHANNEL:-stderr}"
+      LOG_LEVEL: "${LOG_LEVEL:-debug}"
+      DB_CONNECTION: "${DB_CONNECTION:-mysql}"
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: "${DB_DATABASE}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      REDIS_CLIENT: "${REDIS_CLIENT:-phpredis}"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      CACHE_STORE: "${CACHE_STORE:-redis}"
+      SESSION_DRIVER: "${SESSION_DRIVER:-redis}"
+      QUEUE_CONNECTION: "${QUEUE_CONNECTION:-redis}"
+      XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
+      PHP_IDE_CONFIG: "serverName=${XDEBUG_SERVER_NAME:-laravel}"
+      TZ: "${TZ:-UTC}"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [edge, backend]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: "${LOG_DRIVER:-json-file}"
+      options:
+        max-size: "${LOG_MAX_SIZE:-10m}"
+        max-file: "${LOG_MAX_FILE:-5}"
+
+  nginx:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/nginx:${IMAGE_TAG:-latest}"
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+      target: base
+      args:
+        NGINX_VERSION: "${NGINX_VERSION:-1.29}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    environment:
+      NGINX_SERVER_NAME: "${NGINX_SERVER_NAME:-_}"
+      NGINX_FPM_HOST: "${NGINX_FPM_HOST:-app}"
+      NGINX_FPM_PORT: "${NGINX_FPM_PORT:-9000}"
+      NGINX_ROOT: "${NGINX_ROOT:-/var/www/html/public}"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [edge]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,mode=1777,size=64m
+      - /etc/nginx/conf.d:rw,mode=1777,size=4m
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: "${LOG_DRIVER:-json-file}"
+      options:
+        max-size: "${LOG_MAX_SIZE:-10m}"
+        max-file: "${LOG_MAX_FILE:-5}"
+
+  queue:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/app:${IMAGE_TAG:-latest}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    command: [supervisord, -c, /etc/supervisor/supervisord.conf]
+    environment:
+      <<: *app_environment
+      SUPERVISOR_ROLE: queue
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [edge, backend]
+    stop_grace_period: 130s
+    healthcheck:
+      test: [CMD, supervisor-healthcheck]
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+  scheduler:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/app:${IMAGE_TAG:-latest}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    command: [supervisord, -c, /etc/supervisor/supervisord.conf]
+    environment:
+      <<: *app_environment
+      SUPERVISOR_ROLE: scheduler
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [edge, backend]
+    stop_grace_period: 100s
+    healthcheck:
+      test: [CMD, supervisor-healthcheck]
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+  composer:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/composer:${IMAGE_TAG:-latest}"
+    build:
+      context: .
+      dockerfile: docker/composer/Dockerfile
+      args:
+        PHP_VERSION: "${PHP_VERSION:-8.4}"
+        COMPOSER_VERSION: "${COMPOSER_VERSION:-2.8}"
+        UID: "${UID:-1000}"
+        GID: "${GID:-1000}"
+        USER: "${DOCKER_USER:-app}"
+    profiles: [tools]
+    volumes:
+      - .:/var/www/html
+      - composer_cache:/tmp/composer/cache
+    networks: [edge]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+  npm:
+    image: "${COMPOSE_PROJECT_NAME:-laravel}/node:${IMAGE_TAG:-latest}"
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+      args:
+        NODE_VERSION: "${NODE_VERSION:-22}"
+        UID: "${UID:-1000}"
+        GID: "${GID:-1000}"
+    profiles: [frontend, tools]
+    volumes:
+      - .:/var/www/html
+      - node_modules:/var/www/html/node_modules
+      - node_cache:/home/node/.npm
+    networks: [edge]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+networks:
+  edge:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+volumes:
+  mysql_data:
+  mysql_logs:
+  redis_data:
+  composer_cache:
+  node_modules:
+  node_cache:
+  app_storage:

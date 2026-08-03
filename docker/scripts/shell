@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Open a shell inside a service container.
+#
+#   docker/scripts/shell            # app, as the unprivileged app user
+#   docker/scripts/shell nginx
+#   docker/scripts/shell mysql
+#   ROOT=1 docker/scripts/shell     # app, as root (debugging only)
+# =============================================================================
+source "$(dirname -- "${BASH_SOURCE[0]}")/_common.sh"
+
+SERVICE="${1:-app}"
+require_running "${SERVICE}"
+
+USER_FLAG=()
+[[ "${ROOT:-0}" == "1" ]] && USER_FLAG=(-u 0)
+
+# NOTE: `dc` is a shell function (see _common.sh), so it must NOT be prefixed
+# with `exec` — exec only replaces the shell with an EXTERNAL program and would
+# silently run /usr/bin/dc, the GNU desk calculator.
+#
+# nginx-unprivileged and redis ship without bash; fall back to sh.
+if dc exec "${USER_FLAG[@]}" -T "${SERVICE}" test -x /bin/bash 2>/dev/null; then
+    dc exec "${USER_FLAG[@]}" "${SERVICE}" bash
+    exit $?
+fi
+
+dc exec "${USER_FLAG[@]}" "${SERVICE}" sh

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Follow container logs.
+#
+#   docker/scripts/logs             # everything
+#   docker/scripts/logs nginx
+#   docker/scripts/logs queue scheduler
+#   LINES=500 docker/scripts/logs app
+# =============================================================================
+source "$(dirname -- "${BASH_SOURCE[0]}")/_common.sh"
+
+dc logs -f --tail="${LINES:-100}" "$@"

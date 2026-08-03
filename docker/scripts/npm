@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# =============================================================================
+# npm wrapper
+#
+#   docker/scripts/npm install
+#   docker/scripts/npm run build
+#   docker/scripts/npm run dev        # prefer `make dev` for HMR + port mapping
+# =============================================================================
+source "$(dirname -- "${BASH_SOURCE[0]}")/_common.sh"
+
+dc run --rm $(tty_flag) npm "$@"

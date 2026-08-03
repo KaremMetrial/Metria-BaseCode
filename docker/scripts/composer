@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Composer wrapper — runs in the dedicated Composer container, whose PHP
+# extension set mirrors the runtime so platform requirements resolve correctly.
+#
+#   docker/scripts/composer install
+#   docker/scripts/composer require laravel/horizon
+#   docker/scripts/composer validate --strict
+# =============================================================================
+source "$(dirname -- "${BASH_SOURCE[0]}")/_common.sh"
+
+dc run --rm $(tty_flag) composer "$@"

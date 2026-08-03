@@ -1,0 +1,88 @@
+services:
+  mysql:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "${DB_CPU_LIMIT:-4}"
+          memory: "${DB_MEMORY_LIMIT:-4g}"
+        reservations:
+          memory: "${DB_MEMORY_RESERVATION:-1g}"
+
+  redis:
+    restart: always
+    read_only: true
+    tmpfs:
+      - /tmp:rw,mode=1777,size=64m
+    deploy:
+      resources:
+        limits:
+          cpus: "${REDIS_CPU_LIMIT:-1}"
+          memory: "${REDIS_MEMORY_LIMIT:-1g}"
+
+  app:
+    build:
+      target: production
+    restart: always
+    read_only: true
+    volumes:
+      - app_storage:/var/www/html/storage
+    environment:
+      APP_KEY: "${APP_KEY:?APP_KEY is required for production}"
+      APP_ENV: production
+      APP_DEBUG: "false"
+    tmpfs:
+      - /tmp:rw,mode=1777,size=64m
+    deploy:
+      resources:
+        limits:
+          cpus: "${APP_CPU_LIMIT:-2}"
+          memory: "${APP_MEMORY_LIMIT:-1g}"
+        reservations:
+          memory: "${APP_MEMORY_RESERVATION:-256m}"
+
+  nginx:
+    build:
+      target: production
+      additional_contexts:
+        app_image: "service:app"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "${NGINX_CPU_LIMIT:-1}"
+          memory: "${NGINX_MEMORY_LIMIT:-256m}"
+
+  queue:
+    restart: always
+    read_only: true
+    volumes:
+      - app_storage:/var/www/html/storage
+    environment:
+      APP_KEY: "${APP_KEY:?APP_KEY is required for production}"
+      APP_ENV: production
+      APP_DEBUG: "false"
+    tmpfs:
+      - /tmp:rw,mode=1777,size=64m
+    deploy:
+      resources:
+        limits:
+          cpus: "${QUEUE_CPU_LIMIT:-2}"
+          memory: "${QUEUE_MEMORY_LIMIT:-1g}"
+
+  scheduler:
+    restart: always
+    read_only: true
+    volumes:
+      - app_storage:/var/www/html/storage
+    environment:
+      APP_KEY: "${APP_KEY:?APP_KEY is required for production}"
+      APP_ENV: production
+      APP_DEBUG: "false"
+    tmpfs:
+      - /tmp:rw,mode=1777,size=64m
+    deploy:
+      resources:
+        limits:
+          cpus: "${SCHEDULER_CPU_LIMIT:-1}"
+          memory: "${SCHEDULER_MEMORY_LIMIT:-512m}"

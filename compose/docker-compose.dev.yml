@@ -1,0 +1,36 @@
+services:
+  mysql:
+    ports:
+      - "127.0.0.1:${FORWARD_DB_PORT:-3307}:3306"
+
+  redis:
+    ports:
+      - "127.0.0.1:${FORWARD_REDIS_PORT:-6380}:6379"
+
+  app:
+    volumes:
+      - .:/var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  nginx:
+    ports:
+      - "${APP_PORT:-80}:8080"
+    volumes:
+      - ./public:/var/www/html/public:ro
+
+  queue:
+    volumes:
+      - .:/var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  scheduler:
+    volumes:
+      - .:/var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  npm:
+    ports:
+      - "${VITE_PORT:-5173}:5173"

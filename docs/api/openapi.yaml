@@ -1,0 +1,1010 @@
+openapi: 3.0.3
+
+info:
+  title: Task Management API
+  version: "1.0.0"
+  description: |
+    A REST API for managing projects and the tasks inside them.
+
+    ## Response envelope
+
+    Every response — success or failure — uses the same envelope, so a client
+    never has to branch on shape before it can read a status.
+
+    Success:
+    ```json
+    { "success": true, "message": "...", "data": { } }
+    ```
+
+    Error:
+    ```json
+    { "success": false, "message": "...", "errors": { } }
+    ```
+
+    Paginated collections add top-level `meta` and `links` objects alongside
+    `data`.
+
+    ## Authentication
+
+    Laravel Sanctum personal access tokens. Obtain one from
+    `POST /auth/register` or `POST /auth/login`, then send it on every
+    subsequent request:
+
+    ```
+    Authorization: Bearer 1|abcdef...
+    ```
+
+    ## Ownership
+
+    Every project and task belongs to exactly one user. A request for a record
+    owned by somebody else returns **404**, not 403 — a 403 would confirm the
+    record exists and let an attacker enumerate other users' IDs.
+
+    ## Rate limits
+
+    | Scope | Limit |
+    |---|---|
+    | Authenticated requests | 120 / minute per user |
+    | Unauthenticated requests | 30 / minute per IP |
+    | `auth/login`, `auth/register` | 5 / minute per email + IP |
+
+    Exceeding a limit returns **429**.
+
+  contact:
+    name: API Support
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost/api/v1
+    description: Local development
+  - url: https://api.example.com/api/v1
+    description: Production
+
+tags:
+  - name: Authentication
+    description: Registration, login and token lifecycle.
+  - name: Projects
+    description: Project CRUD, filtering and pagination.
+  - name: Tasks
+    description: Task CRUD, filtering and pagination.
+  - name: Dashboard
+    description: Aggregated statistics for the authenticated user.
+
+security:
+  - bearerAuth: []
+
+# =============================================================================
+# Paths
+# =============================================================================
+paths:
+
+  # ---------------------------------------------------------------------------
+  # Authentication
+  # ---------------------------------------------------------------------------
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a new account
+      description: Creates a user and returns their first access token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, password_confirmation]
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 255
+                  example: Ada Lovelace
+                email:
+                  type: string
+                  format: email
+                  maxLength: 255
+                  description: Normalised to lowercase before storage.
+                  example: ada@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: >
+                    Must contain upper and lower case letters and a number, and
+                    must not appear in a known breach corpus.
+                  example: Str0ng!Passphrase22
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: Str0ng!Passphrase22
+                device_name:
+                  type: string
+                  maxLength: 255
+                  description: Labels the token so a user can tell sessions apart.
+                  example: iphone-15
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/AuthPayload"
+              example:
+                success: true
+                message: Account created successfully.
+                data:
+                  user:
+                    id: 1
+                    name: Ada Lovelace
+                    email: ada@example.com
+                    email_verified_at: null
+                    created_at: "2026-07-31T18:04:24+00:00"
+                    updated_at: "2026-07-31T18:04:24+00:00"
+                  token: "1|9xLNRACed2JVxKuUxyy61ptMv0kOYgZCkCi93aBc"
+                  token_type: Bearer
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Exchange credentials for a token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: demo@example.com
+                password:
+                  type: string
+                  format: password
+                  example: Password123!
+                device_name:
+                  type: string
+                  example: iphone-15
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/AuthPayload"
+        "422":
+          description: |
+            Invalid credentials. Deliberately identical whether the email is
+            unknown or the password is wrong, so the endpoint cannot be used to
+            discover which addresses are registered.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+              example:
+                success: false
+                message: The given data was invalid.
+                errors:
+                  email: ["The provided credentials are incorrect."]
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/me:
+    get:
+      tags: [Authentication]
+      summary: The authenticated user
+      responses:
+        "200":
+          description: The current user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/User" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Revoke the current token
+      description: >
+        Revokes only the token used for this request, so signing out on one
+        device leaves other sessions intact.
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessEnvelope" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /auth/logout-all:
+    post:
+      tags: [Authentication]
+      summary: Revoke every token
+      description: Signs the user out on all devices.
+      responses:
+        "200":
+          description: All tokens revoked
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          revoked_tokens: { type: integer, example: 3 }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  # ---------------------------------------------------------------------------
+  # Projects
+  # ---------------------------------------------------------------------------
+  /projects:
+    get:
+      tags: [Projects]
+      summary: List projects
+      description: Returns only the authenticated user's projects.
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/ProjectStatusValue" }
+          example: active
+        - name: search
+          in: query
+          description: Case-insensitive match on name or description. LIKE wildcards are escaped.
+          schema: { type: string, maxLength: 255 }
+          example: redesign
+        - name: sort
+          in: query
+          description: >
+            Comma-separated. Prefix with `-` for descending.
+            Allowed: `name`, `status`, `created_at`, `updated_at`.
+          schema: { type: string }
+          example: "-created_at"
+      responses:
+        "200":
+          description: A page of projects
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - $ref: "#/components/schemas/Paginated"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Project" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+    post:
+      tags: [Projects]
+      summary: Create a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectWrite" }
+            example:
+              name: Website Redesign
+              description: Rebuild the marketing site.
+              status: active
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Project" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /projects/{project}:
+    parameters:
+      - name: project
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
+        example: 1
+
+    get:
+      tags: [Projects]
+      summary: Retrieve a project
+      responses:
+        "200":
+          description: The project
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Project" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+    put:
+      tags: [Projects]
+      summary: Update a project (full)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectWrite" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Project" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+    patch:
+      tags: [Projects]
+      summary: Update a project (partial)
+      description: >
+        Only the fields present in the body are changed. An archived project
+        cannot be edited; change its status first (a status-only change is
+        allowed, which is how a project is reopened).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectWrite" }
+            example:
+              status: completed
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Project" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+    delete:
+      tags: [Projects]
+      summary: Delete a project
+      description: >
+        Soft delete. The project's tasks are soft-deleted with it, in one
+        transaction.
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessEnvelope" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /projects/{project}/tasks:
+    get:
+      tags: [Projects, Tasks]
+      summary: List the tasks in a project
+      parameters:
+        - name: project
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+        - $ref: "#/components/parameters/TaskStatusFilter"
+        - $ref: "#/components/parameters/TaskPriorityFilter"
+        - $ref: "#/components/parameters/TaskSearch"
+        - $ref: "#/components/parameters/TaskOverdue"
+      responses:
+        "200":
+          description: A page of tasks
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - $ref: "#/components/schemas/Paginated"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Task" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  # ---------------------------------------------------------------------------
+  # Tasks
+  # ---------------------------------------------------------------------------
+  /tasks:
+    get:
+      tags: [Tasks]
+      summary: List tasks
+      description: Every task the authenticated user owns, across all projects.
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+        - $ref: "#/components/parameters/TaskStatusFilter"
+        - $ref: "#/components/parameters/TaskPriorityFilter"
+        - $ref: "#/components/parameters/TaskSearch"
+        - $ref: "#/components/parameters/TaskOverdue"
+        - name: project_id
+          in: query
+          description: >
+            Restrict to one project. An ID the user does not own simply matches
+            nothing — it is not an error, and does not reveal whether the ID exists.
+          schema: { type: integer, minimum: 1 }
+        - name: due_from
+          in: query
+          schema: { type: string, format: date }
+          example: "2026-01-01"
+        - name: due_to
+          in: query
+          description: Must be the same as or later than `due_from`.
+          schema: { type: string, format: date }
+          example: "2026-12-31"
+        - name: sort
+          in: query
+          description: >
+            Comma-separated, `-` for descending. Allowed: `title`, `status`,
+            `priority`, `due_date`, `created_at`, `updated_at`, `completed_at`.
+          schema: { type: string }
+          example: "-priority,due_date"
+      responses:
+        "200":
+          description: A page of tasks
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - $ref: "#/components/schemas/Paginated"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Task" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+    post:
+      tags: [Tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TaskWrite" }
+            example:
+              project_id: 1
+              title: Write the migration
+              description: With the right indexes.
+              priority: high
+              due_date: "2026-12-01"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Task" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404":
+          description: >
+            The project does not exist, or is not owned by the authenticated
+            user. The two cases are indistinguishable by design.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /tasks/{task}:
+    parameters:
+      - name: task
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
+        example: 1
+
+    get:
+      tags: [Tasks]
+      summary: Retrieve a task
+      responses:
+        "200":
+          description: The task
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Task" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+    put:
+      tags: [Tasks]
+      summary: Update a task (full)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TaskWrite" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Task" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+    patch:
+      tags: [Tasks]
+      summary: Update a task (partial)
+      description: |
+        Only the fields present in the body are changed.
+
+        `completed_at` is **not** writable. It is derived from `status`: set to
+        the current time when a task becomes `completed`, cleared when it moves
+        back to an open status, and preserved across unrelated edits. This is
+        what guarantees the two fields can never disagree.
+
+        Moving a task to another project is allowed via `project_id`, but only
+        to a project the same user owns, and never into an archived one.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TaskWrite" }
+            example:
+              status: completed
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Task" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+    delete:
+      tags: [Tasks]
+      summary: Delete a task
+      description: Soft delete.
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessEnvelope" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ---------------------------------------------------------------------------
+  # Dashboard
+  # ---------------------------------------------------------------------------
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Aggregated statistics
+      description: >
+        Computed with conditional aggregates in the database — three queries
+        total, regardless of how many projects or tasks the user has.
+      responses:
+        "200":
+          description: The summary
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/DashboardSummary" }
+              example:
+                success: true
+                message: Dashboard statistics retrieved successfully.
+                data:
+                  projects: { total: 5, active: 3, completed: 1, archived: 1 }
+                  tasks:
+                    total: 52
+                    completed: 21
+                    pending: 28
+                    in_progress: 9
+                    cancelled: 3
+                    overdue: 11
+                  tasks_by_priority: { low: 8, medium: 5, high: 7, urgent: 8 }
+                  completion_rate: 40.4
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+# =============================================================================
+# Components
+# =============================================================================
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: A Laravel Sanctum personal access token.
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PerPage:
+      name: per_page
+      in: query
+      description: Capped at 100 — an unbounded page size is a denial-of-service primitive.
+      schema: { type: integer, minimum: 1, maximum: 100, default: 15 }
+    TaskStatusFilter:
+      name: status
+      in: query
+      description: >
+        One status, several comma-separated (`pending,in_progress`), or repeated
+        as `status[]=`.
+      schema:
+        oneOf:
+          - $ref: "#/components/schemas/TaskStatusValue"
+          - type: array
+            items: { $ref: "#/components/schemas/TaskStatusValue" }
+      example: pending
+    TaskPriorityFilter:
+      name: priority
+      in: query
+      description: Same forms as `status`.
+      schema:
+        oneOf:
+          - $ref: "#/components/schemas/TaskPriorityValue"
+          - type: array
+            items: { $ref: "#/components/schemas/TaskPriorityValue" }
+      example: urgent
+    TaskSearch:
+      name: search
+      in: query
+      description: Matches title or description. LIKE wildcards are escaped.
+      schema: { type: string, maxLength: 255 }
+    TaskOverdue:
+      name: overdue
+      in: query
+      description: >
+        `true` returns only tasks past their due date that are still open;
+        `false` returns the complement. Accepts `true`/`false`/`1`/`0`.
+      schema: { type: boolean }
+
+  schemas:
+
+    SuccessEnvelope:
+      type: object
+      required: [success, message, data]
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: Request completed successfully. }
+        data:
+          description: >
+            The payload — an object, an array, or an empty object when there is
+            nothing to return.
+
+    ErrorEnvelope:
+      type: object
+      required: [success, message, errors]
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string, example: The given data was invalid. }
+        errors:
+          type: object
+          description: Field-keyed messages. Always an object, never null.
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+    Paginated:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            current_page: { type: integer, example: 1 }
+            from: { type: integer, nullable: true, example: 1 }
+            last_page: { type: integer, example: 4 }
+            per_page: { type: integer, example: 15 }
+            to: { type: integer, nullable: true, example: 15 }
+            total: { type: integer, example: 52 }
+            path: { type: string }
+        links:
+          type: object
+          properties:
+            first: { type: string, nullable: true }
+            last: { type: string, nullable: true }
+            prev: { type: string, nullable: true }
+            next: { type: string, nullable: true }
+
+    User:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        name: { type: string, example: Ada Lovelace }
+        email: { type: string, format: email, example: ada@example.com }
+        email_verified_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    AuthPayload:
+      type: object
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+        token:
+          type: string
+          description: >
+            Send as the `Authorization` header, prefixed with `Bearer `.
+            Shown once and never retrievable again.
+        token_type: { type: string, example: Bearer }
+
+    ProjectStatusValue:
+      type: string
+      enum: [active, completed, archived]
+
+    TaskStatusValue:
+      type: string
+      enum: [pending, in_progress, completed, cancelled]
+
+    TaskPriorityValue:
+      type: string
+      enum: [low, medium, high, urgent]
+
+    EnumObject:
+      type: object
+      description: >
+        Enums are expanded rather than returned as bare strings, so a client can
+        render a label without hard-coding the mapping.
+      properties:
+        value: { type: string }
+        label: { type: string }
+
+    Project:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        name: { type: string, example: Website Redesign }
+        description: { type: string, nullable: true }
+        status:
+          allOf: [{ $ref: "#/components/schemas/EnumObject" }]
+          example: { value: active, label: Active }
+        tasks_count:
+          type: integer
+          description: Present only when counted (list and show endpoints).
+          example: 12
+        completed_tasks_count: { type: integer, example: 5 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ProjectWrite:
+      type: object
+      properties:
+        name: { type: string, minLength: 2, maxLength: 255 }
+        description: { type: string, nullable: true, maxLength: 5000 }
+        status: { $ref: "#/components/schemas/ProjectStatusValue" }
+      required: [name]
+
+    ProjectSummary:
+      type: object
+      description: The minimal projection embedded inside a task.
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        status: { $ref: "#/components/schemas/EnumObject" }
+
+    Task:
+      type: object
+      properties:
+        id: { type: integer, example: 26 }
+        title: { type: string, example: Write the migration }
+        description: { type: string, nullable: true }
+        status:
+          allOf: [{ $ref: "#/components/schemas/EnumObject" }]
+          example: { value: pending, label: Pending }
+        priority:
+          type: object
+          properties:
+            value: { $ref: "#/components/schemas/TaskPriorityValue" }
+            label: { type: string, example: High }
+            weight:
+              type: integer
+              description: Sort weight ascending in urgency (low=1 … urgent=4).
+              example: 3
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          description: Date only — a due date is a calendar fact and must not shift with timezone.
+          example: "2026-12-01"
+        is_overdue:
+          type: boolean
+          description: >
+            True when the task has a due date strictly before today AND is still
+            open. A completed or cancelled task is never overdue, however late.
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Read-only; derived from `status`.
+        project_id: { type: integer }
+        project: { $ref: "#/components/schemas/ProjectSummary" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    TaskWrite:
+      type: object
+      properties:
+        project_id: { type: integer, minimum: 1 }
+        title: { type: string, minLength: 2, maxLength: 255 }
+        description: { type: string, nullable: true, maxLength: 5000 }
+        status: { $ref: "#/components/schemas/TaskStatusValue" }
+        priority: { $ref: "#/components/schemas/TaskPriorityValue" }
+        due_date: { type: string, format: date, nullable: true }
+      required: [project_id, title]
+
+    DashboardSummary:
+      type: object
+      properties:
+        projects:
+          type: object
+          properties:
+            total: { type: integer }
+            active: { type: integer }
+            completed: { type: integer }
+            archived: { type: integer }
+        tasks:
+          type: object
+          properties:
+            total: { type: integer }
+            completed: { type: integer }
+            pending:
+              type: integer
+              description: Outstanding work — pending plus in_progress.
+            in_progress: { type: integer }
+            cancelled: { type: integer }
+            overdue: { type: integer }
+        tasks_by_priority:
+          type: object
+          description: Open tasks only. Every priority key is always present, zero-filled.
+          properties:
+            low: { type: integer }
+            medium: { type: integer }
+            high: { type: integer }
+            urgent: { type: integer }
+        completion_rate:
+          type: number
+          format: float
+          description: Percentage of tasks completed, to one decimal. 0 when there are no tasks.
+          example: 40.4
+
+  responses:
+    Unauthorized:
+      description: No token, or an invalid/revoked one.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+          example:
+            success: false
+            message: Unauthenticated. A valid bearer token is required.
+            errors: {}
+
+    Forbidden:
+      description: Authenticated but not permitted.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+          example:
+            success: false
+            message: This action is unauthorized.
+            errors: {}
+
+    NotFound:
+      description: >
+        The resource does not exist, or is not owned by the authenticated user.
+        The two cases are deliberately indistinguishable.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+          example:
+            success: false
+            message: The requested resource was not found.
+            errors: {}
+
+    Conflict:
+      description: >
+        Well-formed and authorised, but in conflict with the current state —
+        for example adding a task to an archived project.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+          example:
+            success: false
+            message: Tasks cannot be added to or moved into an archived project.
+            errors:
+              project_id: ["The selected project is archived."]
+
+    ValidationError:
+      description: The payload failed validation.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+          example:
+            success: false
+            message: The given data was invalid.
+            errors:
+              title: ["A task title is required."]
+              due_date: ["The due date must be in YYYY-MM-DD format."]
+
+    TooManyRequests:
+      description: Rate limit exceeded.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+          example:
+            success: false
+            message: Too many requests. Please slow down and try again shortly.
+            errors: {}

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Artisan wrapper
+#
+#   docker/scripts/artisan migrate
+#   docker/scripts/artisan make:model Task -mfs
+#   COMPOSE_MODE=prod docker/scripts/artisan migrate --force
+# =============================================================================
+source "$(dirname -- "${BASH_SOURCE[0]}")/_common.sh"
+
+# NOTE: `dc` is a shell function (see _common.sh) and must NOT be prefixed with
+# `exec` — exec only ever replaces the shell with an EXTERNAL program, so
+# `exec dc …` silently runs /usr/bin/dc, the GNU desk calculator. An explicit
+# `exit` therefore takes the place of exec's terminating behaviour.
+if [[ -z "$(dc ps -q app 2>/dev/null)" ]]; then
+    # Not running: use a throwaway container so `artisan` still works before
+    # the stack is up (e.g. `artisan key:generate` on a fresh checkout).
+    warn "app container is not running — using a one-off container"
+    dc run --rm $(tty_flag) app php artisan "$@"
+    exit $?
+fi
+
+dc exec $(tty_flag) app php artisan "$@"
