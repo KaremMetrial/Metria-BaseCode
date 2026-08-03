@@ -15,6 +15,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string $governorate_id
+ * @property array<string, string> $name
+ * @property string|null $postal_code
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property bool $is_active
+ */
 class City extends Model
 {
     use Auditable;

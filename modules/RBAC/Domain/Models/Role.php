@@ -10,6 +10,11 @@ use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
+ * @property int|string $id
+ * @property string $name
+ * @property string $guard_name
+ * @property string|null $tenant_id
+ * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Modules\RBAC\Domain\Models\RoleMetadata|null $metadata
  */
 class Role extends SpatieRole

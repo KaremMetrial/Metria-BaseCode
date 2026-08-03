@@ -15,6 +15,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string $country_id
+ * @property array<string, string> $name
+ * @property string|null $code
+ * @property bool $is_active
+ */
 class Governorate extends Model
 {
     use Auditable;

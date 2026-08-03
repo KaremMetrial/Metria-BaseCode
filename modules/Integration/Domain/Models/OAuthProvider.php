@@ -8,6 +8,16 @@ use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string $provider
+ * @property string $client_id
+ * @property string $client_secret
+ * @property string $redirect_url
+ * @property array<int, string>|null $scopes
+ * @property bool $is_enabled
+ */
 class OAuthProvider extends Model
 {
     use HasUuid;

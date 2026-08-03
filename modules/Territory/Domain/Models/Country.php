@@ -14,6 +14,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property array<string, string> $name
+ * @property string $iso_code_2
+ * @property string $iso_code_3
+ * @property string $phone_code
+ * @property string $currency
+ * @property bool $is_active
+ */
 class Country extends Model
 {
     use Auditable;

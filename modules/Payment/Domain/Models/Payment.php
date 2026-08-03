@@ -17,11 +17,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $id
  * @property string $tenant_id
  * @property string|null $user_id
+ * @property string $gateway
+ * @property string|null $gateway_reference
  * @property PaymentStatus $status
  * @property int $amount
  * @property int $refunded_amount
  * @property string $currency
  * @property array|null $metadata
+ * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $paid_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property User|null $user

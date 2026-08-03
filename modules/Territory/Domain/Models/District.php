@@ -14,6 +14,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $id
+ * @property string|null $tenant_id
+ * @property string $city_id
+ * @property array<string, string> $name
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property bool $is_active
+ */
 class District extends Model
 {
     use Auditable;

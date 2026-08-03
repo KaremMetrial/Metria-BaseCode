@@ -8,6 +8,18 @@ use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property string $id
+ * @property string $identifier
+ * @property string $code
+ * @property string $guard
+ * @property string $action
+ * @property int $attempts
+ * @property \Illuminate\Support\Carbon|null $verified_at
+ * @property \Illuminate\Support\Carbon $expires_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class OtpCode extends Model
 {
     use HasUuid;

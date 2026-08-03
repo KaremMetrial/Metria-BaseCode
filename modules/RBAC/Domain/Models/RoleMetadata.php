@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Translatable\HasTranslations;
 
 /**
+ * @property string $id
+ * @property int|string $role_id
+ * @property array<string, string>|null $display_name
+ * @property array<string, string>|null $description
+ * @property int $priority
  * @property bool $is_system
  * @property bool $is_editable
  * @property bool $is_assignable
