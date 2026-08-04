@@ -2,7 +2,7 @@ services:
   mysql:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/mysql:${IMAGE_TAG:-latest}"
     build:
-      context: ..
+      context: .
       dockerfile: docker/mysql/Dockerfile
       args:
         MYSQL_VERSION: "${MYSQL_VERSION:-8.4}"
@@ -30,7 +30,7 @@ services:
   redis:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/redis:${IMAGE_TAG:-latest}"
     build:
-      context: ..
+      context: .
       dockerfile: docker/redis/Dockerfile
       args:
         REDIS_VERSION: "${REDIS_VERSION:-8}"
@@ -54,7 +54,7 @@ services:
   app:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/app:${IMAGE_TAG:-latest}"
     build:
-      context: ..
+      context: .
       dockerfile: docker/php/Dockerfile
       target: development
       args:
@@ -116,7 +116,7 @@ services:
   nginx:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/nginx:${IMAGE_TAG:-latest}"
     build:
-      context: ..
+      context: .
       dockerfile: docker/nginx/Dockerfile
       target: base
       args:
@@ -148,7 +148,7 @@ services:
   internal-nginx:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/internal-nginx:${IMAGE_TAG:-latest}"
     build:
-      context: ..
+      context: .
       dockerfile: docker/nginx/Dockerfile
       target: internal
       args:
@@ -196,7 +196,7 @@ services:
   realtime:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/realtime:${IMAGE_TAG:-latest}"
     build:
-      context: ../services/realtime
+      context: services/realtime
       dockerfile: Dockerfile
     restart: "${RESTART_POLICY:-unless-stopped}"
     environment:
@@ -262,7 +262,7 @@ services:
   composer:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/composer:${IMAGE_TAG:-latest}"
     build:
-      context: ..
+      context: .
       dockerfile: docker/composer/Dockerfile
       args:
         PHP_VERSION: "${PHP_VERSION:-8.4}"
@@ -272,7 +272,7 @@ services:
         USER: "${DOCKER_USER:-app}"
     profiles: [tools]
     volumes:
-      - ../:/var/www/html
+      - ./:/var/www/html
       - composer_cache:/tmp/composer/cache
     networks: [edge]
     security_opt: [no-new-privileges:true]
@@ -281,7 +281,7 @@ services:
   npm:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/node:${IMAGE_TAG:-latest}"
     build:
-      context: ..
+      context: .
       dockerfile: docker/node/Dockerfile
       args:
         NODE_VERSION: "${NODE_VERSION:-22}"
@@ -289,7 +289,7 @@ services:
         GID: "${GID:-1000}"
     profiles: [frontend, tools]
     volumes:
-      - ../:/var/www/html
+      - ./:/var/www/html
       - node_modules:/var/www/html/node_modules
       - node_cache:/home/node/.npm
     networks: [edge]

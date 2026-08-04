@@ -20,7 +20,7 @@ services:
   realtime-a:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/realtime:${IMAGE_TAG:-latest}"
     build:
-      context: ../services/realtime
+      context: services/realtime
       dockerfile: Dockerfile
     environment:
       NODE_ENV: test
@@ -50,7 +50,7 @@ services:
   realtime-b:
     image: "${COMPOSE_PROJECT_NAME:-laravel}/realtime:${IMAGE_TAG:-latest}"
     build:
-      context: ../services/realtime
+      context: services/realtime
       dockerfile: Dockerfile
     environment:
       NODE_ENV: test

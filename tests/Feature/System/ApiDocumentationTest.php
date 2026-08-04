@@ -49,5 +49,11 @@ class ApiDocumentationTest extends TestCase
         $this->assertSame(['Communication'], $communicationMessage['tags']);
         $this->assertStringContainsString('Socket.IO', (string) ($communicationMessage['description'] ?? ''));
         $this->assertStringContainsString('authoritative cursor synchronization', (string) ($communicationSync['description'] ?? ''));
+
+        $oauthProviders = $documents[0]['paths']['/auth/oauth-providers']['get']['responses']['200']['content']['application/json']['schema'] ?? null;
+        $this->assertIsArray($oauthProviders);
+        $this->assertSame('object', $oauthProviders['type']);
+        $this->assertTrue($oauthProviders['examples'][0]['success']);
+        $this->assertNotEmpty($oauthProviders['examples'][0]['data']);
     }
 }
