@@ -7,20 +7,20 @@ covered.
 
 ## Controls
 
-| Control | Implementation | Verified by |
-|---|---|---|
-| Non-root | php-fpm uid 1000, nginx uid **101 including the master**, redis uid 999, mysqld uid 999 | `docker top` on each container |
-| No privilege escalation | `security_opt: no-new-privileges:true` on every service | compose config |
-| Capabilities | `cap_drop: ALL` everywhere; only MySQL adds back `CHOWN`, `SETGID`, `SETUID`, `DAC_OVERRIDE` | compose config |
-| Read-only rootfs | nginx (dev + prod); app/queue/scheduler in prod | `touch /etc/probe` → "Read-only file system" |
-| Network isolation | `backend` is `internal: true` — no egress, no ingress | compose config |
-| Port exposure | Only nginx. MySQL/Redis on `127.0.0.1` in dev, nothing in prod | `docker ps` |
-| Document root | `public/` only | 24 HTTP probes |
-| PHP execution | `index.php` is the only executable entry point | planted `.php` files return 404 |
-| Secrets | `*_FILE` support throughout; `.env` excluded from images | `.dockerignore` |
-| Version disclosure | `server_tokens off`, `expose_php = Off`, `X-Powered-By` stripped | response headers |
-| Rate limiting | Per-IP zones for general / API / auth | 429s after burst |
-| Supply chain | CI publishes SBOM + signed provenance, Trivy scan | pipeline |
+| Control                 | Implementation                                                                                         | Verified by                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| Non-root                | php-fpm uid 1000, nginx uid**101 including the master**, redis uid 999, mysqld uid 999           | `docker top` on each container                |
+| No privilege escalation | `security_opt: no-new-privileges:true` on every service                                              | compose config                                  |
+| Capabilities            | `cap_drop: ALL` everywhere; only MySQL adds back `CHOWN`, `SETGID`, `SETUID`, `DAC_OVERRIDE` | compose config                                  |
+| Read-only rootfs        | nginx (dev + prod); app/queue/scheduler in prod                                                        | `touch /etc/probe` → "Read-only file system" |
+| Network isolation       | `backend` is `internal: true` — no egress, no ingress                                             | compose config                                  |
+| Port exposure           | Only nginx. MySQL/Redis on`127.0.0.1` in dev, nothing in prod                                        | `docker ps`                                   |
+| Document root           | `public/` only                                                                                       | 24 HTTP probes                                  |
+| PHP execution           | `index.php` is the only executable entry point                                                       | planted`.php` files return 404                |
+| Secrets                 | `*_FILE` support throughout; `.env` excluded from images                                           | `.dockerignore`                               |
+| Version disclosure      | `server_tokens off`, `expose_php = Off`, `X-Powered-By` stripped                                 | response headers                                |
+| Rate limiting           | Per-IP zones for general / API / auth                                                                  | 429s after burst                                |
+| Supply chain            | CI publishes SBOM + signed provenance, Trivy scan                                                      | pipeline                                        |
 
 ---
 
@@ -176,12 +176,12 @@ secrets:
 
 Three places where the obvious implementation would leak:
 
-| Where | Naive approach | What this platform does |
-|---|---|---|
-| MySQL healthcheck | `mysql --password=…` | `MYSQL_PWD` environment variable |
-| Redis healthcheck | `redis-cli -a …` | `REDISCLI_AUTH` environment variable |
-| Redis startup | `redis-server --requirepass …` | Entrypoint writes a 0600 config to tmpfs |
-| Backups | `mysqldump -p…` | `MYSQL_PWD` |
+| Where             | Naive approach                    | What this platform does                  |
+| ----------------- | --------------------------------- | ---------------------------------------- |
+| MySQL healthcheck | `mysql --password=…`           | `MYSQL_PWD` environment variable       |
+| Redis healthcheck | `redis-cli -a …`               | `REDISCLI_AUTH` environment variable   |
+| Redis startup     | `redis-server --requirepass …` | Entrypoint writes a 0600 config to tmpfs |
+| Backups           | `mysqldump -p…`                | `MYSQL_PWD`                            |
 
 ### Rotating credentials
 
