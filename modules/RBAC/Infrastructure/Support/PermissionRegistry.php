@@ -10,7 +10,7 @@ namespace Modules\RBAC\Infrastructure\Support;
  */
 class PermissionRegistry
 {
-    public const array PERMISSIONS = [
+    public const PERMISSIONS = [
         'Governance' => [
             'Audit Logs' => [
                 'governance.audit.view' => 'View Audit Logs',
