@@ -8,11 +8,9 @@ use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Modules\Shared\Infrastructure\Traits\Auditable;
 use Modules\Media\Domain\Models\Media;
-use Modules\Wallet\Domain\Models\Wallet;
 use Modules\Auth\Infrastructure\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,7 +37,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $phone_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property Wallet|null $wallet
  * @property \Illuminate\Database\Eloquent\Collection<int, FcmDeviceToken> $fcmDeviceTokens
  * @property \Illuminate\Database\Eloquent\Collection<int, UserSession> $sessions
  * @property \Illuminate\Database\Eloquent\Collection<int, UserSocialIdentity> $socialIdentities
@@ -74,11 +71,6 @@ class User extends Authenticatable
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function wallet(): HasOne
-    {
-        return $this->hasOne(Wallet::class);
     }
 
     public function fcmDeviceTokens(): HasMany
