@@ -98,16 +98,21 @@ class MediaProcessingService
 
     private function processImage(Media $media, \Modules\Media\Domain\Models\MediaBlob $blob, string $filePath, \Illuminate\Contracts\Filesystem\Filesystem $disk): void
     {
-        // 1. Extract metadata (Width, Height, Orientation)
-        $width = 800;
-        $height = 600;
-        if (function_exists('getimagesize')) {
-            $sizeInfo = @getimagesize($filePath);
-            if ($sizeInfo) {
-                $width = $sizeInfo[0];
-                $height = $sizeInfo[1];
-            }
+        // 1. Extract metadata (Width, Height, Orientation) — this also acts
+        // as the real content-type gate: getimagesize() parses the actual
+        // image headers rather than trusting the claimed MIME type, so a
+        // non-image file smuggled in under an image/* mime never reaches
+        // Imagick's format auto-detection below (a known RCE/SSRF surface
+        // for attacker-controlled bytes — the "ImageTragick" class of
+        // issues) and never falls back to a fabricated 800x600 size.
+        $sizeInfo = function_exists('getimagesize') ? @getimagesize($filePath) : false;
+
+        if ($sizeInfo === false) {
+            throw new \RuntimeException(__('media.not_a_valid_image'));
         }
+
+        $width = $sizeInfo[0];
+        $height = $sizeInfo[1];
 
         // Strip EXIF / Metadata: If Imagick is available, use it. Else fallback.
         if (class_exists('Imagick')) {
@@ -117,8 +122,12 @@ class MediaProcessingService
                 $imagick->writeImage($filePath);
                 $imagick->clear();
                 $imagick->destroy();
-            } catch (\Throwable) {
-                // Ignore transient Imagick errors
+            } catch (\Throwable $e) {
+                // A confirmed-valid image (per getimagesize above) that
+                // Imagick still can't process is unusual enough to be
+                // worth knowing about, rather than silently continuing as
+                // if metadata stripping succeeded.
+                report($e);
             }
         }
 

@@ -15,5 +15,7 @@ return [
     'stream_write_failed' => 'Failed to open write stream for path: :path',
     'variant_read_failed' => 'Failed to open local path :path for reading variant.',
     'missing_blob' => 'No file blob is attached to this media.',
+    'not_a_valid_image' => 'File claims to be an image but its content is not a valid, decodable image.',
+    'already_confirmed' => 'This upload has already been confirmed or is no longer pending.',
 ];
 

@@ -12,6 +12,7 @@ use Modules\Media\Domain\Models\Media;
 use Modules\Media\Infrastructure\Services\MediaDownloadService;
 use Modules\Media\Infrastructure\Services\MediaUploadService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class MediaController extends ApiController
@@ -35,13 +36,35 @@ class MediaController extends ApiController
 
     public function confirm(ConfirmUploadRequest $request, string $mediaId, MediaUploadService $uploadService): JsonResponse
     {
-        // Enforce ownership / tenant scoping (inherent in Media query through tenant global scope)
+        // Tenant scoping alone (TenantScope) doesn't stop one user from
+        // confirming another user's upload within the same tenant — check
+        // ownership of this specific media explicitly.
+        $pendingMedia = Media::query()->findOrFail($mediaId);
+        Gate::authorize('confirm', $pendingMedia);
+
         $media = $uploadService->confirmUpload(
             mediaId: $mediaId,
             clientChecksum: $request->string('checksum')->value()
         );
 
         return $this->respond(new MediaResource($media));
+    }
+
+    /**
+     * Local-disk fallback for the presign flow: accepts the raw file body
+     * PUT here (mirroring what a real presigned S3 PUT URL would receive)
+     * and writes it to the pre-computed storage path, so confirm() has an
+     * actual file to find. Only reachable for the upload_url initiateUpload()
+     * hands out when the disk lacks a real temporaryUploadUrl() adapter.
+     */
+    public function upload(Request $request, string $mediaId, MediaUploadService $uploadService): JsonResponse
+    {
+        $media = Media::query()->findOrFail($mediaId);
+        Gate::authorize('confirm', $media);
+
+        $uploadService->receiveLocalUpload($media, $request->getContent());
+
+        return $this->respond(['status' => 'received']);
     }
 
     public function download(string $mediaId, MediaDownloadService $downloadService): JsonResponse
@@ -58,7 +81,7 @@ class MediaController extends ApiController
         ]);
     }
 
-    private function getAuthenticatedUser(\Illuminate\Http\Request $request): \Modules\Auth\Domain\Models\User
+    private function getAuthenticatedUser(Request $request): \Modules\Auth\Domain\Models\User
     {
         $user = $request->user();
         if (! $user instanceof \Modules\Auth\Domain\Models\User) {

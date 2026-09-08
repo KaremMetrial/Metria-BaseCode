@@ -182,6 +182,67 @@ class MediaUploadTest extends TestCase
         ]);
     }
 
+    /**
+     * On disks without a real presigned-PUT adapter (local/public — i.e.
+     * anything but genuine S3), initiateUpload() hands out the `media.upload`
+     * route as upload_url. This exercises that exact route end-to-end
+     * instead of the other tests' shortcut of writing straight to the fake
+     * disk, which never touches the fallback upload endpoint at all.
+     */
+    public function test_presign_then_put_upload_then_confirm_activates_media(): void
+    {
+        $user = $this->createTenantUser('org-1');
+        Sanctum::actingAs($user);
+
+        $presignResponse = $this->postJson('/api/v1/media/presign', [
+            'filename' => 'clean_photo.jpg',
+            'mime_type' => 'image/jpeg',
+            'size' => 5000,
+            'is_public' => true,
+            'purpose' => 'avatar',
+        ])->json();
+
+        $mediaId = $presignResponse['data']['media_id'];
+        $uploadUrl = $presignResponse['data']['upload_url'];
+
+        $this->assertStringContainsString("/media/{$mediaId}/upload", $uploadUrl);
+
+        $fileContent = UploadedFile::fake()->image('clean_photo.jpg', 800, 600)->get();
+
+        $this->call('PUT', $uploadUrl, [], [], [], [], $fileContent)
+            ->assertStatus(200);
+
+        Storage::disk('public')->assertExists($presignResponse['data']['path']);
+
+        $checksum = hash('sha256', $fileContent);
+        $this->postJson("/api/v1/media/{$mediaId}/confirm", ['checksum' => $checksum])
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('media', [
+            'id' => $mediaId,
+            'status' => MediaStatus::Active->value,
+        ]);
+    }
+
+    public function test_upload_route_rejects_a_non_owner(): void
+    {
+        $owner = $this->createTenantUser('org-1');
+        $intruder = $this->createTenantUser('org-1');
+
+        Sanctum::actingAs($owner);
+        $presignResponse = $this->postJson('/api/v1/media/presign', [
+            'filename' => 'clean_photo.jpg',
+            'mime_type' => 'image/jpeg',
+            'size' => 5000,
+            'is_public' => true,
+            'purpose' => 'avatar',
+        ])->json();
+
+        Sanctum::actingAs($intruder);
+        $this->call('PUT', $presignResponse['data']['upload_url'], [], [], [], [], 'attacker bytes')
+            ->assertStatus(403);
+    }
+
     public function test_confirm_upload_fails_on_checksum_mismatch(): void
     {
         $user = $this->createTenantUser('org-1');
@@ -215,6 +276,38 @@ class MediaUploadTest extends TestCase
             'id' => $mediaId,
             'status' => MediaStatus::Failed->value,
             'processing_error' => 'Checksum verification failed.',
+        ]);
+    }
+
+    public function test_confirm_rejects_a_non_owner_within_the_same_tenant(): void
+    {
+        $owner = $this->createTenantUser('org-1');
+        $intruder = $this->createTenantUser('org-1');
+
+        Sanctum::actingAs($owner);
+        $presignResponse = $this->postJson('/api/v1/media/presign', [
+            'filename' => 'clean_photo.jpg',
+            'mime_type' => 'image/jpeg',
+            'size' => 5000,
+            'is_public' => true,
+            'purpose' => 'avatar',
+        ])->json();
+
+        $mediaId = $presignResponse['data']['media_id'];
+        $path = $presignResponse['data']['path'];
+        $fileContent = UploadedFile::fake()->image('clean_photo.jpg', 800, 600)->get();
+        Storage::disk('public')->put($path, $fileContent);
+        $checksum = hash('sha256', $fileContent);
+
+        // Same tenant, same "media.upload" permission — but not the owner
+        // of this specific media. TenantScope alone would let this through.
+        Sanctum::actingAs($intruder);
+        $this->postJson("/api/v1/media/{$mediaId}/confirm", ['checksum' => $checksum])
+            ->assertStatus(403);
+
+        $this->assertDatabaseHas('media', [
+            'id' => $mediaId,
+            'status' => MediaStatus::Pending->value,
         ]);
     }
 
@@ -296,6 +389,44 @@ class MediaUploadTest extends TestCase
             'status' => MediaStatus::Quarantined->value,
             'moderation_status' => 'flagged',
             'processing_error' => 'Content moderation failed: NSFW/18+ content detected.',
+        ]);
+    }
+
+    public function test_deduplication_still_works_when_virus_scanning_is_disabled(): void
+    {
+        config(['media.virus_scan_enabled' => false]);
+
+        $user = $this->createTenantUser('tenant-noscan');
+        Sanctum::actingAs($user);
+
+        $fileContent = 'identical content, scanning turned off';
+        $checksum = hash('sha256', $fileContent);
+
+        foreach (['first.pdf', 'second.pdf'] as $filename) {
+            $presign = $this->postJson('/api/v1/media/presign', [
+                'filename' => $filename,
+                'mime_type' => 'application/pdf',
+                'size' => 100,
+                'is_public' => false,
+            ])->json();
+
+            Storage::disk('local')->put($presign['data']['path'], $fileContent);
+            $this->postJson("/api/v1/media/{$presign['data']['media_id']}/confirm", ['checksum' => $checksum])
+                ->assertOk();
+        }
+
+        // Without the fix, every blob stays virus_status='pending' forever
+        // (nothing sets it to 'safe' when scanning is off), so the dedup
+        // query — which only matches 'safe' blobs — never finds a match
+        // and a second physical blob row gets created for identical bytes.
+        $this->assertEquals(
+            1,
+            MediaBlob::where('tenant_id', 'tenant-noscan')->where('sha256', $checksum)->count()
+        );
+        $this->assertDatabaseHas('media_blobs', [
+            'tenant_id' => 'tenant-noscan',
+            'sha256' => $checksum,
+            'virus_status' => 'safe',
         ]);
     }
 
@@ -416,9 +547,10 @@ class MediaUploadTest extends TestCase
                 ],
             ]);
 
-        // Check audit fields updated (1 from confirmation response serialization + 1 from download route request)
+        // Serializing the media (confirm's response, e.g.) must not itself
+        // count as a download — only the explicit /download call should.
         $media = Media::findOrFail($presign['data']['media_id']);
-        $this->assertEquals(2, $media->download_count);
+        $this->assertEquals(1, $media->download_count);
         $this->assertNotNull($media->last_downloaded_at);
 
         // 3. Other unprivileged user tries to download

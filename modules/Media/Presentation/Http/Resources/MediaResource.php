@@ -27,7 +27,10 @@ class MediaResource extends JsonResource
                 if ($this->resource->is_public) {
                     $downloadUrl = Storage::disk($this->resource->blob->disk)->url($this->resource->blob->path);
                 } else {
-                    $downloadUrl = $downloadService->generateDownloadUrl($this->resource);
+                    // Resources are read-only: build the URL without
+                    // recording a download (that belongs to the explicit
+                    // download action only — see MediaController::download).
+                    $downloadUrl = $downloadService->generateUrl($this->resource);
                 }
             } catch (\Throwable) {
                 $downloadUrl = '';

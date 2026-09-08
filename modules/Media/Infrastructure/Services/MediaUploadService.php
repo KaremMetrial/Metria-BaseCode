@@ -13,6 +13,7 @@ use Modules\Media\Domain\Events\MediaUploadInitiated;
 use Modules\Media\Infrastructure\Jobs\VerifyMediaUpload;
 use Modules\Media\Domain\Models\Media;
 use Modules\Media\Domain\Models\MediaBlob;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -96,11 +97,13 @@ class MediaUploadService
                         $presignedUrl = is_scalar($urlResult) ? (string) $urlResult : '';
                     }
                 } else {
-                    // Fallback to local API upload endpoint
-                    $presignedUrl = (string) route('media.confirm', ['media' => $mediaId]);
+                    // Fallback for disks without a real presigned-PUT
+                    // adapter (local, public, testing): the client PUTs the
+                    // raw file body here, then calls confirm separately.
+                    $presignedUrl = (string) route('media.upload', ['media' => $mediaId]);
                 }
             } catch (\Throwable) {
-                $presignedUrl = (string) route('media.confirm', ['media' => $mediaId]);
+                $presignedUrl = (string) route('media.upload', ['media' => $mediaId]);
             }
 
             $presignedUrlStr = (string) $presignedUrl;
@@ -127,6 +130,45 @@ class MediaUploadService
                 'path' => $storagePath,
             ];
         });
+    }
+
+    /**
+     * Receives the raw file bytes for the local-disk fallback path:
+     * initiateUpload() hands out the `media.upload` route as `upload_url`
+     * whenever the disk adapter doesn't support temporaryUploadUrl() (any
+     * disk other than a real S3-compatible one — i.e. local/public/testing
+     * setups), but there was previously no endpoint that actually accepted
+     * a PUT body and wrote it to storage: confirmUpload() would always see
+     * a missing file and fail with file_not_found. This is that endpoint's
+     * service-side handler — called from a dedicated upload route before
+     * the client calls confirm.
+     */
+    public function receiveLocalUpload(Media $media, string $rawBody): void
+    {
+        if (! in_array($media->status, [MediaStatus::Pending, MediaStatus::Uploading], true)) {
+            throw new DomainException(__('media.already_confirmed'), errorCode: 'already_confirmed');
+        }
+
+        $maxSizeVal = config('media.max_file_size_bytes', 500 * 1024 * 1024);
+        $maxSize = is_numeric($maxSizeVal) ? (int) $maxSizeVal : 500 * 1024 * 1024;
+        if (strlen($rawBody) > $maxSize) {
+            throw new DomainException(__('media.file_too_large'), errorCode: 'file_too_large');
+        }
+
+        $diskNameVal = $media->custom_properties['disk'] ?? null;
+        $diskName = is_string($diskNameVal) ? $diskNameVal : 'public';
+        $storagePathVal = $media->custom_properties['path'] ?? null;
+        $storagePath = is_string($storagePathVal) ? $storagePathVal : '';
+
+        if ($storagePath === '') {
+            throw new DomainException(__('media.file_not_found'), errorCode: 'file_not_found');
+        }
+
+        Storage::disk($diskName)->put($storagePath, $rawBody);
+
+        if ($media->status !== MediaStatus::Uploading) {
+            $this->stateMachine->transition($media, MediaStatus::Uploading);
+        }
     }
 
     public function confirmUpload(string $mediaId, string $clientChecksum, ?string $idempotencyKey = null): Media
@@ -192,22 +234,53 @@ class MediaUploadService
                     // Deduplication: Delete redundant physical file since we already have it!
                     $disk->delete($storagePath);
                 } else {
-                    // Create a new physical Blob entry
-                    $blob = MediaBlob::query()->create([
-                        'tenant_id' => $tenantId,
-                        'sha256' => $actualHash,
-                        'disk' => $diskName,
-                        'path' => $storagePath,
-                        'filename' => $filename,
-                        'original_filename' => $filename,
-                        'mime_type' => $actualMime,
-                        'size' => $actualSize,
-                        'virus_status' => 'pending',
-                        'uploaded_at' => now(),
-                    ]);
+                    // Skipping virus scanning is an explicit operator choice
+                    // (media.virus_scan_enabled=false) — mark the blob safe
+                    // immediately so dedup still works instead of every
+                    // re-upload of identical content permanently missing
+                    // the dedup query above (which only matches 'safe').
+                    $virusScanEnabled = config('media.virus_scan_enabled', true);
+                    $initialVirusStatus = $virusScanEnabled ? 'pending' : 'safe';
 
-                    $media->media_blob_id = $blob->id;
-                    $media->save();
+                    try {
+                        // Create a new physical Blob entry
+                        $blob = MediaBlob::query()->create([
+                            'tenant_id' => $tenantId,
+                            'sha256' => $actualHash,
+                            'disk' => $diskName,
+                            'path' => $storagePath,
+                            'filename' => $filename,
+                            'original_filename' => $filename,
+                            'mime_type' => $actualMime,
+                            'size' => $actualSize,
+                            'virus_status' => $initialVirusStatus,
+                            'uploaded_at' => now(),
+                        ]);
+
+                        $media->media_blob_id = $blob->id;
+                        $media->save();
+                    } catch (QueryException $e) {
+                        // Another concurrent confirm for the same tenant+hash
+                        // won the unique (tenant_id, sha256) constraint race.
+                        // Fall back to linking against whatever it created
+                        // instead of surfacing a raw 500 to this request.
+                        if ($e->getCode() !== '23000') {
+                            throw $e;
+                        }
+
+                        $winningBlob = MediaBlob::query()
+                            ->where('tenant_id', $tenantId)
+                            ->where('sha256', $actualHash)
+                            ->first();
+
+                        if (! $winningBlob) {
+                            throw $e;
+                        }
+
+                        $media->media_blob_id = $winningBlob->id;
+                        $media->save();
+                        $disk->delete($storagePath);
+                    }
                 }
 
                 // Set checksum on Logical media
@@ -228,10 +301,22 @@ class MediaUploadService
                 return $media->refresh();
             });
         } catch (DomainException $e) {
-            if ($e->errorCode === 'checksum_mismatch') {
+            // Any failure inside the transaction above rolls the DB back to
+            // Pending — surface it as a terminal Failed state with a reason
+            // instead of leaving the media stuck in Pending with no
+            // visibility into what went wrong (previously only
+            // checksum_mismatch was handled here).
+            if (in_array($e->errorCode, ['checksum_mismatch', 'file_not_found'], true)) {
                 $media = Media::query()->findOrFail($mediaId);
-                $this->stateMachine->transition($media, MediaStatus::Failed);
-                $media->update(['processing_error' => __('media.checksum_failed')]);
+
+                if (in_array($media->status, [MediaStatus::Pending, MediaStatus::Uploading], true)) {
+                    $this->stateMachine->transition($media, MediaStatus::Failed);
+                    $media->update([
+                        'processing_error' => $e->errorCode === 'checksum_mismatch'
+                            ? __('media.checksum_failed')
+                            : $e->getMessage(),
+                    ]);
+                }
             }
             throw $e;
         }

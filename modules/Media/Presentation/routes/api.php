@@ -14,6 +14,7 @@ Route::prefix('api/v1')
     ->group(function () {
         Route::prefix('media')->name('media.')->group(function () {
             Route::post('/presign', [MediaController::class, 'presign'])->name('presign');
+            Route::put('/{media}/upload', [MediaController::class, 'upload'])->name('upload');
             Route::post('/{media}/confirm', [MediaController::class, 'confirm'])->name('confirm');
             Route::get('/{media}/download', [MediaController::class, 'download'])->name('download');
         });

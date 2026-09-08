@@ -9,13 +9,18 @@ use Illuminate\Support\Facades\Storage;
 
 class MediaDownloadService
 {
-    public function generateDownloadUrl(Media $media, int $expiresInSeconds = 3600): string
+    /**
+     * Build the (possibly temporary/CDN-mapped) download URL only — no
+     * side effects. Safe to call from read paths like resource
+     * serialization, which must never mutate state as a side effect of a
+     * GET request.
+     */
+    public function generateUrl(Media $media, int $expiresInSeconds = 3600): string
     {
         $blob = $media->blob;
         if (! $blob) {
             throw new \RuntimeException(__('media.missing_blob'));
         }
-
 
         $disk = Storage::disk($blob->disk);
 
@@ -38,11 +43,23 @@ class MediaDownloadService
             $url = str_replace(url('/'), rtrim($cdnUrl, '/'), $url);
         }
 
-        // Increment download count and update timing details (auditing)
-        $media->update([
-            'download_count' => $media->download_count + 1,
-            'last_downloaded_at' => now(),
-        ]);
+        return $url;
+    }
+
+    /**
+     * Same as generateUrl(), but records the download — use only from an
+     * actual download action, never from serialization/listing, or every
+     * GET that touches this resource silently inflates the counter.
+     */
+    public function generateDownloadUrl(Media $media, int $expiresInSeconds = 3600): string
+    {
+        $url = $this->generateUrl($media, $expiresInSeconds);
+
+        // Atomic UPDATE ... SET download_count = download_count + 1, so
+        // concurrent downloads of the same media don't lose updates to a
+        // stale in-memory read of the counter.
+        $media->increment('download_count');
+        $media->update(['last_downloaded_at' => now()]);
 
         return $url;
     }

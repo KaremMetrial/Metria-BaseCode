@@ -56,6 +56,16 @@ class MediaPolicy
         return $this->view($user, $media);
     }
 
+    /** Confirming an upload mutates it (checksum, dedup, state transition) — owner or manager only. */
+    public function confirm(User $user, ?Media $media = null): bool
+    {
+        if ($media === null) {
+            return $user->can('media.upload') || $user->can('media.manage');
+        }
+
+        return (string) $media->created_by === (string) $user->id || $user->can('media.manage');
+    }
+
     public function delete(User $user, ?Media $media = null): bool
     {
         if ($media === null) {
