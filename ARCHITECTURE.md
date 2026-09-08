@@ -7,45 +7,55 @@ contracts, and application services — never through each other's internals.
 
 ## Layer map
 
+The codebase is organized as **modules**, not a single `app/Domain` tree.
+`app/` itself now holds only host-level wiring (`Http/`, `Providers/`); every
+business capability lives under `modules/{Module}/`, each split into three
+internal layers:
+
 ```
-app/
-├── Core/                    ← shared kernel (no business rules)
-│   ├── Support/             Result, Money (minor-units value object)
-│   ├── Abstracts/           DataTransferObject, BaseRepository
-│   ├── Contracts/           RepositoryInterface
-│   ├── Events/              DomainEvent, EventBus, StoredInOutbox
-│   ├── Outbox/              OutboxMessage (transactional outbox)
-│   ├── Exceptions/          ApiException → Domain/Payment/Integration
-│   ├── Http/                ApiController, ForceJsonResponse, SetLocale,
-│   │                        IdempotencyMiddleware
-│   ├── Tenancy/             TenantManager, TenantScope, BelongsToTenant,
-│   │                        ResolveTenant (single-DB tenant_id strategy)
-│   └── Traits/              ApiResponses, HasUuid, HasTranslations
+modules/
+├── Shared/                  ← shared kernel (no business rules)
+│   ├── Domain/               Contracts, Events, Specifications, Support (Money)
+│   ├── Application/           Abstracts (BaseRepository), Exceptions, Support
+│   └── Infrastructure/        Tenancy (TenantManager, TenantScope,
+│                              BelongsToTenant), Events (EventBus, Outbox),
+│                              Broadcasting, Realtime, Queue, Persistence,
+│                              Localization, Traits, config/
 │
-├── Domain/                  ← business capabilities (one folder per subdomain)
-│   ├── Auth/                User, RegisterUser, IssueApiToken, UserRegistered
-│   ├── Governance/          AuditLog, Settings, FeatureFlags,
-│   │                        ApprovalRequests (maker-checker)
-│   ├── Payment/             PaymentManager + Stripe/Paymob/Fawry/PayTabs
-│   │                        drivers, PaymentService, refund approvals
-│   ├── Wallet/              Wallet + append-only ledger + escrow
-│   │                        (hold → capture/release), row-level locking
-│   ├── Webhook/             outgoing webhooks: endpoints, deliveries,
-│   │                        signed + retried DeliverWebhook job
-│   └── Integration/         CircuitBreaker, ApiClient base, SmsManager
+├── Auth/                    User, RegisterUser, IssueApiToken, UserRegistered,
+│                            MFA, lockout policies
+├── RBAC/                    Roles, permissions, tenant-scoped policy resolution
+├── Governance/               AuditLog, Settings, FeatureFlags,
+│                            ApprovalRequest (maker-checker)
+├── Payment/                  PaymentManager + Stripe/Paymob/Fawry/PayTabs
+│                            drivers, PaymentService, refund approvals
+├── Wallet/                   Wallet + append-only ledger + escrow
+│                            (hold → capture/release), row-level locking
+├── Webhook/                  Outgoing webhooks: endpoints, deliveries,
+│                            signed + retried DeliverWebhook job
+├── Integration/               CircuitBreaker, ApiClient base, SmsManager
 │                            (Twilio/Vonage/log), FCM push
-│
-├── Http/                    ← delivery layer only (thin controllers)
-│   ├── Controllers/Api/V1/  versioned controllers
-│   ├── Requests/            FormRequest validation
-│   └── Resources/           response transformers
-│
-└── Providers/               AppServiceProvider, DomainEventServiceProvider
+├── Media/                    Upload/verify/process pipeline, virus scanning,
+│                            moderation, state machine
+├── Communication/             In-app messaging / conversations
+├── Currency/                  Exchange rates, currency conversion
+└── Territory/                 Countries/regions/duplicate detection
+
+Each module follows the same three sub-layers:
+  Domain/          entities, contracts, domain events — no framework code
+  Infrastructure/   Eloquent models' concerns, services, providers, config/
+  Presentation/     Http/Controllers, Requests, Resources, Policies, routes/
 ```
 
-**Dependency rule:** `Http → Domain → Core`. Core imports nothing from
-Domain; Domain never imports Http. Cross-domain reactions happen through
-events (e.g. `UserRegistered` → Wallet provisioning), not direct calls.
+**Dependency rule:** within a module, `Presentation → Infrastructure →
+Domain`. Across modules, the intended seam is events and shared contracts
+(e.g. `UserRegistered` → Wallet provisioning) rather than direct calls —
+Governance's `approvals.handlers` config map (invoking a handler by name,
+never importing it beyond that array) is the model to follow. Payment and
+Governance are a known exception: `PaymentService` currently depends on
+Governance's `ApprovalService`/`ApprovalRequest`/`AuditLogger` directly.
+Treat that as tracked debt, not the pattern to copy for new cross-module
+work — see the "Known gaps" section below.
 
 ## Patterns in use (and why)
 
@@ -134,3 +144,22 @@ with stable `error.code` values clients can switch on.
   timestamp tolerance); webhook egress: HMAC-signed with rotatable secrets.
 - Audit logger masks `password`, `token`, `secret`, `api_key`, …
 - Secrets only in `.env`; nothing sensitive in code or logs.
+- `config/cors.php` / `config/sanctum.php` are published explicitly
+  (`CORS_ALLOWED_ORIGINS`, `SANCTUM_STATEFUL_DOMAINS`) rather than left on
+  framework defaults.
+
+## Known gaps
+
+- **Payment ↔ Governance coupling.** `PaymentService` imports Governance's
+  `ApprovalService`, `ApprovalRequest`, and `AuditLogger` directly, and
+  `Governance`'s config imports Payment's `ApproveRefundHandler`. This is a
+  real, bidirectional class-level dependency — not an events-only seam — so
+  neither module can be extracted into its own service without the other.
+  The fix is to have Payment raise a `RefundRequested` domain event that
+  Governance subscribes to, rather than Payment orchestrating Governance's
+  services inline.
+- **HSTS, CSP, and a WAF** are not configured at the application layer —
+  expected to be handled by the edge/reverse proxy in front of this service.
+- **No dedicated secrets manager** — secrets are environment variables /
+  Docker `*_FILE` mounts, not Vault/AWS Secrets Manager. Acceptable for the
+  current deployment target; revisit if that changes.

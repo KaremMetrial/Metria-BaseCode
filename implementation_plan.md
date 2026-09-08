@@ -1,5 +1,12 @@
 # Implementation Plan: Advanced Enterprise Media Upload Domain
 
+> **Historical planning document.** Written against an earlier scaffold path
+> (`app/Domain/Media`) on a previous contributor's machine — the links below
+> point to `file:///home/metrial/Downloads/laravel-enterprise-base/...` and
+> will not resolve here. The implemented result lives at
+> `modules/Media/{Domain,Infrastructure,Presentation}` in this repository.
+> Kept for historical context on the design intent, not as a working index.
+
 Design and implement a highly secure, scalable, and resilient media upload and processing domain (`app/Domain/Media`) incorporating direct-to-cloud uploads, an explicit `MediaStatus` state machine, tenant-scoped physical blob deduplication, virus scanning, content moderation, integrity checksum validation, and variant generation.
 
 ---
