@@ -28,17 +28,7 @@ class UserRoleController extends ApiController
     {
         $this->authorize('rbac.roles.manage');
 
-        $validated = $request->validate([
-            'roles' => ['required', 'array'],
-            'roles.*' => ['string', Rule::exists('roles', 'name')->where(function (\Illuminate\Database\Query\Builder $query) {
-                $query->where('tenant_id', app(TenantManager::class)->id())->orWhereNull('tenant_id');
-            })],
-        ]);
-        $validatedArray = is_array($validated) ? $validated : [];
-        $rolesVal = $validatedArray['roles'] ?? [];
-        /** @var array<int, string> $roles */
-        $roles = is_array($rolesVal) ? array_filter($rolesVal, 'is_string') : [];
-
+        $roles = $this->validatedRoles($request);
         $this->syncAction->execute($user, $roles, 'add');
 
         return $this->respond(RoleResource::collection($user->refresh()->roles), __('rbac.roles_added'));
@@ -48,17 +38,7 @@ class UserRoleController extends ApiController
     {
         $this->authorize('rbac.roles.manage');
 
-        $validated = $request->validate([
-            'roles' => ['required', 'array'],
-            'roles.*' => ['string', Rule::exists('roles', 'name')->where(function (\Illuminate\Database\Query\Builder $query) {
-                $query->where('tenant_id', app(TenantManager::class)->id())->orWhereNull('tenant_id');
-            })],
-        ]);
-        $validatedArray = is_array($validated) ? $validated : [];
-        $rolesVal = $validatedArray['roles'] ?? [];
-        /** @var array<int, string> $roles */
-        $roles = is_array($rolesVal) ? array_filter($rolesVal, 'is_string') : [];
-
+        $roles = $this->validatedRoles($request);
         $this->syncAction->execute($user, $roles, 'replace');
 
         return $this->respond(RoleResource::collection($user->refresh()->roles), __('rbac.roles_synced'));
@@ -68,6 +48,17 @@ class UserRoleController extends ApiController
     {
         $this->authorize('rbac.roles.manage');
 
+        $roles = $this->validatedRoles($request);
+        $this->syncAction->execute($user, $roles, 'remove');
+
+        return $this->respond(null, __('rbac.roles_removed'));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function validatedRoles(Request $request): array
+    {
         $validated = $request->validate([
             'roles' => ['required', 'array'],
             'roles.*' => ['string', Rule::exists('roles', 'name')->where(function (\Illuminate\Database\Query\Builder $query) {
@@ -76,11 +67,7 @@ class UserRoleController extends ApiController
         ]);
         $validatedArray = is_array($validated) ? $validated : [];
         $rolesVal = $validatedArray['roles'] ?? [];
-        /** @var array<int, string> $roles */
-        $roles = is_array($rolesVal) ? array_filter($rolesVal, 'is_string') : [];
 
-        $this->syncAction->execute($user, $roles, 'remove');
-
-        return $this->respond(null, __('rbac.roles_removed'));
+        return is_array($rolesVal) ? array_filter($rolesVal, 'is_string') : [];
     }
 }

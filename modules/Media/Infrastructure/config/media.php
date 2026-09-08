@@ -24,7 +24,10 @@ return [
         'video/quicktime',
         'video/x-matroska',
         'application/pdf',
-        'application/zip',
+        // 'application/zip' — REMOVED: no decompression-ratio or entry-count guard
+        //   exists in the verification/processing pipeline, so archives are a
+        //   zip-bomb and content-smuggling vector. Re-enable only alongside
+        //   explicit decompressed-size and entry-count limits.
     ],
 
     'max_file_size_bytes' => env('MEDIA_MAX_FILE_SIZE', 500 * 1024 * 1024), // 500 MB

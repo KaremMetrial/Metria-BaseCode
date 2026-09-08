@@ -13,6 +13,7 @@ use Modules\Wallet\Domain\Events\WalletCredited;
 use Modules\Wallet\Domain\Events\WalletDebited;
 use Modules\Wallet\Domain\Models\Wallet;
 use Modules\Wallet\Domain\Models\WalletTransaction;
+use Modules\Shared\Infrastructure\Tenancy\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -176,7 +177,7 @@ class WalletService
 
     private function locked(Wallet $wallet): Wallet
     {
-        return Wallet::query()->withoutGlobalScopes()->lockForUpdate()->findOrFail($wallet->id);
+        return Wallet::query()->withoutGlobalScope(TenantScope::class)->lockForUpdate()->findOrFail($wallet->id);
     }
 
     private function ledger(Wallet $wallet, WalletTransactionType $type, int $amount, ?string $description, ?Model $reference): WalletTransaction

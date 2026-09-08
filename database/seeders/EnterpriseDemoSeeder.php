@@ -26,6 +26,12 @@ final class EnterpriseDemoSeeder extends Seeder
 
     public function run(): void
     {
+        if (app()->environment('production')) {
+            throw new \RuntimeException(
+                'EnterpriseDemoSeeder seeds accounts with a published, hardcoded password and must never run in production.'
+            );
+        }
+
         $now = now();
         $this->seedTenants($now);
         $this->seedCurrencies($now);
