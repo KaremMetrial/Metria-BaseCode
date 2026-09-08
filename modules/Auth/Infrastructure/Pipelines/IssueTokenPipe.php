@@ -8,13 +8,13 @@ use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Auth\Domain\Events\UserLoggedIn;
 use Modules\Auth\Domain\Events\UserLoggedInByOtp;
 use Modules\Auth\Presentation\Http\Resources\UserResource;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Closure;
 
 class IssueTokenPipe
 {
     public function __construct(
-        private readonly AuditLogger $audit,
+        private readonly AuditRecorder $audit,
         private readonly EventBus $events
     ) {}
 

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Modules\Governance\Infrastructure\Services;
 
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 use Modules\Governance\Domain\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
 
-class AuditLogger
+class AuditLogger implements AuditRecorder
 {
     /**
      * Write an audit entry. Sensitive attributes are masked according to

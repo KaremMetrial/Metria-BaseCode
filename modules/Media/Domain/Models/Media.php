@@ -6,7 +6,7 @@ namespace Modules\Media\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use Modules\Governance\Infrastructure\Traits\Auditable;
+use Modules\Shared\Infrastructure\Traits\Auditable;
 use Modules\Media\Domain\Enums\MediaStatus;
 use Modules\Media\Domain\Enums\MediaType;
 use Illuminate\Database\Eloquent\Model;

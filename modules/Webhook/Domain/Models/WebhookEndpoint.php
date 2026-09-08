@@ -6,7 +6,7 @@ namespace Modules\Webhook\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use Modules\Governance\Infrastructure\Traits\Auditable;
+use Modules\Shared\Infrastructure\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;

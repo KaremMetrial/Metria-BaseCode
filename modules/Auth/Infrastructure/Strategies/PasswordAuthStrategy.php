@@ -7,14 +7,14 @@ namespace Modules\Auth\Infrastructure\Strategies;
 use Modules\Shared\Application\Exceptions\ApiException;
 use Modules\Auth\Domain\Contracts\AuthStrategyInterface;
 use Modules\Auth\Domain\Models\User;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 
 class PasswordAuthStrategy implements AuthStrategyInterface
 {
     public function __construct(
-        private readonly AuditLogger $audit
+        private readonly AuditRecorder $audit
     ) {}
 
     /**

@@ -7,7 +7,7 @@ namespace Modules\Auth\Infrastructure\Services;
 use Modules\Shared\Application\Exceptions\ApiException;
 use Modules\Auth\Domain\Events\UserLoggedIn;
 use Modules\Auth\Domain\Models\User;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\RateLimiter;
  */
 class IssueApiToken
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(private readonly AuditRecorder $audit) {}
 
     /**
      * @return array{user: User, token: string}

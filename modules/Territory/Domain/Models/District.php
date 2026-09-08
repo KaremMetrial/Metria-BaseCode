@@ -7,7 +7,7 @@ namespace Modules\Territory\Domain\Models;
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasTranslations;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use Modules\Governance\Infrastructure\Traits\Auditable;
+use Modules\Shared\Infrastructure\Traits\Auditable;
 use Modules\Shared\Infrastructure\Translation\Traits\AutoTranslates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

@@ -9,7 +9,7 @@ use Modules\Auth\Domain\Events\AllSessionsRevoked;
 use Modules\Auth\Domain\Events\PasswordResetRequested;
 use Modules\Auth\Domain\Events\PasswordResetSuccessfully;
 use Modules\Auth\Domain\Models\User;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 class PasswordResetService
 {
     public function __construct(
-        private readonly AuditLogger $audit
+        private readonly AuditRecorder $audit
     ) {}
 
     public function requestReset(string $email): void

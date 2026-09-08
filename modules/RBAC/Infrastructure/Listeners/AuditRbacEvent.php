@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\RBAC\Infrastructure\Listeners;
 
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Modules\RBAC\Domain\Events\RoleCreated;
 use Modules\RBAC\Domain\Events\RoleDeleted;
 use Modules\RBAC\Domain\Events\RolePermissionsUpdated;
@@ -13,7 +13,7 @@ use Illuminate\Events\Dispatcher;
 
 class AuditRbacEvent
 {
-    public function __construct(private readonly AuditLogger $auditLogger) {}
+    public function __construct(private readonly AuditRecorder $auditLogger) {}
 
     public function subscribe(Dispatcher $events): void
     {

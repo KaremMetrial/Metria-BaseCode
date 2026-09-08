@@ -7,7 +7,7 @@ namespace Modules\Auth\Infrastructure\Services;
 use Modules\Shared\Infrastructure\Events\EventBus;
 use Modules\Auth\Domain\Events\UserRegistered;
 use Modules\Auth\Domain\Models\User;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Modules\Media\Infrastructure\Services\MediaUploadService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +21,7 @@ class RegisterUser
 {
     public function __construct(
         private readonly EventBus $events,
-        private readonly AuditLogger $audit,
+        private readonly AuditRecorder $audit,
         private readonly MediaUploadService $mediaUpload
     ) {}
 

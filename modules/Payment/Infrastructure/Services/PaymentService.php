@@ -9,9 +9,8 @@ use Modules\Shared\Application\Exceptions\ApiException;
 use Modules\Shared\Application\Exceptions\DomainException;
 use Modules\Shared\Domain\Support\Money;
 use Modules\Auth\Domain\Models\User;
-use Modules\Governance\Domain\Models\ApprovalRequest;
-use Modules\Governance\Infrastructure\Services\ApprovalService;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\ApprovalGateway;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Modules\Payment\Domain\DTOs\PaymentResult;
 use Modules\Payment\Domain\Enums\PaymentStatus;
 use Modules\Payment\Domain\Events\PaymentFailed;
@@ -24,14 +23,18 @@ use Illuminate\Support\Facades\DB;
 /**
  * Application service orchestrating the payment lifecycle:
  * create → (gateway) → webhook transition → optional maker-checker refund.
+ *
+ * Refund approval is delegated through the Shared ApprovalGateway/
+ * AuditRecorder contracts (implemented by Governance) rather than importing
+ * Governance's services directly — Payment stays extractable on its own.
  */
 class PaymentService
 {
     public function __construct(
         private readonly PaymentManager $gateways,
         private readonly EventBus $events,
-        private readonly ApprovalService $approvals,
-        private readonly AuditLogger $audit,
+        private readonly ApprovalGateway $approvals,
+        private readonly AuditRecorder $audit,
     ) {}
 
     /**
@@ -136,8 +139,13 @@ class PaymentService
     /**
      * Maker-checker entry point: when approvals are enabled the refund is
      * queued for a second pair of eyes; otherwise it executes immediately.
+     *
+     * Returns the approval-gateway's pending-request object (a Governance
+     * ApprovalRequest at runtime, typed here as `object` since Payment
+     * doesn't depend on Governance's concrete model) when approvals are
+     * enabled, or the refunded Payment when they're not.
      */
-    public function requestRefund(Payment $payment, ?Money $amount, User $requestedBy, ?string $reason = null): ApprovalRequest|Payment
+    public function requestRefund(Payment $payment, ?Money $amount, User $requestedBy, ?string $reason = null): object
     {
         $this->assertRefundable($payment, $amount);
 

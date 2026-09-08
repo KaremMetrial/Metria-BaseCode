@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Listeners;
 
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 
 class AuditSecurityEvent
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(private readonly AuditRecorder $audit) {}
 
     public function handle(object $event): void
     {

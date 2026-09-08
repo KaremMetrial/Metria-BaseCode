@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Governance\Infrastructure\Observers;
 
+use Modules\Shared\Domain\Contracts\AuditObserver;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
 use Illuminate\Database\Eloquent\Model;
 
-class AuditableObserver
+class AuditableObserver implements AuditObserver
 {
     public function __construct(private readonly AuditLogger $logger) {}
 

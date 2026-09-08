@@ -10,14 +10,14 @@ use Modules\Auth\Domain\Events\SocialIdentityUnlinked;
 use Modules\Auth\Domain\Events\UserLoggedInByProvider;
 use Modules\Auth\Domain\Models\User;
 use Modules\Auth\Domain\Models\UserSocialIdentity;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class SocialIdentityService
 {
     public function __construct(
-        private readonly AuditLogger $audit,
+        private readonly AuditRecorder $audit,
         private readonly AuthMethodGovernanceService $governance
     ) {}
 

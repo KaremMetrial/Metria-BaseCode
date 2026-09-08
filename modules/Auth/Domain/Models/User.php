@@ -6,7 +6,7 @@ namespace Modules\Auth\Domain\Models;
 
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
-use Modules\Governance\Infrastructure\Traits\Auditable;
+use Modules\Shared\Infrastructure\Traits\Auditable;
 use Modules\Media\Domain\Models\Media;
 use Modules\Wallet\Domain\Models\Wallet;
 use Modules\Auth\Infrastructure\Database\Factories\UserFactory;

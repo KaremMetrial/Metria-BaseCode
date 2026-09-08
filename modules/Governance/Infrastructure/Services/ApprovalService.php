@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Governance\Infrastructure\Services;
 
 use Modules\Shared\Application\Exceptions\DomainException;
+use Modules\Shared\Domain\Contracts\ApprovalGateway;
 use Modules\Auth\Domain\Models\User;
 use Modules\Governance\Domain\Enums\ApprovalStatus;
 use Modules\Governance\Domain\Models\ApprovalRequest;
@@ -21,7 +22,7 @@ use Throwable;
  *                  .handlers') is invoked with the payload.
  *  3. reject()   — closes the request without executing.
  */
-class ApprovalService
+class ApprovalService implements ApprovalGateway
 {
     public function __construct(private readonly AuditLogger $audit) {}
 

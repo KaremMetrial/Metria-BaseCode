@@ -49,13 +49,22 @@ Each module follows the same three sub-layers:
 
 **Dependency rule:** within a module, `Presentation → Infrastructure →
 Domain`. Across modules, the intended seam is events and shared contracts
-(e.g. `UserRegistered` → Wallet provisioning) rather than direct calls —
-Governance's `approvals.handlers` config map (invoking a handler by name,
-never importing it beyond that array) is the model to follow. Payment and
-Governance are a known exception: `PaymentService` currently depends on
-Governance's `ApprovalService`/`ApprovalRequest`/`AuditLogger` directly.
-Treat that as tracked debt, not the pattern to copy for new cross-module
-work — see the "Known gaps" section below.
+rather than direct calls. Two concrete examples:
+
+- Governance's `approvals.handlers` config map invokes a handler by class
+  name without importing it beyond that array — Governance drives, the
+  handler's owning module (e.g. Payment's `ApproveRefundHandler`) supplies.
+- Payment depends on Governance's maker-checker and audit-logging
+  capabilities through `Modules\Shared\Domain\Contracts\ApprovalGateway`
+  and `AuditRecorder` — contracts owned by Shared and bound to Governance's
+  concrete services in `GovernanceServiceProvider`. `PaymentService` never
+  imports Governance's `ApprovalService`/`ApprovalRequest`/`AuditLogger`
+  directly, so Payment stays extractable without dragging Governance's
+  internals along. The `Auditable` trait models opt into (Payment, Wallet,
+  Media, Webhook, Territory, Auth's `User`) lives in
+  `Modules\Shared\Infrastructure\Traits` for the same reason — it resolves
+  its observer through `Modules\Shared\Domain\Contracts\AuditObserver`
+  rather than importing Governance's `AuditableObserver`.
 
 ## Patterns in use (and why)
 
@@ -150,14 +159,14 @@ with stable `error.code` values clients can switch on.
 
 ## Known gaps
 
-- **Payment ↔ Governance coupling.** `PaymentService` imports Governance's
-  `ApprovalService`, `ApprovalRequest`, and `AuditLogger` directly, and
-  `Governance`'s config imports Payment's `ApproveRefundHandler`. This is a
-  real, bidirectional class-level dependency — not an events-only seam — so
-  neither module can be extracted into its own service without the other.
-  The fix is to have Payment raise a `RefundRequested` domain event that
-  Governance subscribes to, rather than Payment orchestrating Governance's
-  services inline.
+- **Governance's `approvals.handlers` config still names handler classes by
+  module** (e.g. `payments.refund => Payment\...\ApproveRefundHandler`),
+  and a handler's `__invoke` receives Governance's concrete `ApprovalRequest`
+  model. This is the accepted direction for a plugin-style registry
+  (Governance drives, the owning module supplies the handler) rather than
+  the problematic kind of coupling — but it does mean a handler class is
+  never fully framework-agnostic of Governance's domain model. Not treated
+  as debt; documented so it isn't mistaken for an oversight.
 - **HSTS, CSP, and a WAF** are not configured at the application layer —
   expected to be handled by the edge/reverse proxy in front of this service.
 - **No dedicated secrets manager** — secrets are environment variables /

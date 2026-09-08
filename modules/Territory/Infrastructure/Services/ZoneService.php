@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\Territory\Infrastructure\Services;
 
 use Modules\Shared\Infrastructure\Events\EventBus;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Modules\Territory\Domain\Events\ZoneStatusChanged;
 use Modules\Territory\Infrastructure\Persistence\Filters\TerritoryFilter;
 use Modules\Territory\Domain\Models\Zone;
@@ -18,7 +18,7 @@ class ZoneService
     public function __construct(
         private readonly ZoneRepository $repository,
         private readonly EventBus $events,
-        private readonly AuditLogger $audit,
+        private readonly AuditRecorder $audit,
     ) {}
 
     /**

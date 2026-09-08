@@ -8,7 +8,7 @@ use Modules\Shared\Domain\Support\Money;
 use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
 use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Modules\Auth\Domain\Models\User;
-use Modules\Governance\Infrastructure\Traits\Auditable;
+use Modules\Shared\Infrastructure\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

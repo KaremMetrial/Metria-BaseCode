@@ -9,7 +9,7 @@ use Modules\Auth\Domain\Events\MfaDisabled;
 use Modules\Auth\Domain\Events\MfaEnabled;
 use Modules\Auth\Domain\Events\MfaVerified;
 use Modules\Auth\Domain\Models\User;
-use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Shared\Domain\Contracts\AuditRecorder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -18,7 +18,7 @@ class MfaService
 {
     private const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(private readonly AuditRecorder $audit) {}
 
     /**
      * @return array{secret: string, qr_url: string, recovery_codes: string[]}
