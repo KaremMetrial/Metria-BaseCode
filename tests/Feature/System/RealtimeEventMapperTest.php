@@ -22,7 +22,7 @@ class RealtimeEventMapperTest extends TestCase
     {
         config(['tenancy.enabled' => true]);
         $tenantId = '11111111-1111-4111-8111-111111111111';
-        DB::table('tenants')->insert([
+        DB::table('tenants')->updateOrInsert(['id' => $tenantId], [
             'id' => $tenantId,
             'name' => 'Realtime Test Tenant',
             'slug' => 'realtime-test-tenant',
@@ -53,7 +53,7 @@ class RealtimeEventMapperTest extends TestCase
     public function test_session_revocation_targets_only_the_revoked_token_owner(): void
     {
         $tenantId = '22222222-2222-4222-8222-222222222222';
-        DB::table('tenants')->insert([
+        DB::table('tenants')->updateOrInsert(['id' => $tenantId], [
             'id' => $tenantId,
             'name' => 'Realtime Security Tenant',
             'slug' => 'realtime-security-tenant',

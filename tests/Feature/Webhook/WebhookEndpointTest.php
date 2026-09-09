@@ -78,7 +78,11 @@ class WebhookEndpointTest extends TestCase
             'events' => ['payment.succeeded'],
         ]);
 
-        $response->assertStatus(422)->assertJsonValidationErrors('url');
+        // This app wraps validation failures in its own envelope
+        // (error.errors.*) rather than Laravel's default top-level
+        // `errors` key — see ApiExceptionRenderer::renderValidation().
+        $response->assertStatus(422)->assertJsonPath('error.code', 'validation_failed');
+        $this->assertNotEmpty($response->json('error.errors.url'));
         $this->assertDatabaseMissing('webhook_endpoints', ['url' => $url]);
     }
 
@@ -104,10 +108,13 @@ class WebhookEndpointTest extends TestCase
             'events' => ['payment.succeeded'],
         ])->json('data.id');
 
-        $this->putJson("/api/v1/webhook-endpoints/{$endpointId}", [
+        $response = $this->putJson("/api/v1/webhook-endpoints/{$endpointId}", [
             'name' => 'Billing Service',
             'url' => 'https://127.0.0.1/webhook',
             'events' => ['payment.succeeded'],
-        ])->assertStatus(422)->assertJsonValidationErrors('url');
+        ]);
+
+        $response->assertStatus(422)->assertJsonPath('error.code', 'validation_failed');
+        $this->assertNotEmpty($response->json('error.errors.url'));
     }
 }

@@ -45,7 +45,7 @@ class CurrencyRegistryTest extends TestCase
         $this->providerChain = $this->app->make(ExchangeRateProviderChain::class);
 
         // Seed default EGP currency
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'EGP'], [
             'code' => 'EGP',
             'name' => ['en' => 'Egyptian Pound', 'ar' => 'جنيه مصري'],
             'symbol' => ['en' => 'EGP', 'ar' => 'ج.م'],
@@ -61,7 +61,7 @@ class CurrencyRegistryTest extends TestCase
     public function test_default_currency_uniqueness(): void
     {
         // Add second currency with is_default = true
-        $usd = Currency::create([
+        $usd = Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],
@@ -91,7 +91,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_currencies_cannot_be_deleted_once_referenced(): void
     {
-        $usd = Currency::create([
+        $usd = Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],
@@ -118,7 +118,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_non_overlapping_validity_windows(): void
     {
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],
@@ -164,7 +164,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_stale_rate_policy(): void
     {
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],
@@ -193,7 +193,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_locked_manual_override_precedence(): void
     {
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],
@@ -287,7 +287,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_currency_conversion_and_rounding(): void
     {
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],
@@ -362,7 +362,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_currencies_with_zero_and_three_minor_units(): void
     {
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'BHD'], [
             'code' => 'BHD',
             'name' => ['en' => 'Bahraini Dinar'],
             'symbol' => ['en' => 'BD'],
@@ -371,7 +371,7 @@ class CurrencyRegistryTest extends TestCase
             'is_default' => false,
         ]);
 
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'JPY'], [
             'code' => 'JPY',
             'name' => ['en' => 'Japanese Yen'],
             'symbol' => ['en' => '¥'],
@@ -418,7 +418,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_payment_snapshot_integrity(): void
     {
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],
@@ -468,7 +468,7 @@ class CurrencyRegistryTest extends TestCase
      */
     public function test_property_based_conversion(): void
     {
-        Currency::create([
+        Currency::query()->updateOrCreate(['code' => 'USD'], [
             'code' => 'USD',
             'name' => ['en' => 'US Dollar'],
             'symbol' => ['en' => '$'],

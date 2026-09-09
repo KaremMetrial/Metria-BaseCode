@@ -31,8 +31,15 @@ class OAuthProviderTenantIsolationTest extends TestCase
         );
 
         $user = User::factory()->create(['tenant_id' => $tenantId]);
-        $permission = Permission::firstOrCreate(['name' => 'integrations.oauth.manage', 'guard_name' => 'web']);
-        $user->givePermissionTo($permission);
+
+        // RBAC uses Spatie's tenant-scoped "teams" feature (team_foreign_key
+        // = tenant_id) — a permission must be granted under the same team
+        // context the request will later resolve, or $user->can(...)
+        // evaluates against the wrong team and silently returns false.
+        setPermissionsTeamId($tenantId);
+        Permission::firstOrCreate(['name' => 'integrations.oauth.manage', 'guard_name' => 'web']);
+        Permission::firstOrCreate(['name' => 'integrations.oauth.view', 'guard_name' => 'web']);
+        $user->givePermissionTo(['integrations.oauth.manage', 'integrations.oauth.view']);
 
         return $user;
     }

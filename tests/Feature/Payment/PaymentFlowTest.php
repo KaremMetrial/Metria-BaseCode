@@ -76,7 +76,10 @@ class PaymentFlowTest extends TestCase
         $second->assertCreated();
         $second->assertHeader('Idempotency-Replayed', 'true');
 
-        $this->assertSame(1, Payment::query()->count());
+        // Scoped to this test's own user: EnterpriseDemoSeeder (which
+        // TestCase::$seed runs) plants its own demo payment row, so a
+        // global count would include that unrelated row too.
+        $this->assertSame(1, Payment::query()->where('user_id', $user->id)->count());
         $this->assertSame(
             $first->json('data.payment.id'),
             $second->json('data.payment.id'),

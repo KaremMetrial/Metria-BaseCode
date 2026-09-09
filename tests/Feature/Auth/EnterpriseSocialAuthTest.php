@@ -8,6 +8,9 @@ use Modules\Auth\Domain\Models\User;
 use Modules\Auth\Domain\Models\UserSocialIdentity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Laravel\Socialite\Contracts\Provider as SocialiteProviderContract;
+use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\User as SocialiteUser;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
@@ -28,8 +31,30 @@ class EnterpriseSocialAuthTest extends TestCase
         ]);
     }
 
+    /**
+     * verifySocialIdentity() (on by default — see auth_features.php) calls
+     * Socialite::driver($provider)->userFromToken($token) and cross-checks
+     * the result's id/email against what the client submitted. Mock that
+     * provider round-trip to return a matching verified identity, the way
+     * a real callback from Google/Apple/GitHub would.
+     */
+    private function fakeVerifiedSocialUser(string $provider, string $id, ?string $email): void
+    {
+        $verified = SocialiteUser::fake([
+            'id' => $id,
+            'email' => $email,
+        ]);
+
+        $driver = \Mockery::mock(SocialiteProviderContract::class);
+        $driver->shouldReceive('userFromToken')->andReturn($verified);
+
+        Socialite::shouldReceive('driver')->with($provider)->andReturn($driver);
+    }
+
     public function test_social_callback_creates_new_user_and_links_identity(): void
     {
+        $this->fakeVerifiedSocialUser('google', 'google_12345', 'newuser@example.com');
+
         $response = $this->postJson('/api/v1/auth/social/google/callback', [
             'id' => 'google_12345',
             'email' => 'newuser@example.com',
@@ -56,10 +81,13 @@ class EnterpriseSocialAuthTest extends TestCase
             'password' => 'Secret123!',
         ]);
 
+        $this->fakeVerifiedSocialUser('apple', 'apple_99999', 'existing@example.com');
+
         $response = $this->postJson('/api/v1/auth/social/apple/callback', [
             'id' => 'apple_99999',
             'email' => 'existing@example.com',
             'name' => 'Apple User',
+            'token' => 'mock_token',
         ]);
 
         $response->assertOk()
@@ -78,10 +106,13 @@ class EnterpriseSocialAuthTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
+        $this->fakeVerifiedSocialUser('github', 'github_555', $user->email);
+
         $this->postJson('/api/v1/auth/social/github/link', [
             'id' => 'github_555',
             'email' => $user->email,
             'name' => 'GitHub Dev',
+            'token' => 'mock_token',
         ])->assertOk();
 
         $this->assertDatabaseHas('user_social_identities', [

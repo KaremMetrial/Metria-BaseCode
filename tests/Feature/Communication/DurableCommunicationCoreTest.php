@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Communication;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\Auth\Domain\Models\User;
 use Modules\Communication\Domain\Models\Conversation;
@@ -55,8 +56,12 @@ class DurableCommunicationCoreTest extends TestCase
             'next_sequence' => 1,
             'version' => 2,
         ]);
-        $this->assertDatabaseCount('communication_memberships', 2);
-        $this->assertDatabaseCount('communication_messages', 1);
+        // Scoped to this test's own conversation/tenant: EnterpriseDemoSeeder
+        // (which TestCase::$seed runs) plants its own demo conversation,
+        // membership, and message rows, so a global count would include
+        // those unrelated rows too.
+        $this->assertSame(2, DB::table('communication_memberships')->where('conversation_id', $conversationId)->count());
+        $this->assertSame(1, DB::table('communication_messages')->where('conversation_id', $conversationId)->count());
         $this->assertDatabaseHas('outbox_messages', ['event_name' => 'communication.conversation.created']);
         $this->assertDatabaseHas('outbox_messages', ['event_name' => 'communication.message.created']);
 
@@ -95,13 +100,21 @@ class DurableCommunicationCoreTest extends TestCase
         $second->assertCreated()->assertHeader('Idempotency-Replayed', 'true');
         $reused->assertStatus(409)->assertJsonPath('error.code', 'idempotency_key_reused');
 
-        $this->assertDatabaseCount('communication_conversations', 1);
+        $this->assertSame(1, DB::table('communication_conversations')->where('tenant_id', $tenantId)->count());
     }
 
     public function test_invalid_message_kind_rolls_back_sequence_message_and_outbox_event(): void
     {
         $tenantId = $this->setRandomTenant();
         [$author, $recipient] = $this->actors($tenantId);
+
+        // EnterpriseDemoSeeder (TestCase::$seed) plants its own message and
+        // outbox rows, so the assertions below check this test's own
+        // conversation/delta rather than a global count.
+        $messageCountBefore = Message::query()->count();
+        $conversationCreatedOutboxBefore = OutboxMessage::query()->where('event_name', 'communication.conversation.created')->count();
+        $messageCreatedOutboxBefore = OutboxMessage::query()->where('event_name', 'communication.message.created')->count();
+
         $conversation = $this->createDirectConversation($author, $recipient);
 
         $response = $this->actingAs($author)->postJson("/api/v1/communication/conversations/{$conversation->id}/messages", [
@@ -115,9 +128,9 @@ class DurableCommunicationCoreTest extends TestCase
         $conversation->refresh();
         $this->assertSame(0, $conversation->next_sequence);
         $this->assertSame(1, $conversation->version);
-        $this->assertSame(0, Message::query()->count());
-        $this->assertSame(1, OutboxMessage::query()->where('event_name', 'communication.conversation.created')->count());
-        $this->assertSame(0, OutboxMessage::query()->where('event_name', 'communication.message.created')->count());
+        $this->assertSame($messageCountBefore, Message::query()->count());
+        $this->assertSame(1, OutboxMessage::query()->where('event_name', 'communication.conversation.created')->count() - $conversationCreatedOutboxBefore);
+        $this->assertSame($messageCreatedOutboxBefore, OutboxMessage::query()->where('event_name', 'communication.message.created')->count());
     }
 
     public function test_cross_tenant_actor_cannot_synchronize_another_tenants_conversation(): void
@@ -166,6 +179,11 @@ class DurableCommunicationCoreTest extends TestCase
         $tenantId = $this->setRandomTenant();
         [$author, $recipient] = $this->actors($tenantId);
 
+        // EnterpriseDemoSeeder (TestCase::$seed) plants its own outbox rows,
+        // so this test checks the delta it itself causes rather than a
+        // global count.
+        $outboxCountBefore = DB::table('outbox_messages')->count();
+
         $payload = ['type' => 'direct', 'participant_ids' => [$recipient->id]];
         $first = $this->actingAs($author)->postJson('/api/v1/communication/conversations', $payload, [
             'Idempotency-Key' => (string) Str::uuid(),
@@ -176,9 +194,11 @@ class DurableCommunicationCoreTest extends TestCase
 
         $first->assertCreated();
         $second->assertCreated()->assertJsonPath('data.id', $first->json('data.id'));
-        $this->assertDatabaseCount('communication_conversations', 1);
-        $this->assertDatabaseCount('communication_memberships', 2);
-        $this->assertDatabaseCount('outbox_messages', 1);
+        $conversationId = $first->json('data.id');
+
+        $this->assertSame(1, DB::table('communication_conversations')->where('tenant_id', $tenantId)->count());
+        $this->assertSame(2, DB::table('communication_memberships')->where('conversation_id', $conversationId)->count());
+        $this->assertSame(1, DB::table('outbox_messages')->count() - $outboxCountBefore);
     }
 
     /** @return array{0: User, 1: User} */
