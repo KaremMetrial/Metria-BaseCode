@@ -136,10 +136,16 @@ class StripeGateway implements PaymentGateway
         $latestChargeVal = $objectVal['latest_charge'] ?? null;
         $latestCharge = is_scalar($latestChargeVal) ? (string) $latestChargeVal : null;
 
+        // Present on the charge object for charge.refunded events — lets
+        // handleWebhook() reconcile refunded_amount instead of only ever
+        // flipping status (see PaymentService::handleWebhook).
+        $amountRefundedVal = $objectVal['amount_refunded'] ?? null;
+        $amountRefunded = is_numeric($amountRefundedVal) ? (int) $amountRefundedVal : null;
+
         return new WebhookResult(
             gatewayReference: $gatewayRef,
             status: $status,
-            extra: ['latest_charge' => $latestCharge],
+            extra: ['latest_charge' => $latestCharge, 'amount_refunded' => $amountRefunded],
             raw: $event,
         );
     }

@@ -57,7 +57,7 @@ class VerifyOtp
                     return ['status' => 422, 'code' => 'otp_max_attempts', 'message' => __('auth.otp_max_attempts', ['default' => 'Too many invalid attempts. Please request a new OTP.'])];
                 }
 
-                if ($otp->code !== $code) {
+                if (! hash_equals((string) $otp->code, (string) $code)) {
                     $otp->increment('attempts');
                     $this->events->publish(new OtpFailed($identifier, $action, $guard, 'invalid_code'));
                     return ['status' => 422, 'code' => 'otp_invalid', 'message' => __('auth.otp_invalid', ['default' => 'Invalid OTP code.'])];

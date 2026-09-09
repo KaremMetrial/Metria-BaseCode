@@ -116,8 +116,29 @@ class PaymentService
                 return $payment; // duplicate delivery
             }
 
+            // executeRefund() is the only other place that touches
+            // refunded_amount. If a refund happens outside this app (gateway
+            // dashboard) and only arrives here as a webhook, status alone
+            // used to flip to Refunded/PartiallyRefunded while
+            // refunded_amount stayed at its old value — remainingRefundable()
+            // would then still report the full amount as refundable,
+            // allowing the same payment to be refunded twice. A full
+            // Refunded status unambiguously means the whole amount is gone
+            // regardless of gateway; a known amount_refunded (Stripe) is
+            // used when present for the partial case.
+            $refundedAmount = $payment->refunded_amount;
+            if (in_array($webhook->status, [PaymentStatus::Refunded, PaymentStatus::PartiallyRefunded], true)) {
+                $amountRefundedVal = $webhook->extra['amount_refunded'] ?? null;
+                if (is_numeric($amountRefundedVal)) {
+                    $refundedAmount = max($refundedAmount, (int) $amountRefundedVal);
+                } elseif ($webhook->status === PaymentStatus::Refunded) {
+                    $refundedAmount = $payment->amount;
+                }
+            }
+
             $payment->update([
                 'status' => $webhook->status,
+                'refunded_amount' => $refundedAmount,
                 'paid_at' => $webhook->status === PaymentStatus::Succeeded ? now() : $payment->paid_at,
                 'metadata' => array_merge($payment->metadata ?? [], array_filter($webhook->extra)),
             ]);

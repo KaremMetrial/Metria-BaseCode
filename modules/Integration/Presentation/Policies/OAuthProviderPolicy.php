@@ -31,7 +31,7 @@ class OAuthProviderPolicy
 
     public function view(User $user, ?OAuthProvider $provider = null): bool
     {
-        return $user->can('integrations.oauth.view');
+        return $user->can('integrations.oauth.view') && $this->belongsToUserTenant($user, $provider);
     }
 
     public function create(User $user): bool
@@ -41,16 +41,32 @@ class OAuthProviderPolicy
 
     public function update(User $user, ?OAuthProvider $provider = null): bool
     {
-        return $user->can('integrations.oauth.manage');
+        return $user->can('integrations.oauth.manage') && $this->belongsToUserTenant($user, $provider);
     }
 
     public function delete(User $user, ?OAuthProvider $provider = null): bool
     {
-        return $user->can('integrations.oauth.manage');
+        return $user->can('integrations.oauth.manage') && $this->belongsToUserTenant($user, $provider);
     }
 
     public function toggle(User $user, ?OAuthProvider $provider = null): bool
     {
-        return $user->can('integrations.oauth.manage');
+        return $user->can('integrations.oauth.manage') && $this->belongsToUserTenant($user, $provider);
+    }
+
+    /**
+     * Defense in depth alongside the controller's forTenant() query scope:
+     * a provider with tenant_id=null is a shared/global provider visible to
+     * every tenant, but one with a tenant_id must match the caller's own —
+     * this is what stops a valid permission in tenant A from reaching
+     * tenant B's OAuth client_secret.
+     */
+    private function belongsToUserTenant(User $user, ?OAuthProvider $provider): bool
+    {
+        if ($provider === null || $provider->tenant_id === null) {
+            return true;
+        }
+
+        return (string) $provider->tenant_id === (string) $user->tenant_id;
     }
 }

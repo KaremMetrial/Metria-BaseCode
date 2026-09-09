@@ -27,7 +27,6 @@ use Modules\Auth\Infrastructure\Services\RegisterUser;
 use Modules\Auth\Infrastructure\Strategies\PasswordAuthStrategy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends ApiController
 {
@@ -91,7 +90,7 @@ class AuthController extends ApiController
         return $this->respond($context->payload);
     }
 
-    public function verifyMfa(Request $request, IssueApiToken $issueToken, MfaService $mfa): JsonResponse
+    public function verifyMfa(Request $request, IssueApiToken $issueToken, MfaService $mfa, PasswordAuthStrategy $strategy): JsonResponse
     {
         $request->validate([
             'email' => ['required', 'email'],
@@ -103,11 +102,13 @@ class AuthController extends ApiController
         $password = $request->string('password')->value();
         $code = $request->string('code')->value();
 
-        /** @var User|null $user */
-        $user = User::query()->where('email', $email)->first();
-        if (! $user || ! Hash::check($password, (string) $user->password)) {
-            throw new ApiException(__('auth.failed'), status: 401, errorCode: 'invalid_credentials');
-        }
+        // Route through the same strategy as /auth/login so both entry
+        // points share one login-attempts:{email} lockout counter — this
+        // endpoint previously re-checked the password independently and
+        // never touched that limiter, letting an attacker brute-force a
+        // password here at the flat per-IP throttle:auth rate instead of
+        // the per-account lockout enforced everywhere else.
+        $user = $strategy->authenticate(['email' => $email, 'password' => $password]);
 
         if (! $mfa->verify($user, $code)) {
             throw new ApiException(__('auth.mfa.invalid_code'), status: 401, errorCode: 'invalid_mfa_code');

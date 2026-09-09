@@ -62,4 +62,52 @@ class WebhookEndpointTest extends TestCase
         $response = $this->getJson('/api/v1/webhook-endpoints');
         $response->assertStatus(403);
     }
+
+    /**
+     * @dataProvider unsafeUrls
+     */
+    public function test_endpoint_url_resolving_to_a_private_or_loopback_address_is_rejected(string $url): void
+    {
+        $user = User::factory()->create();
+        $this->givePermission($user, 'webhooks.manage');
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/webhook-endpoints', [
+            'name' => 'Attempted SSRF target',
+            'url' => $url,
+            'events' => ['payment.succeeded'],
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors('url');
+        $this->assertDatabaseMissing('webhook_endpoints', ['url' => $url]);
+    }
+
+    public static function unsafeUrls(): array
+    {
+        return [
+            'loopback IP' => ['https://127.0.0.1/webhook'],
+            'link-local / cloud metadata' => ['https://169.254.169.254/latest/meta-data/'],
+            'localhost hostname' => ['https://localhost/webhook'],
+            'private RFC1918 range' => ['https://10.0.0.5/webhook'],
+        ];
+    }
+
+    public function test_updating_an_endpoint_to_an_unsafe_url_is_also_rejected(): void
+    {
+        $user = User::factory()->create();
+        $this->givePermission($user, 'webhooks.manage');
+        Sanctum::actingAs($user);
+
+        $endpointId = $this->postJson('/api/v1/webhook-endpoints', [
+            'name' => 'Billing Service',
+            'url' => 'https://billing.example.com/webhook',
+            'events' => ['payment.succeeded'],
+        ])->json('data.id');
+
+        $this->putJson("/api/v1/webhook-endpoints/{$endpointId}", [
+            'name' => 'Billing Service',
+            'url' => 'https://127.0.0.1/webhook',
+            'events' => ['payment.succeeded'],
+        ])->assertStatus(422)->assertJsonValidationErrors('url');
+    }
 }

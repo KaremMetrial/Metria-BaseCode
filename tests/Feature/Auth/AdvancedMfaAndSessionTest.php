@@ -120,4 +120,44 @@ class AdvancedMfaAndSessionTest extends TestCase
 
         $this->assertDatabaseMissing('user_sessions', ['id' => $session->id]);
     }
+
+    /**
+     * /auth/mfa/verify previously re-checked the password independently of
+     * PasswordAuthStrategy, never touching the login-attempts:{email}
+     * lockout that /auth/login enforces — an attacker could brute-force a
+     * password through this endpoint at the flat per-IP throttle:auth rate
+     * instead of the 5-attempt per-account lockout. Both entry points must
+     * now share one counter.
+     */
+    public function test_mfa_verify_locks_the_account_after_repeated_wrong_passwords(): void
+    {
+        $user = User::factory()->create(['password' => 'Secret123!']);
+        $user->two_factor_secret = 'JBSWY3DPEHPK3PXP';
+        $user->two_factor_confirmed_at = now();
+        $user->save();
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->postJson('/api/v1/auth/mfa/verify', [
+                'email' => $user->email,
+                'password' => 'wrong-password',
+                'code' => '000000',
+            ])->assertStatus(401);
+        }
+
+        // The 6th attempt — even with the *correct* password — must now be
+        // blocked by the shared lockout, not accepted.
+        $response = $this->postJson('/api/v1/auth/mfa/verify', [
+            'email' => $user->email,
+            'password' => 'Secret123!',
+            'code' => $this->generateTotp('JBSWY3DPEHPK3PXP'),
+        ]);
+
+        $response->assertStatus(429);
+
+        // The normal /auth/login path shares the same counter.
+        $this->postJson('/api/v1/auth/login', [
+            'email' => $user->email,
+            'password' => 'Secret123!',
+        ])->assertStatus(429);
+    }
 }

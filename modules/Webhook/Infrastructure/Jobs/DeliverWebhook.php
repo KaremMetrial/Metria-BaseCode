@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Modules\Webhook\Domain\Models\WebhookDelivery;
+use Modules\Webhook\Infrastructure\Support\WebhookUrlGuard;
 use RuntimeException;
 use Throwable;
 
@@ -71,6 +72,16 @@ class DeliverWebhook implements ShouldQueue
 
         if ($endpoint === null || ! $endpoint->active) {
             $delivery->update(['status' => WebhookDelivery::STATUS_FAILED, 'response_body' => 'Endpoint inactive.']);
+
+            return;
+        }
+
+        // Re-check at delivery time, not just at creation: a hostname's DNS
+        // resolution can change between when the endpoint was registered and
+        // when this job actually runs (DNS rebinding), and rows created
+        // before this guard existed were never checked at all.
+        if (! WebhookUrlGuard::isSafe($endpoint->url)) {
+            $delivery->update(['status' => WebhookDelivery::STATUS_FAILED, 'response_body' => 'Endpoint URL resolves to a disallowed address.']);
 
             return;
         }

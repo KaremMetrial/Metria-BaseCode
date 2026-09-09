@@ -33,10 +33,13 @@ final class MessageController extends ApiController
             throw new ApiException('Unauthorized.', 401, 'AUTH_TOKEN_INVALID');
         }
 
-        $target = Conversation::query()->find($conversation);
-        if ($target instanceof Conversation) {
-            Gate::authorize('sendMessage', $target);
-        }
+        // Fail closed: a missing/out-of-scope conversation must not skip
+        // authorization silently. CommunicationService::sendMessage also
+        // re-checks membership independently, but that shouldn't be the
+        // only thing standing between an unauthorized request and a 404 —
+        // this controller-level check should mean what it says.
+        $target = Conversation::query()->findOrFail($conversation);
+        Gate::authorize('sendMessage', $target);
 
         $content = $request->validated('content');
         $clientMessageId = $request->validated('client_message_id');

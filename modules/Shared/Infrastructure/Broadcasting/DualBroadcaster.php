@@ -8,6 +8,7 @@ use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Enterprise Dual/Hybrid Broadcaster.
@@ -70,10 +71,21 @@ class DualBroadcaster extends Broadcaster
     {
         $manager = app(BroadcastManager::class);
 
+        // Each driver is independent — one connection failing (e.g. Reverb
+        // unreachable) must not stop the event from still reaching the
+        // others, or "dual" delivery silently degrades to "whichever driver
+        // happens to be first and healthy."
         foreach ($this->drivers as $driverName) {
-            $connection = $manager->connection($driverName);
-            if ($connection instanceof BroadcasterContract) {
-                $connection->broadcast($channels, $event, $payload);
+            try {
+                $connection = $manager->connection($driverName);
+                if ($connection instanceof BroadcasterContract) {
+                    $connection->broadcast($channels, $event, $payload);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("DualBroadcaster: failed to broadcast on driver [{$driverName}]", [
+                    'event' => $event,
+                    'exception' => $e->getMessage(),
+                ]);
             }
         }
     }
