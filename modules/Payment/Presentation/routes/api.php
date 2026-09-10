@@ -11,6 +11,10 @@ use Modules\Payment\Presentation\Http\Controllers\Api\V1\PaymentWebhookControlle
 // applies automatically to routes/api.php — that must be repeated explicitly
 // here (same reasoning as modules/Webhook/Presentation/routes/api.php).
 
+if (! config('modules.payment', true)) {
+    return;
+}
+
 // Payment Gateway Callbacks (Signed Webhooks) — public, no auth:sanctum.
 Route::prefix('api/v1')
     ->middleware(['api'])

@@ -20,6 +20,11 @@ teams shipping to Egypt / UAE / GCC markets and beyond:
 - **Integrations** — circuit-breaker `ApiClient` base, SMS manager
   (Twilio / Vonage / log), FCM push.
 - **Multi-tenancy (optional)** — single-DB `tenant_id` scoping, toggled by env.
+- **Scales down too** — every capability past Auth/RBAC (Payment, Wallet,
+  Media, Webhook, Communication, Governance, per-tenant OAuth config) is an
+  independent on/off switch in `config/modules.php`. A single-purpose
+  project turns off what it doesn't need and those routes simply don't
+  exist — see [Minimal setup](#minimal-setup-a-simple-project) below.
 
 Read [ARCHITECTURE.md](ARCHITECTURE.md) for the layer map, patterns, and the
 end-to-end event flow diagram.
@@ -52,6 +57,36 @@ curl http://localhost:8000/api/v1/health
 > All migrations ship in-repo — including UUID-ready `personal_access_tokens`
 > and the spatie permission tables — so `migrate` works on the first run with
 > no vendor:publish step.
+
+## Minimal setup (a simple project)
+
+Everything above describes the full enterprise shape. A project that just
+needs accounts, roles, and a couple of its own endpoints doesn't have to
+carry the rest — turn off what you don't need in `.env`:
+
+```bash
+MODULE_PAYMENT_ENABLED=false
+MODULE_WALLET_ENABLED=false
+MODULE_MEDIA_ENABLED=false
+MODULE_WEBHOOK_ENABLED=false
+MODULE_COMMUNICATION_ENABLED=false
+MODULE_GOVERNANCE_ENABLED=false
+MODULE_INTEGRATION_OAUTH_ENABLED=false
+```
+
+Each flag removes that module's HTTP routes entirely (not just hides them —
+`php artisan route:list` won't show them, and calling one 404s). What's left
+is Auth (register/login/MFA/sessions), RBAC, Territory, and Currency's
+internal conversion service — a normal, small API. Nothing else changes:
+the same migrations run (the unused tables just stay empty), the same
+`php artisan serve` command works, and flipping a flag back on later doesn't
+need a new migration or a code change.
+
+`config/modules.php` documents each flag inline, including which internal
+service bindings stay active regardless (Payment's refund flow depends on
+Governance's approval/audit contracts internally even if you never expose
+Governance's own HTTP endpoints — turning off `MODULE_GOVERNANCE_ENABLED`
+only removes `/api/v1/governance/*`, it doesn't touch that internal wiring).
 
 ## Quick tour of the API
 
@@ -118,14 +153,14 @@ signature (HMAC / re-query), never by session. **Verify endpoint shapes against
 each provider's current docs before go-live; sandbox base URLs are the defaults.**
 
 Add your own gateway in three steps: implement
-`App\Domain\Payment\Contracts\PaymentGateway`, register it —
+`Modules\Payment\Domain\Contracts\PaymentGateway`, register it —
 `app(PaymentManager::class)->extend('mygateway', fn () => new MyGateway(config('payments.gateways.mygateway')))`
 — and add its config block. Callers never change.
 
 ## Wallet & escrow
 
 ```php
-$wallets = app(\App\Domain\Wallet\Services\WalletService::class);
+$wallets = app(\Modules\Wallet\Infrastructure\Services\WalletService::class);
 
 $wallets->credit($wallet, Money::fromDecimal('500.00', 'EGP'), 'Top-up');
 $wallets->hold($wallet, Money::of(30_000, 'EGP'), 'Delivery escrow');   // lock
@@ -142,7 +177,7 @@ reconstructable for finance.
 Publish through the bus and both worlds are handled:
 
 ```php
-app(\App\Core\Events\EventBus::class)->publish(new PaymentSucceeded($payment));
+app(\Modules\Shared\Infrastructure\Events\EventBus::class)->publish(new PaymentSucceeded($payment));
 ```
 
 - **In-process** listeners: map them in `DomainEventServiceProvider`
@@ -191,13 +226,18 @@ CI (`.github/workflows/ci.yml`) runs all three on push/PR.
 
 ## Extending with a new domain
 
-1. `app/Domain/Orders/{Models,Services,Events,…}` — keep the shape of the
-   existing domains.
+1. `modules/Orders/{Domain,Infrastructure,Presentation}` — keep the same
+   three-layer shape every existing module uses (see ARCHITECTURE.md).
 2. Migration + policy/permissions (add to `RolesAndPermissionsSeeder`).
-3. Thin controller in `app/Http/Controllers/Api/V1` + FormRequest + Resource,
-   routes in `routes/api_v1.php`.
+3. Thin controller in `Presentation/Http/Controllers/Api/V1` + FormRequest +
+   Resource, routes in `Presentation/routes/api.php`, registered from your
+   module's `OrdersServiceProvider::boot()` via `loadRoutesFrom()` (add the
+   provider to `bootstrap/providers.php`).
 4. Publish domain events through `EventBus`; implement `StoredInOutbox` if the
    outside world should hear about them.
+5. If this module is genuinely optional for other projects using this base,
+   add an `orders` flag to `config/modules.php` and gate its route file the
+   same way Payment/Wallet/Media/etc. do — one `if (! config('modules.orders')) return;` at the top.
 
 ## Identity upgrade path (metrial/auth)
 

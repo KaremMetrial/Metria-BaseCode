@@ -12,6 +12,11 @@ use Modules\Governance\Presentation\Http\Controllers\Api\V1\SettingsController;
 // `api` middleware group that bootstrap/app.php's withRouting(api: ...)
 // applies automatically to routes/api.php — that must be repeated explicitly
 // here (same reasoning as modules/Webhook/Presentation/routes/api.php).
+
+if (! config('modules.governance', true)) {
+    return;
+}
+
 Route::prefix('api/v1')
     ->middleware(['api', 'auth:sanctum', 'tenant', 'throttle:api'])
     ->group(function () {

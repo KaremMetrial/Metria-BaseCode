@@ -30,6 +30,9 @@ final class CommunicationServiceProvider extends ServiceProvider
             ->by(($request->user()?->getAuthIdentifier() ?: $request->ip()).'|'.$request->path()));
 
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
-        $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
+
+        if (config('modules.communication', true)) {
+            $this->loadRoutesFrom(__DIR__.'/../../Presentation/routes/api.php');
+        }
     }
 }

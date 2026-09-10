@@ -10,6 +10,11 @@ use Modules\Integration\Presentation\Http\Controllers\Api\V1\OAuthProviderContro
 // applies automatically to routes/api.php — that must be repeated explicitly
 // here (same reasoning as modules/Webhook/Presentation/routes/api.php). Nested under `auth.` to
 // match the original route names/URIs exactly (api/v1/auth/oauth-providers).
+
+if (! config('modules.integration_oauth', true)) {
+    return;
+}
+
 Route::prefix('api/v1')
     ->middleware(['api', 'auth:sanctum', 'tenant', 'throttle:api'])
     ->group(function () {

@@ -9,6 +9,11 @@ use Modules\Media\Presentation\Http\Controllers\Api\V1\MediaController;
 // `api` middleware group that bootstrap/app.php's withRouting(api: ...)
 // applies automatically to routes/api.php — that must be repeated explicitly
 // here (same reasoning as modules/Webhook/Presentation/routes/api.php).
+
+if (! config('modules.media', true)) {
+    return;
+}
+
 Route::prefix('api/v1')
     ->middleware(['api', 'auth:sanctum', 'tenant', 'throttle:api'])
     ->group(function () {
