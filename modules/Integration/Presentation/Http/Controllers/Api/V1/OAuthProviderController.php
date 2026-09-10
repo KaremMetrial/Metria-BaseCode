@@ -4,31 +4,40 @@ declare(strict_types=1);
 
 namespace Modules\Integration\Presentation\Http\Controllers\Api\V1;
 
-use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use Modules\Integration\Presentation\Http\Requests\UpdateOAuthProviderRequest;
-use Modules\Integration\Domain\Models\OAuthProvider;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Modules\Integration\Domain\Models\OAuthProvider;
+use Modules\Integration\Presentation\Http\Requests\UpdateOAuthProviderRequest;
+use Modules\Integration\Presentation\Http\Resources\OAuthProviderResource;
+use Modules\Shared\Infrastructure\Tenancy\TenantManager;
+use Modules\Shared\Presentation\Http\Controllers\BaseCrudController;
 
-class OAuthProviderController extends ApiController
+/**
+ * index/show/update/destroy come from BaseCrudController; every lookup is
+ * scoped to the caller's tenant (plus tenant_id=null "global" providers) at
+ * the query level — findOrFail() throwing a plain 404 for another tenant's
+ * row (rather than Gate::authorize() throwing 403) is what
+ * OAuthProviderTenantIsolationTest asserts, so that scope has to live in
+ * the query, not only in the Policy.
+ *
+ * store() stays custom: one OAuthProvider per (tenant, provider) is an
+ * upsert, not a plain create.
+ */
+class OAuthProviderController extends BaseCrudController
 {
-    public function index(Request $request): JsonResponse
-    {
-        Gate::authorize('viewAny', OAuthProvider::class);
-        // Tenant scope only ever comes from the resolved request context —
-        // never a client-supplied header, which would let a caller with a
-        // null tenant context list another tenant's providers by header alone.
-        $tenantId = app(TenantManager::class)->id();
-        $providers = OAuthProvider::query()->forTenant($tenantId)->get();
+    protected string $modelClass = OAuthProvider::class;
 
-        return $this->respond(['providers' => $providers]);
-    }
+    protected string $resourceClass = OAuthProviderResource::class;
 
-    public function store(UpdateOAuthProviderRequest $request): JsonResponse
+    protected string $storeRequestClass = UpdateOAuthProviderRequest::class;
+
+    public function store(): JsonResponse
     {
         Gate::authorize('create', OAuthProvider::class);
+
+        $request = app($this->storeRequestClass);
         $tenantId = app(TenantManager::class)->id();
 
         $provider = OAuthProvider::query()->updateOrCreate(
@@ -39,32 +48,16 @@ class OAuthProviderController extends ApiController
             $request->validated()
         );
 
-        return $this->respondCreated(['provider' => $provider]);
+        return $this->respondCreated(new OAuthProviderResource($provider));
     }
 
-    public function show(string $id): JsonResponse
+    protected function indexQuery(): Builder
     {
-        $provider = OAuthProvider::query()->forTenant(app(TenantManager::class)->id())->findOrFail($id);
-        Gate::authorize('view', $provider);
-
-        return $this->respond(['provider' => $provider]);
+        return OAuthProvider::query()->forTenant(app(TenantManager::class)->id())->latest();
     }
 
-    public function update(UpdateOAuthProviderRequest $request, string $id): JsonResponse
+    protected function findOrFail(string $id): Model
     {
-        $provider = OAuthProvider::query()->forTenant(app(TenantManager::class)->id())->findOrFail($id);
-        Gate::authorize('update', $provider);
-        $provider->update($request->validated());
-
-        return $this->respond(['provider' => $provider]);
-    }
-
-    public function destroy(string $id): JsonResponse
-    {
-        $provider = OAuthProvider::query()->forTenant(app(TenantManager::class)->id())->findOrFail($id);
-        Gate::authorize('delete', $provider);
-        $provider->delete();
-
-        return $this->respondNoContent();
+        return OAuthProvider::query()->forTenant(app(TenantManager::class)->id())->findOrFail($id);
     }
 }

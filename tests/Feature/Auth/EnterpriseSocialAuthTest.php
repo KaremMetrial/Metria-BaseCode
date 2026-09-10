@@ -174,7 +174,7 @@ class EnterpriseSocialAuthTest extends TestCase
         ]);
 
         $response->assertCreated()
-            ->assertJsonPath('data.provider.provider', 'custom_idp');
+            ->assertJsonPath('data.provider', 'custom_idp');
 
         $this->assertDatabaseHas('oauth_providers', [
             'provider' => 'custom_idp',
