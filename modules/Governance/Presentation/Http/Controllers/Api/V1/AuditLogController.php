@@ -4,32 +4,28 @@ declare(strict_types=1);
 
 namespace Modules\Governance\Presentation\Http\Controllers\Api\V1;
 
-use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use Modules\Governance\Presentation\Http\Resources\AuditLogResource;
-use Modules\Governance\Domain\Models\AuditLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Modules\Governance\Domain\Models\AuditLog;
+use Modules\Governance\Presentation\Http\Resources\AuditLogResource;
+use Modules\Shared\Infrastructure\Support\Pagination;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 
 class AuditLogController extends ApiController
 {
     public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', AuditLog::class);
-        $cfgPerPage = config('core.api.per_page', 20);
-        $perPageDefault = is_numeric($cfgPerPage) ? (int) $cfgPerPage : 20;
-        $cfgMaxPerPage = config('core.api.max_per_page', 100);
-        $maxPerPage = is_numeric($cfgMaxPerPage) ? (int) $cfgMaxPerPage : 100;
 
         $reqPerPageQuery = $request->query('per_page');
-        $reqPerPage = is_numeric($reqPerPageQuery) ? (int) $reqPerPageQuery : $perPageDefault;
 
         $logs = AuditLog::query()
             ->when($request->query('action'), fn ($q, $action) => $q->where('action', $action))
             ->when($request->query('user_id'), fn ($q, $userId) => $q->where('user_id', $userId))
             ->when($request->query('auditable_type'), fn ($q, $type) => $q->where('auditable_type', $type))
             ->latest()
-            ->paginate(min($reqPerPage, $maxPerPage));
+            ->paginate(Pagination::resolve(is_numeric($reqPerPageQuery) ? $reqPerPageQuery : null));
 
         return $this->respond(AuditLogResource::collection($logs));
     }

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Shared\Infrastructure\Persistence;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Shared\Domain\Contracts\RepositoryInterface;
 use Modules\Shared\Domain\Specifications\QueryFilter;
+use Modules\Shared\Infrastructure\Support\Pagination;
 
 /**
  * Thin Eloquent repository. Use repositories to keep complex query logic
@@ -20,7 +22,7 @@ use Modules\Shared\Domain\Specifications\QueryFilter;
 abstract class BaseRepository implements RepositoryInterface
 {
     /**
-     * @param TModel $model
+     * @param  TModel  $model
      */
     public function __construct(protected Model $model) {}
 
@@ -56,7 +58,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * @param array<int, \Illuminate\Contracts\Database\Query\Expression|string> $columns
+     * @param  array<int, Expression|string>  $columns
      * @return Collection<int, TModel>
      */
     public function all(array $columns = ['*'], ?string $tenantId = null): Collection
@@ -69,14 +71,7 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function paginate(?int $perPage = null, ?string $tenantId = null): LengthAwarePaginator
     {
-        $configPerPage = config('core.api.per_page', 20);
-        $configMaxPerPage = config('core.api.max_per_page', 100);
-        $perPage = min(
-            $perPage ?? (is_numeric($configPerPage) ? (int) $configPerPage : 20),
-            is_numeric($configMaxPerPage) ? (int) $configMaxPerPage : 100,
-        );
-
-        return $this->query($tenantId)->latest()->paginate($perPage);
+        return $this->query($tenantId)->latest()->paginate(Pagination::resolve($perPage));
     }
 
     public function filter(QueryFilter $filter, ?string $tenantId = null): Builder
@@ -86,18 +81,11 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function getFiltered(QueryFilter $filter, ?int $perPage = null, ?string $tenantId = null): LengthAwarePaginator
     {
-        $configPerPage = config('core.api.per_page', 20);
-        $configMaxPerPage = config('core.api.max_per_page', 100);
-        $perPage = min(
-            $perPage ?? (is_numeric($configPerPage) ? (int) $configPerPage : 20),
-            is_numeric($configMaxPerPage) ? (int) $configMaxPerPage : 100,
-        );
-
-        return $this->filter($filter, $tenantId)->paginate($perPage);
+        return $this->filter($filter, $tenantId)->paginate(Pagination::resolve($perPage));
     }
 
     /**
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $attributes
      * @return TModel
      */
     public function create(array $attributes, ?string $tenantId = null): Model
@@ -110,8 +98,8 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * @param TModel $model
-     * @param array<string, mixed> $attributes
+     * @param  TModel  $model
+     * @param  array<string, mixed>  $attributes
      * @return TModel
      */
     public function update(Model $model, array $attributes, ?string $tenantId = null): Model

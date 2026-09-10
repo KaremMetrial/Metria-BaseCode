@@ -11,6 +11,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Request;
+use Modules\Shared\Infrastructure\Support\Pagination;
 
 /**
  * Generic index/show/store/update/destroy for a single Eloquent model,
@@ -134,15 +136,9 @@ abstract class BaseCrudController extends ApiController
 
     protected function paginate(Builder $query): LengthAwarePaginator
     {
-        $configPerPage = config('core.api.per_page', 20);
-        $configMaxPerPage = config('core.api.max_per_page', 100);
+        $requested = Request::query('per_page');
 
-        $perPage = min(
-            is_numeric($configPerPage) ? (int) $configPerPage : 20,
-            is_numeric($configMaxPerPage) ? (int) $configMaxPerPage : 100,
-        );
-
-        return $query->paginate($perPage);
+        return $query->paginate(Pagination::resolve(is_numeric($requested) ? $requested : null));
     }
 
     /** Override to drop fields, inject the authenticated user/tenant id, hash secrets, etc. */

@@ -4,39 +4,37 @@ declare(strict_types=1);
 
 namespace Modules\Payment\Presentation\Http\Controllers\Api\V1;
 
-use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use Modules\Shared\Domain\Support\Money;
-use Modules\Governance\Presentation\Http\Resources\ApprovalRequestResource;
-use Modules\Governance\Domain\Models\ApprovalRequest;
-use Modules\Payment\Presentation\Http\Requests\CreatePaymentRequest;
-use Modules\Payment\Presentation\Http\Requests\RefundPaymentRequest;
-use Modules\Payment\Presentation\Http\Resources\PaymentResource;
-use Modules\Payment\Domain\Models\Payment;
-use Modules\Payment\Infrastructure\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Modules\Governance\Domain\Models\ApprovalRequest;
+use Modules\Governance\Presentation\Http\Resources\ApprovalRequestResource;
+use Modules\Payment\Domain\Models\Payment;
+use Modules\Payment\Infrastructure\Services\PaymentService;
+use Modules\Payment\Presentation\Http\Requests\CreatePaymentRequest;
+use Modules\Payment\Presentation\Http\Requests\RefundPaymentRequest;
+use Modules\Payment\Presentation\Http\Resources\PaymentResource;
+use Modules\Shared\Domain\Support\Money;
+use Modules\Shared\Infrastructure\Support\Pagination;
+use Modules\Shared\Presentation\Http\Concerns\RequiresAuthenticatedUser;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 
 class PaymentController extends ApiController
 {
+    use RequiresAuthenticatedUser;
+
     public function __construct(private readonly PaymentService $payments) {}
 
     public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Payment::class);
 
-        $cfgPerPage = config('core.api.per_page', 20);
-        $perPageDefault = is_numeric($cfgPerPage) ? (int) $cfgPerPage : 20;
-        $cfgMaxPerPage = config('core.api.max_per_page', 100);
-        $maxPerPage = is_numeric($cfgMaxPerPage) ? (int) $cfgMaxPerPage : 100;
-
         $reqPerPageQuery = $request->query('per_page');
-        $reqPerPage = is_numeric($reqPerPageQuery) ? (int) $reqPerPageQuery : $perPageDefault;
 
         $payments = Payment::query()
-            ->where('user_id', $this->getAuthenticatedUser($request)->id)
+            ->where('user_id', $this->authUser($request)->id)
             ->latest()
-            ->paginate(min($reqPerPage, $maxPerPage));
+            ->paginate(Pagination::resolve(is_numeric($reqPerPageQuery) ? $reqPerPageQuery : null));
 
         return $this->respond(PaymentResource::collection($payments));
     }
@@ -71,7 +69,7 @@ class PaymentController extends ApiController
         $description = is_string($descriptionVal) ? $descriptionVal : null;
 
         ['payment' => $payment, 'result' => $result] = $this->payments->create(
-            user: $this->getAuthenticatedUser($request),
+            user: $this->authUser($request),
             money: $money,
             gateway: $gateway,
             options: [
@@ -112,7 +110,7 @@ class PaymentController extends ApiController
         $reasonVal = $request->validated('reason');
         $reason = is_string($reasonVal) ? $reasonVal : null;
 
-        $outcome = $this->payments->requestRefund($payment, $amount, $this->getAuthenticatedUser($request), $reason);
+        $outcome = $this->payments->requestRefund($payment, $amount, $this->authUser($request), $reason);
 
         if ($outcome instanceof ApprovalRequest) {
             return $this->respond(
@@ -123,15 +121,5 @@ class PaymentController extends ApiController
         }
 
         return $this->respond(new PaymentResource($outcome), __('payments.refunded'));
-    }
-
-    private function getAuthenticatedUser(Request $request): \Modules\Auth\Domain\Models\User
-    {
-        $user = $request->user();
-        if (! $user instanceof \Modules\Auth\Domain\Models\User) {
-            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
-        }
-
-        return $user;
     }
 }
