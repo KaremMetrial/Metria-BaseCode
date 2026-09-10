@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Presentation\Http\Controllers\Api\V1;
 
-use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use Modules\Auth\Presentation\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Modules\Auth\Domain\Models\User;
 use Modules\Auth\Infrastructure\Services\AuthMethodGovernanceService;
 use Modules\Auth\Infrastructure\Services\DynamicSocialiteConfigService;
 use Modules\Auth\Infrastructure\Services\SocialIdentityService;
 use Modules\Auth\Infrastructure\Strategies\SocialProviderStrategy;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Modules\Auth\Presentation\Http\Resources\UserResource;
+use Modules\Shared\Presentation\Http\Concerns\RequiresAuthenticatedUser;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 
 class SocialAuthController extends ApiController
 {
+    use RequiresAuthenticatedUser;
+
     public function __construct(private readonly AuthMethodGovernanceService $governance) {}
 
     public function redirect(
@@ -89,7 +92,7 @@ class SocialAuthController extends ApiController
             'token' => $request->string('token')->value() ?: null,
         ];
 
-        $user = $this->getAuthenticatedUser($request);
+        $user = $this->authUser($request);
         $strategy->verifySocialIdentity($provider, $socialUser, $user->tenant_id);
 
         $socialService->linkIdentity($user, $provider, $socialUser);
@@ -99,19 +102,9 @@ class SocialAuthController extends ApiController
 
     public function unlink(Request $request, string $provider, SocialIdentityService $socialService): JsonResponse
     {
-        $socialService->unlinkIdentity($this->getAuthenticatedUser($request), $provider);
+        $socialService->unlinkIdentity($this->authUser($request), $provider);
 
         return $this->respond(message: __('auth.social.unlinked', ['provider' => $provider]));
-    }
-
-    private function getAuthenticatedUser(Request $request): User
-    {
-        $user = $request->user();
-        if (! $user instanceof User) {
-            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
-        }
-
-        return $user;
     }
 
     private function recordSession(User $user, Request $request): void

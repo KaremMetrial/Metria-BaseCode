@@ -4,26 +4,29 @@ declare(strict_types=1);
 
 namespace Modules\Media\Presentation\Http\Controllers\Api\V1;
 
-use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use Modules\Media\Presentation\Http\Requests\ConfirmUploadRequest;
-use Modules\Media\Presentation\Http\Requests\GeneratePresignedUrlRequest;
-use Modules\Media\Presentation\Http\Resources\MediaResource;
-use Modules\Media\Domain\Models\Media;
-use Modules\Media\Infrastructure\Services\MediaDownloadService;
-use Modules\Media\Infrastructure\Services\MediaUploadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Modules\Media\Domain\Models\Media;
+use Modules\Media\Infrastructure\Services\MediaDownloadService;
+use Modules\Media\Infrastructure\Services\MediaUploadService;
+use Modules\Media\Presentation\Http\Requests\ConfirmUploadRequest;
+use Modules\Media\Presentation\Http\Requests\GeneratePresignedUrlRequest;
+use Modules\Media\Presentation\Http\Resources\MediaResource;
+use Modules\Shared\Presentation\Http\Concerns\RequiresAuthenticatedUser;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 
 class MediaController extends ApiController
 {
+    use RequiresAuthenticatedUser;
+
     public function presign(GeneratePresignedUrlRequest $request, MediaUploadService $uploadService): JsonResponse
     {
         $sizeVal = $request->input('size');
         $size = is_numeric($sizeVal) ? (int) $sizeVal : 0;
 
         $result = $uploadService->initiateUpload(
-            user: $this->getAuthenticatedUser($request),
+            user: $this->authUser($request),
             filename: $request->string('filename')->value(),
             mimeType: $request->string('mime_type')->value(),
             size: $size,
@@ -79,15 +82,5 @@ class MediaController extends ApiController
         return $this->respond([
             'download_url' => $url,
         ]);
-    }
-
-    private function getAuthenticatedUser(Request $request): \Modules\Auth\Domain\Models\User
-    {
-        $user = $request->user();
-        if (! $user instanceof \Modules\Auth\Domain\Models\User) {
-            throw new \Modules\Shared\Application\Exceptions\ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
-        }
-
-        return $user;
     }
 }

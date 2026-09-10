@@ -4,19 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Presentation\Http\Controllers\Api\V1;
 
-use Modules\Shared\Application\Exceptions\ApiException;
-use Modules\Shared\Presentation\Http\Controllers\ApiController;
-use Modules\Auth\Presentation\Http\Requests\ConfirmMfaRequest;
-use Modules\Auth\Presentation\Http\Requests\DisableMfaRequest;
-use Modules\Auth\Presentation\Http\Requests\ForgotPasswordRequest;
-use Modules\Auth\Presentation\Http\Requests\LoginRequest;
-use Modules\Auth\Presentation\Http\Requests\RegisterRequest;
-use Modules\Auth\Presentation\Http\Requests\ResetPasswordRequest;
-use Modules\Auth\Presentation\Http\Requests\UpdateFcmTokenRequest;
-use Modules\Auth\Presentation\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Modules\Auth\Domain\Events\UserSessionRevoked;
 use Modules\Auth\Domain\Models\User;
 use Modules\Auth\Domain\Models\UserSession;
-use Modules\Auth\Domain\Events\UserSessionRevoked;
 use Modules\Auth\Infrastructure\Pipelines\AuthContext;
 use Modules\Auth\Infrastructure\Pipelines\AuthPipeline;
 use Modules\Auth\Infrastructure\Services\AuthMethodGovernanceService;
@@ -25,11 +17,22 @@ use Modules\Auth\Infrastructure\Services\MfaService;
 use Modules\Auth\Infrastructure\Services\PasswordResetService;
 use Modules\Auth\Infrastructure\Services\RegisterUser;
 use Modules\Auth\Infrastructure\Strategies\PasswordAuthStrategy;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Modules\Auth\Presentation\Http\Requests\ConfirmMfaRequest;
+use Modules\Auth\Presentation\Http\Requests\DisableMfaRequest;
+use Modules\Auth\Presentation\Http\Requests\ForgotPasswordRequest;
+use Modules\Auth\Presentation\Http\Requests\LoginRequest;
+use Modules\Auth\Presentation\Http\Requests\RegisterRequest;
+use Modules\Auth\Presentation\Http\Requests\ResetPasswordRequest;
+use Modules\Auth\Presentation\Http\Requests\UpdateFcmTokenRequest;
+use Modules\Auth\Presentation\Http\Resources\UserResource;
+use Modules\Shared\Application\Exceptions\ApiException;
+use Modules\Shared\Presentation\Http\Concerns\RequiresAuthenticatedUser;
+use Modules\Shared\Presentation\Http\Controllers\ApiController;
 
 class AuthController extends ApiController
 {
+    use RequiresAuthenticatedUser;
+
     public function __construct(
         private readonly AuthMethodGovernanceService $governance
     ) {}
@@ -140,29 +143,29 @@ class AuthController extends ApiController
     public function sessions(Request $request): JsonResponse
     {
         return $this->respond([
-            'sessions' => $this->getAuthenticatedUser($request)->sessions()->orderByDesc('last_activity_at')->get(),
+            'sessions' => $this->authUser($request)->sessions()->orderByDesc('last_activity_at')->get(),
         ]);
     }
 
     public function revokeSession(Request $request, string $id): JsonResponse
     {
-        /** @var \Modules\Auth\Domain\Models\UserSession $session */
-        $session = $this->getAuthenticatedUser($request)->sessions()->where('id', $id)->firstOrFail();
+        /** @var UserSession $session */
+        $session = $this->authUser($request)->sessions()->where('id', $id)->firstOrFail();
         $tokenId = $session->personal_access_token_id;
         $session->revoke();
-        event(new UserSessionRevoked($this->getAuthenticatedUser($request), $id, $tokenId));
+        event(new UserSessionRevoked($this->authUser($request), $id, $tokenId));
 
         return $this->respond(message: __('auth.session.revoked'));
     }
 
     public function enableMfa(Request $request, MfaService $mfa): JsonResponse
     {
-        return $this->respond($mfa->enable($this->getAuthenticatedUser($request)));
+        return $this->respond($mfa->enable($this->authUser($request)));
     }
 
     public function confirmMfa(ConfirmMfaRequest $request, MfaService $mfa): JsonResponse
     {
-        if (! $mfa->confirm($this->getAuthenticatedUser($request), $request->string('code')->value())) {
+        if (! $mfa->confirm($this->authUser($request), $request->string('code')->value())) {
             throw new ApiException(__('auth.mfa.invalid_code'), status: 422, errorCode: 'invalid_mfa_code');
         }
 
@@ -171,7 +174,7 @@ class AuthController extends ApiController
 
     public function disableMfa(DisableMfaRequest $request, MfaService $mfa): JsonResponse
     {
-        $mfa->disable($this->getAuthenticatedUser($request), $request->string('password')->value());
+        $mfa->disable($this->authUser($request), $request->string('password')->value());
 
         return $this->respond(message: __('auth.mfa.disabled'));
     }
@@ -196,12 +199,12 @@ class AuthController extends ApiController
 
     public function me(Request $request): JsonResponse
     {
-        return $this->respond(new UserResource($this->getAuthenticatedUser($request)->load('roles')));
+        return $this->respond(new UserResource($this->authUser($request)->load('roles')));
     }
 
     public function logout(Request $request): JsonResponse
     {
-        $user = $this->getAuthenticatedUser($request);
+        $user = $this->authUser($request);
         $token = $user->currentAccessToken();
         if ($token && method_exists($token, 'delete')) {
             $session = $user->sessions()->where('personal_access_token_id', $token->getKey())->first();
@@ -220,7 +223,7 @@ class AuthController extends ApiController
 
     public function updateFcmToken(UpdateFcmTokenRequest $request): JsonResponse
     {
-        $this->getAuthenticatedUser($request)->updateFcmDeviceToken(
+        $this->authUser($request)->updateFcmDeviceToken(
             $request->string('device_token')->value(),
             $request->string('device_id')->value() ?: null,
             $request->string('device_name')->value() ?: null,
@@ -228,16 +231,6 @@ class AuthController extends ApiController
         );
 
         return $this->respond(message: __('auth.fcm_token_updated', ['default' => 'FCM device token updated successfully.']));
-    }
-
-    private function getAuthenticatedUser(Request $request): User
-    {
-        $user = $request->user();
-        if (! $user instanceof User) {
-            throw new ApiException(__('auth.unauthorized', ['default' => 'Unauthorized']), status: 401, errorCode: 'unauthorized');
-        }
-
-        return $user;
     }
 
     private function recordSession(User $user, Request $request): void
