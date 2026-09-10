@@ -232,7 +232,11 @@ CI (`.github/workflows/ci.yml`) runs all three on push/PR.
 3. Thin controller in `Presentation/Http/Controllers/Api/V1` + FormRequest +
    Resource, routes in `Presentation/routes/api.php`, registered from your
    module's `OrdersServiceProvider::boot()` via `loadRoutesFrom()` (add the
-   provider to `bootstrap/providers.php`).
+   provider to `bootstrap/providers.php`). If it's plain CRUD, extend
+   `Modules\Shared\Presentation\Http\Controllers\BaseCrudController` instead
+   of hand-writing index/show/store/update/destroy — see ARCHITECTURE.md's
+   "Adding a new CRUD module" section for the four-property pattern
+   (`WebhookEndpointController` is the reference example).
 4. Publish domain events through `EventBus`; implement `StoredInOutbox` if the
    outside world should hear about them.
 5. If this module is genuinely optional for other projects using this base,

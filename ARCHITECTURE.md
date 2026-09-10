@@ -82,6 +82,53 @@ rather than direct calls. Two concrete examples:
 | **Circuit breaker**             | `CircuitBreaker`, `ApiClient`                          | A dead third party fails fast instead of exhausting workers.                                                                 |
 | **Observer**                    | `AuditableObserver`                                      | Every create/update/delete on audited models is logged with masked secrets.                                                  |
 | **Repository (optional)**       | `BaseRepository`                                         | Available for complex query encapsulation; simple domains use Eloquent directly — no ceremony for its own sake.             |
+| **Template Method (CRUD)**      | `BaseCrudController`                                     | index/show/store/update/destroy written once; a plain-CRUD module (`WebhookEndpointController`) declares 3-4 class properties instead of five hand-written actions. |
+
+## One identity model, many roles — no per-role code
+
+There is exactly one `User` model and one HTTP surface. `super-admin`,
+`admin`, `finance`, `support`, `customer`, a future `client`, or any other
+role is a row in `roles`/`role_metadata` (seeded in
+`RolesAndPermissionsSeeder`) carrying a set of `resource.action` permissions
+— never a `hasRole('admin')` branch in a controller. Every endpoint uses the
+same request/response envelope (`ApiResponses`) and the same authorization
+seam (`Gate::authorize()` + a Policy's `viewAny/view/create/update/delete`
+abilities, backed by `spatie/laravel-permission`). Two roles hitting the same
+endpoint get identical response shapes; they differ only in which Policy
+checks pass and which fields a Resource chooses to expose (e.g. a Resource
+can `mergeWhen($request->user()->can('finance.view'), [...])`) — the
+difference lives in data/policy, not in duplicated routes or controllers.
+Adding a role is a seeder change; it never requires new controller code.
+
+## Adding a new CRUD module without duplicating CRUD
+
+For a module that's genuinely just "manage records of X" (no workflow,
+no maker-checker, no side-effecting Actions), extend
+`Modules\Shared\Presentation\Http\Controllers\BaseCrudController` instead of
+hand-writing index/show/store/update/destroy:
+
+```php
+class WidgetController extends BaseCrudController
+{
+    protected string $modelClass = Widget::class;
+    protected string $resourceClass = WidgetResource::class;
+    protected string $storeRequestClass = StoreWidgetRequest::class;
+    // protected ?string $updateRequestClass = UpdateWidgetRequest::class; // optional, defaults to storeRequestClass
+}
+```
+
+That's the whole controller — pagination (honoring `core.api.per_page` /
+`max_per_page`), the `ApiResponses` envelope, and `Gate::authorize()` against
+the model's Policy all come from the base class. Override `indexQuery()`,
+`storeAttributes()`, or `updateAttributes()` only when you need extra
+scoping or to inject computed fields (see `WebhookEndpointController`, which
+overrides `store()` outright because it also has to generate a one-time
+secret — the base class is a floor to build on, not a ceiling that forces
+every mutation through bare `Model::update()`). A module with real business
+rules (approval gates, DTOs, multi-step Actions — see RBAC's
+`RoleController` or `PaymentService`) should keep writing its controller by
+hand; `BaseCrudController` targets the copy-pasted shape, not every
+controller in the codebase.
 
 ## Event flow (end to end)
 

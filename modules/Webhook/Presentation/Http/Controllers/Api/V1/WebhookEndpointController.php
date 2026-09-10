@@ -7,23 +7,30 @@ namespace Modules\Webhook\Presentation\Http\Controllers\Api\V1;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Modules\Shared\Presentation\Http\Controllers\ApiController;
+use Modules\Shared\Presentation\Http\Controllers\BaseCrudController;
 use Modules\Webhook\Domain\Models\WebhookEndpoint;
 use Modules\Webhook\Presentation\Http\Requests\StoreWebhookEndpointRequest;
 use Modules\Webhook\Presentation\Http\Resources\WebhookEndpointResource;
 
-class WebhookEndpointController extends ApiController
+/**
+ * index/update/destroy come from BaseCrudController — store and
+ * rotateSecret stay custom here because they generate/reveal the signing
+ * secret, which is business logic BaseCrudController deliberately doesn't
+ * know about.
+ */
+class WebhookEndpointController extends BaseCrudController
 {
-    public function index(): JsonResponse
-    {
-        Gate::authorize('viewAny', WebhookEndpoint::class);
+    protected string $modelClass = WebhookEndpoint::class;
 
-        return $this->respond(WebhookEndpointResource::collection(WebhookEndpoint::query()->latest()->get()));
-    }
+    protected string $resourceClass = WebhookEndpointResource::class;
 
-    public function store(StoreWebhookEndpointRequest $request): JsonResponse
+    protected string $storeRequestClass = StoreWebhookEndpointRequest::class;
+
+    public function store(): JsonResponse
     {
         Gate::authorize('create', WebhookEndpoint::class);
+
+        $request = app($this->storeRequestClass);
 
         $endpoint = WebhookEndpoint::create([
             ...$request->validated(),
@@ -34,24 +41,6 @@ class WebhookEndpointController extends ApiController
         $resource = (new WebhookEndpointResource($endpoint))->additional(['reveal_secret' => true]);
 
         return $this->respondCreated($resource, __('webhooks.secret_shown_once'));
-    }
-
-    public function update(StoreWebhookEndpointRequest $request, WebhookEndpoint $webhookEndpoint): JsonResponse
-    {
-        Gate::authorize('update', $webhookEndpoint);
-
-        $webhookEndpoint->update($request->validated());
-
-        return $this->respond(new WebhookEndpointResource($webhookEndpoint));
-    }
-
-    public function destroy(WebhookEndpoint $webhookEndpoint): JsonResponse
-    {
-        Gate::authorize('delete', $webhookEndpoint);
-
-        $webhookEndpoint->delete();
-
-        return $this->respondNoContent();
     }
 
     /** Rotate the signing secret (old signatures stop validating immediately). */
