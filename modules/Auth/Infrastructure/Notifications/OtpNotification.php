@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Modules\Shared\Infrastructure\Notifications\Channels\SmsChannel;
+use Modules\Shared\Infrastructure\Notifications\Support\NotificationGate;
 
 class OtpNotification extends Notification implements ShouldQueue
 {
@@ -45,7 +46,7 @@ class OtpNotification extends Notification implements ShouldQueue
             $channels[] = SmsChannel::class;
         }
 
-        return $channels;
+        return app(NotificationGate::class)->filterChannels('otp', $channels);
     }
 
     public function toMail(object $notifiable): MailMessage

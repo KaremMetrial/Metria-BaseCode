@@ -12,6 +12,7 @@ use Illuminate\Notifications\Notification;
 use Modules\Auth\Domain\Models\User;
 use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
 use Modules\Shared\Infrastructure\Notifications\Channels\SmsChannel;
+use Modules\Shared\Infrastructure\Notifications\Support\NotificationGate;
 
 class WelcomeNotification extends Notification implements ShouldQueue
 {
@@ -48,7 +49,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
             $channels[] = FcmChannel::class;
         }
 
-        return $channels;
+        return app(NotificationGate::class)->filterChannels('welcome', $channels);
     }
 
     public function toMail(object $notifiable): MailMessage

@@ -164,6 +164,42 @@ and every response's `meta` carries `locale` + `direction` (`rtl` for ar/fa/ur/h
 so clients can render correctly. `HasTranslations` stores per-model translations
 as JSON (`{"en": "...", "ar": "..."}`) with automatic fallback — no extra package.
 
+This also covers queued Notifications (mail/SMS/FCM), which don't have a
+request to read `SetLocale`'s resolution from: `User implements
+HasLocalePreference`, so `$user->notify(...)` renders in that user's own
+saved `locale` column regardless of which queue worker picks it up. A
+notification sent before a `User` exists (the OTP flow's anonymous
+`Notification::route()`) carries the dispatching request's locale on its
+triggering domain event instead (`OtpGenerated::$locale`, set from
+`app()->getLocale()` at dispatch time — excluded from the event's
+`payload()`, since it's not part of the public webhook contract). Every
+notification's own text lives under a `{module}.notifications.*` key in
+`lang/{locale}/{module}.php` — a literal string passed to `__()` only
+"translates" via a `lang/{locale}.json` map, which this project doesn't
+use, so it would silently render in whatever locale happened to be default
+regardless of the recipient.
+
+## Runtime-controllable notifications
+
+`Modules\Shared\Infrastructure\Notifications\Support\NotificationGate`
+reads Governance's Settings (`PUT /api/v1/governance/settings/{key}`) to
+decide, per notification type, whether it sends at all and which channels
+it's allowed to use — without a deploy:
+
+```
+notifications.welcome.enabled       bool    default true
+notifications.login_alert.channels  array   e.g. ["mail"]  — subset of mail/sms/fcm
+integrations.sms.provider           string  overrides SMS_DEFAULT (twilio/vonage/log)
+```
+
+The gate only narrows what a notification's own `via()` already decided is
+*possible* for that recipient (an email address, an active FCM token) — it
+can silence a channel, never invent one. Reached through
+`Modules\Shared\Domain\Contracts\RuntimeSettings`, the same
+contracts-in-Shared/bound-in-Governance seam `ApprovalGateway` and
+`AuditRecorder` use, so Auth/Integration depend on the contract, never on
+Governance's concrete `SettingsService`.
+
 ## Multi-tenancy
 
 Single database, `tenant_id` column strategy: `BelongsToTenant` applies a

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Modules\Governance\Infrastructure\Services;
 
-use Modules\Shared\Infrastructure\Tenancy\TenantManager;
-use Modules\Governance\Domain\Models\Setting;
 use Illuminate\Support\Facades\Cache;
+use Modules\Governance\Domain\Models\Setting;
+use Modules\Shared\Domain\Contracts\RuntimeSettings;
+use Modules\Shared\Infrastructure\Tenancy\TenantManager;
 
 /**
  * DB-backed, cached runtime settings — the knobs ops/admins can turn without
  * a deploy (commission rates, support phone, maintenance flags, ...).
  */
-class SettingsService
+class SettingsService implements RuntimeSettings
 {
     private const CACHE_PREFIX = 'settings:';
 

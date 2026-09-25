@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace Modules\Governance\Infrastructure\Providers;
 
-use Modules\Governance\Infrastructure\Console\Commands\PruneGovernanceData;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 use Modules\Governance\Domain\Enums\ApprovalStatus;
 use Modules\Governance\Domain\Models\ApprovalRequest;
 use Modules\Governance\Domain\Models\AuditLog;
 use Modules\Governance\Domain\Models\FeatureFlag;
 use Modules\Governance\Domain\Models\Setting;
+use Modules\Governance\Infrastructure\Console\Commands\PruneGovernanceData;
 use Modules\Governance\Infrastructure\Observers\AuditableObserver;
 use Modules\Governance\Infrastructure\Services\ApprovalService;
 use Modules\Governance\Infrastructure\Services\AuditLogger;
+use Modules\Governance\Infrastructure\Services\SettingsService;
 use Modules\Governance\Presentation\Policies\ApprovalRequestPolicy;
 use Modules\Governance\Presentation\Policies\AuditLogPolicy;
 use Modules\Governance\Presentation\Policies\FeatureFlagPolicy;
 use Modules\Governance\Presentation\Policies\SettingPolicy;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
 use Modules\Shared\Application\Support\EnumRegistry;
 use Modules\Shared\Domain\Contracts\ApprovalGateway;
 use Modules\Shared\Domain\Contracts\AuditObserver;
 use Modules\Shared\Domain\Contracts\AuditRecorder;
+use Modules\Shared\Domain\Contracts\RuntimeSettings;
 
 class GovernanceServiceProvider extends ServiceProvider
 {
@@ -36,6 +38,7 @@ class GovernanceServiceProvider extends ServiceProvider
         $this->app->bind(AuditRecorder::class, AuditLogger::class);
         $this->app->bind(AuditObserver::class, AuditableObserver::class);
         $this->app->bind(ApprovalGateway::class, ApprovalService::class);
+        $this->app->singleton(RuntimeSettings::class, SettingsService::class);
     }
 
     public function boot(): void

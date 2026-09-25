@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
+use Modules\Shared\Infrastructure\Notifications\Support\NotificationGate;
 
 class LoginAlertNotification extends Notification implements ShouldQueue
 {
@@ -41,7 +42,7 @@ class LoginAlertNotification extends Notification implements ShouldQueue
             }
         }
 
-        return $channels;
+        return app(NotificationGate::class)->filterChannels('login_alert', $channels);
     }
 
     public function toMail(object $notifiable): MailMessage
