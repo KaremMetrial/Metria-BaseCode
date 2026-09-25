@@ -9,11 +9,19 @@ use Modules\Shared\Domain\Events\StoredInOutbox;
 
 class OtpGenerated extends DomainEvent implements StoredInOutbox
 {
+    /**
+     * @param  string  $locale  The requester's locale at dispatch time —
+     *                          SendOtpNotification (queued, no HTTP request context of its own)
+     *                          needs this to send the OTP in the right language; deliberately
+     *                          excluded from payload() since it's not part of the public
+     *                          webhook contract external consumers rely on.
+     */
     public function __construct(
         public readonly string $identifier,
         public readonly string $code,
         public readonly string $action,
-        public readonly string $guard
+        public readonly string $guard,
+        public readonly string $locale = 'en',
     ) {
         parent::__construct();
     }

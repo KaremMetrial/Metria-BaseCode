@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Listeners;
 
-use Modules\Auth\Domain\Events\OtpGenerated;
-use Modules\Auth\Infrastructure\Notifications\OtpNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Notification;
+use Modules\Auth\Domain\Events\OtpGenerated;
+use Modules\Auth\Infrastructure\Notifications\OtpNotification;
 
 class SendOtpNotification implements ShouldQueue
 {
@@ -33,12 +33,17 @@ class SendOtpNotification implements ShouldQueue
     {
         $identifier = $event->identifier;
 
+        // An ad-hoc route (no User model attached, e.g. a registration OTP
+        // sent before the account exists) has no locale of its own — this
+        // listener runs on the queue with no request context, so the
+        // locale has to travel on the event itself (set at dispatch time,
+        // inside the original request).
         if (str_contains($identifier, '@')) {
             Notification::route('mail', $identifier)
-                ->notify(new OtpNotification($event->code));
+                ->notify((new OtpNotification($event->code))->locale($event->locale));
         } else {
             Notification::route('sms', $identifier)
-                ->notify(new OtpNotification($event->code));
+                ->notify((new OtpNotification($event->code))->locale($event->locale));
         }
     }
 }

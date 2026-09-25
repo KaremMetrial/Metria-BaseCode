@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Notifications;
 
-use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
 
 class LoginAlertNotification extends Notification implements ShouldQueue
 {
@@ -24,7 +26,7 @@ class LoginAlertNotification extends Notification implements ShouldQueue
     {
         $channels = [];
 
-        $email = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+        $email = $notifiable instanceof Model
             ? $notifiable->getAttribute('email')
             : (property_exists($notifiable, 'email') ? $notifiable->email : null);
 
@@ -34,7 +36,7 @@ class LoginAlertNotification extends Notification implements ShouldQueue
 
         if (method_exists($notifiable, 'fcmDeviceTokens')) {
             $tokens = $notifiable->fcmDeviceTokens();
-            if ($tokens instanceof \Illuminate\Database\Eloquent\Relations\Relation && $tokens->exists()) {
+            if ($tokens instanceof Relation && $tokens->exists()) {
                 $channels[] = FcmChannel::class;
             }
         }
@@ -48,23 +50,23 @@ class LoginAlertNotification extends Notification implements ShouldQueue
         $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return (new MailMessage)
-            ->subject(__('Security Alert: New Login Detected'))
-            ->greeting(__('Hello, :name', ['name' => $this->getName($notifiable)]))
-            ->line(__('A new login to your account was detected.'))
-            ->line(__('**Details:**'))
-            ->line(__('• **Time:** :time', ['time' => $this->loginTime]))
-            ->line(__('• **IP Address:** :ip', ['ip' => $this->ipAddress]))
-            ->line(__('• **Device/Browser:** :agent', ['agent' => $this->userAgent]))
-            ->line(__('If this login was you, no action is needed.'))
-            ->line(__('**Warning: If this was NOT you, please secure your account immediately by changing your password.**'))
-            ->salutation(__('Regards,')."\n".__(':app Security Team', ['app' => $appName]));
+            ->subject(__('auth.notifications.login_alert.mail_subject'))
+            ->greeting(__('auth.notifications.login_alert.greeting', ['name' => $this->getName($notifiable)]))
+            ->line(__('auth.notifications.login_alert.intro'))
+            ->line('**'.__('auth.notifications.login_alert.details_label').'**')
+            ->line('• '.__('auth.notifications.login_alert.time_line', ['time' => $this->loginTime]))
+            ->line('• '.__('auth.notifications.login_alert.ip_line', ['ip' => $this->ipAddress]))
+            ->line('• '.__('auth.notifications.login_alert.agent_line', ['agent' => $this->userAgent]))
+            ->line(__('auth.notifications.login_alert.ok_line'))
+            ->line('**'.__('auth.notifications.login_alert.warn_line').'**')
+            ->salutation(__('auth.notifications.common.regards')."\n".__('auth.notifications.login_alert.security_team', ['app' => $appName]));
     }
 
     public function toFcm(object $notifiable): array
     {
         return [
-            'title' => __('Security Alert: New Login'),
-            'body' => __('A new login to your account was detected at :time.', ['time' => $this->loginTime]),
+            'title' => __('auth.notifications.login_alert.fcm_title'),
+            'body' => __('auth.notifications.login_alert.fcm_body', ['time' => $this->loginTime]),
             'data' => [
                 'type' => 'security_alert',
                 'ip' => $this->ipAddress,
@@ -75,9 +77,10 @@ class LoginAlertNotification extends Notification implements ShouldQueue
 
     private function getName(object $notifiable): string
     {
-        $nameVal = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+        $nameVal = $notifiable instanceof Model
             ? $notifiable->getAttribute('name')
             : (property_exists($notifiable, 'name') ? $notifiable->name : null);
+
         return is_scalar($nameVal) ? (string) $nameVal : 'User';
     }
 }

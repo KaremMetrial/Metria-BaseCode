@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Notifications;
 
-use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
-use Modules\Shared\Infrastructure\Notifications\Channels\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Modules\Auth\Domain\Models\User;
+use Modules\Shared\Infrastructure\Notifications\Channels\FcmChannel;
+use Modules\Shared\Infrastructure\Notifications\Channels\SmsChannel;
 
 class WelcomeNotification extends Notification implements ShouldQueue
 {
@@ -19,7 +21,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
     {
         $channels = [];
 
-        $email = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+        $email = $notifiable instanceof Model
             ? $notifiable->getAttribute('email')
             : (property_exists($notifiable, 'email') ? $notifiable->email : null);
 
@@ -30,7 +32,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
 
-        $phone = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+        $phone = $notifiable instanceof Model
             ? $notifiable->getAttribute('phone')
             : (property_exists($notifiable, 'phone') ? $notifiable->phone : null);
 
@@ -42,7 +44,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
         }
 
         // If the user has active FCM device tokens, send a push notification too!
-        if ($notifiable instanceof \Modules\Auth\Domain\Models\User && $notifiable->fcmDeviceTokens()->exists()) {
+        if ($notifiable instanceof User && $notifiable->fcmDeviceTokens()->exists()) {
             $channels[] = FcmChannel::class;
         }
 
@@ -55,13 +57,13 @@ class WelcomeNotification extends Notification implements ShouldQueue
         $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return (new MailMessage)
-            ->subject(__('Welcome to :app!', ['app' => $appName]))
-            ->greeting(__('Welcome, :name!', ['name' => $this->getName($notifiable)]))
-            ->line(__('Thank you for registering. We are thrilled to have you with us.'))
-            ->line(__('Your account is now active and ready. Explore the dashboard to discover all key features.'))
-            ->action(__('Go to Dashboard'), url('/'))
-            ->line(__('If you have any questions or need support, reply to this email.'))
-            ->salutation(__('Regards,')."\n".__(':app Team', ['app' => $appName]));
+            ->subject(__('auth.notifications.welcome.mail_subject', ['app' => $appName]))
+            ->greeting(__('auth.notifications.welcome.greeting', ['name' => $this->getName($notifiable)]))
+            ->line(__('auth.notifications.welcome.intro'))
+            ->line(__('auth.notifications.welcome.body'))
+            ->action(__('auth.notifications.welcome.action'), url('/'))
+            ->line(__('auth.notifications.welcome.support'))
+            ->salutation(__('auth.notifications.common.regards')."\n".__('auth.notifications.common.team', ['app' => $appName]));
     }
 
     public function toSms(object $notifiable): string
@@ -69,7 +71,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
         $cfgApp = config('app.name', 'Enterprise Base');
         $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
-        return __('Welcome to :app, :name! Your account is active.', [
+        return __('auth.notifications.welcome.sms', [
             'app' => $appName,
             'name' => $this->getName($notifiable),
         ]);
@@ -81,8 +83,8 @@ class WelcomeNotification extends Notification implements ShouldQueue
         $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return [
-            'title' => __('Welcome to :app!', ['app' => $appName]),
-            'body' => __('Hey :name, thanks for joining us! Your account is active.', ['name' => $this->getName($notifiable)]),
+            'title' => __('auth.notifications.welcome.fcm_title', ['app' => $appName]),
+            'body' => __('auth.notifications.welcome.fcm_body', ['name' => $this->getName($notifiable)]),
             'data' => [
                 'type' => 'welcome',
                 'action' => 'open_dashboard',
@@ -92,9 +94,10 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     private function getName(object $notifiable): string
     {
-        $name = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+        $name = $notifiable instanceof Model
             ? $notifiable->getAttribute('name')
             : (property_exists($notifiable, 'name') ? $notifiable->name : null);
+
         return is_string($name) ? $name : 'User';
     }
 }

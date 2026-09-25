@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Notifications;
 
-use Modules\Shared\Infrastructure\Notifications\Channels\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Modules\Shared\Infrastructure\Notifications\Channels\SmsChannel;
 
 class OtpNotification extends Notification implements ShouldQueue
 {
@@ -21,7 +22,7 @@ class OtpNotification extends Notification implements ShouldQueue
         $channels = [];
 
         // Check if notifiable has email or a mail route
-        $email = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+        $email = $notifiable instanceof Model
             ? $notifiable->getAttribute('email')
             : (property_exists($notifiable, 'email') ? $notifiable->email : null);
 
@@ -33,7 +34,7 @@ class OtpNotification extends Notification implements ShouldQueue
         }
 
         // Check if notifiable has phone or an SMS route
-        $phone = $notifiable instanceof \Illuminate\Database\Eloquent\Model
+        $phone = $notifiable instanceof Model
             ? $notifiable->getAttribute('phone')
             : (property_exists($notifiable, 'phone') ? $notifiable->phone : null);
 
@@ -53,17 +54,17 @@ class OtpNotification extends Notification implements ShouldQueue
         $appName = is_scalar($cfgApp) ? (string) $cfgApp : 'Enterprise Base';
 
         return (new MailMessage)
-            ->subject(__(':app OTP Verification Code', ['app' => $appName]))
-            ->greeting(__('Hello!'))
-            ->line(__('You are receiving this email because we received an OTP verification request for your account.'))
-            ->line(__('Your verification code is:'))
+            ->subject(__('auth.notifications.otp.mail_subject', ['app' => $appName]))
+            ->greeting(__('auth.notifications.otp.greeting'))
+            ->line(__('auth.notifications.otp.intro'))
+            ->line(__('auth.notifications.otp.code_line'))
             ->line("## {$this->code}")
-            ->line(__('This code is valid for 10 minutes. If you did not request this, no further action is required.'))
-            ->salutation(__('Regards,')."\n".__(':app Team', ['app' => $appName]));
+            ->line(__('auth.notifications.otp.validity'))
+            ->salutation(__('auth.notifications.common.regards')."\n".__('auth.notifications.common.team', ['app' => $appName]));
     }
 
     public function toSms(object $notifiable): string
     {
-        return __('Your OTP verification code is: :code. Valid for 10 minutes.', ['code' => $this->code]);
+        return __('auth.notifications.otp.sms', ['code' => $this->code]);
     }
 }

@@ -59,5 +59,45 @@ return [
         'revoked' => 'Session revoked successfully.',
         'all_revoked' => 'All active sessions have been revoked successfully.',
     ],
+
+    'notifications' => [
+        'otp' => [
+            'mail_subject' => ':app OTP Verification Code',
+            'greeting' => 'Hello!',
+            'intro' => 'You are receiving this email because we received an OTP verification request for your account.',
+            'code_line' => 'Your verification code is:',
+            'validity' => 'This code is valid for 10 minutes. If you did not request this, no further action is required.',
+            'sms' => 'Your OTP verification code is: :code. Valid for 10 minutes.',
+        ],
+        'welcome' => [
+            'mail_subject' => 'Welcome to :app!',
+            'greeting' => 'Welcome, :name!',
+            'intro' => 'Thank you for registering. We are thrilled to have you with us.',
+            'body' => 'Your account is now active and ready. Explore the dashboard to discover all key features.',
+            'action' => 'Go to Dashboard',
+            'support' => 'If you have any questions or need support, reply to this email.',
+            'sms' => 'Welcome to :app, :name! Your account is active.',
+            'fcm_title' => 'Welcome to :app!',
+            'fcm_body' => 'Hey :name, thanks for joining us! Your account is active.',
+        ],
+        'login_alert' => [
+            'mail_subject' => 'Security Alert: New Login Detected',
+            'greeting' => 'Hello, :name',
+            'intro' => 'A new login to your account was detected.',
+            'details_label' => 'Details:',
+            'time_line' => 'Time: :time',
+            'ip_line' => 'IP Address: :ip',
+            'agent_line' => 'Device/Browser: :agent',
+            'ok_line' => 'If this login was you, no action is needed.',
+            'warn_line' => 'Warning: If this was NOT you, please secure your account immediately by changing your password.',
+            'security_team' => ':app Security Team',
+            'fcm_title' => 'Security Alert: New Login',
+            'fcm_body' => 'A new login to your account was detected at :time.',
+        ],
+        'common' => [
+            'regards' => 'Regards,',
+            'team' => ':app Team',
+        ],
+    ],
 ];
 

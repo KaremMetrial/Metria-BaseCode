@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Domain\Models;
 
-use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
-use Modules\Shared\Infrastructure\Traits\HasUuid;
-use Modules\Shared\Infrastructure\Traits\Auditable;
-use Modules\Media\Domain\Models\Media;
-use Modules\Auth\Infrastructure\Database\Factories\UserFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\Auth\Infrastructure\Database\Factories\UserFactory;
+use Modules\Media\Domain\Models\Media;
+use Modules\Shared\Infrastructure\Traits\Auditable;
+use Modules\Shared\Infrastructure\Traits\BelongsToTenant;
+use Modules\Shared\Infrastructure\Traits\HasUuid;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -28,21 +31,21 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $mfa_secret
  * @property string|null $mfa_backup_codes
  * @property string|null $two_factor_secret
- * @property \Illuminate\Support\Carbon|null $two_factor_confirmed_at
+ * @property Carbon|null $two_factor_confirmed_at
  * @property string|null $two_factor_recovery_codes
  * @property string|null $locale
  * @property bool $is_active
  * @property array|null $preferences
- * @property \Illuminate\Support\Carbon|null $email_verified_at
- * @property \Illuminate\Support\Carbon|null $phone_verified_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Database\Eloquent\Collection<int, FcmDeviceToken> $fcmDeviceTokens
- * @property \Illuminate\Database\Eloquent\Collection<int, UserSession> $sessions
- * @property \Illuminate\Database\Eloquent\Collection<int, UserSocialIdentity> $socialIdentities
+ * @property Carbon|null $email_verified_at
+ * @property Carbon|null $phone_verified_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Collection<int, FcmDeviceToken> $fcmDeviceTokens
+ * @property Collection<int, UserSession> $sessions
+ * @property Collection<int, UserSocialIdentity> $socialIdentities
  * @property Media|null $avatar
  */
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference
 {
     use Auditable;
     use BelongsToTenant;
@@ -71,6 +74,21 @@ class User extends Authenticatable
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Makes every queued Notification (mail/SMS/FCM) render in this user's
+     * own saved locale instead of the app's fixed default — a queue worker
+     * has no request context, so without this every notification would go
+     * out in whatever locale happened to be app()->getLocale() at boot.
+     */
+    public function preferredLocale(): string
+    {
+        $fallback = config('localization.fallback', 'en');
+
+        return is_string($this->locale) && $this->locale !== ''
+            ? $this->locale
+            : (is_string($fallback) ? $fallback : 'en');
     }
 
     public function fcmDeviceTokens(): HasMany

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Services;
 
-use Modules\Shared\Infrastructure\Events\EventBus;
-use Modules\Shared\Application\Exceptions\ApiException;
+use Illuminate\Support\Facades\DB;
 use Modules\Auth\Domain\Events\OtpGenerated;
 use Modules\Auth\Domain\Models\OtpCode;
-use Illuminate\Support\Facades\DB;
+use Modules\Shared\Application\Exceptions\ApiException;
+use Modules\Shared\Infrastructure\Events\EventBus;
 
 class SendOtp
 {
@@ -56,8 +56,10 @@ class SendOtp
                 'expires_at' => now()->addMinutes(10),
             ]);
 
-            // Publish the OtpGenerated event
-            $this->events->publish(new OtpGenerated($identifier, $code, $action, $guard));
+            // Publish the OtpGenerated event, carrying the requester's
+            // current locale — the listener that sends it runs on the
+            // queue with no request context of its own to resolve it from.
+            $this->events->publish(new OtpGenerated($identifier, $code, $action, $guard, app()->getLocale()));
 
             return $otp;
         });
